@@ -6,3 +6,4 @@ For more details goto [wiki](https://github.com/Neos1/vo_main/wiki)
 
 ## Roadmap  
 
+See this link: [roadmap](https://github.com/Neos1/vo_main/wiki/Roadmap)  
