@@ -1,0 +1,48 @@
+@import './_variables.scss';
+@import './_mixins.scss';
+
+.btn {
+    display: inline-block;
+    color: #fff;
+	border: none;
+	position: relative;
+	text-decoration: none;
+	transition: all 0.3s;
+	border-radius: 3px;
+	cursor: pointer;
+	overflow: hidden;
+    outline: none;
+    background-color: #000;
+    padding: 15px 25px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #fff;
+    box-shadow: 0;
+    &:disabled {
+        opacity: .5;
+        cursor: default;
+    }
+    &--block {
+        display: block;
+        width: 100%;
+    }
+    &--blue {
+        background: linear-gradient(90deg, #38aee0 0%, #69d1ff 100%);
+        box-shadow: 0px 5px 15px 0px rgba(56, 174, 224, 0.5);
+        &:hover {
+            box-shadow: 0px 2px 8px 0px rgba(56, 174, 224, 0.3);
+        }
+    }
+    &--red {
+        background: linear-gradient(90deg, #e9286e 0%, #fa4e8d 100%);
+        box-shadow: 0px 5px 15px 0px rgba(233, 40, 110, 0.5);
+        &:hover {
+            box-shadow: 0px 8px 25px 0px rgba(233, 40, 110, 0.3);
+        }
+    }
+    &--gray {
+        background-color: #f3f4f5;
+        color: rgba(101, 107, 115, 0.3);
+        box-shadow: none;
+    }
+}

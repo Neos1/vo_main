@@ -1,0 +1,41 @@
+{
+  "name": "voter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "electron.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "electron-build": "set DEV=false&&electron-builder "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neos1/vo_temp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Neos1/vo_temp/issues"
+  },
+  "homepage": "https://github.com/Neos1/vo_temp#readme",
+  "devDependencies": {
+    "electron": "^3.0.11",
+    "electron-builder": "^20.38.3"
+  },
+  "build": {
+    "files":["build/ballot/**/*", "electron.js"],
+    "win": {
+        "target": [
+            "portable"
+        ]
+    },
+    "nsis": {
+        "warningsAsErrors": false
+    },
+    "portable": {
+        "artifactName": "voter_portable--win.exe"
+    },
+    "compression": "store",
+    "asar": false
+  }
+}
