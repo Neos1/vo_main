@@ -1,0 +1,134 @@
+@import '../../../styles/ballot/_mixins.scss';
+@import '../../../styles/ballot/_variables.scss';
+
+.field {
+	margin-bottom: 14px;
+	&--auth {
+		margin: 0;
+	}
+	label {
+		font-weight: bold;
+		margin-bottom: 4px;
+		display: block;
+		color: #2a2a2a;
+		font-size: 14px;
+	}
+	&--profile {
+		position: relative;
+		label {
+			font-size: 14px;
+			font-weight: 400;
+			margin-bottom: 4px;
+			color: #2a2a2a;
+			font-weight: 400;
+		}
+	}
+    &__input {
+		display: block;
+		width: 100%;
+		border-radius: 2px;
+		outline: none;
+		background-color: rgba($color: #fff, $alpha: .3);
+		color: #555;
+		min-width: 120px;
+		transition: border-color .3s;
+		font-size: 14px;
+		border: 1px solid rgba(101, 107, 115, 0.3);
+		padding: 15px 24px;
+		font-size: 14px;
+		font-weight: 400;
+		border-radius: 3px;
+		@include placeholder {
+			font-family: $font_family;
+			font-size: 14px;
+		}
+		&--error {
+			border: 1px solid red;
+		}
+		&--auth {
+			border: 0;
+			padding-top: 8px;
+			padding-bottom: 8px;
+			font-size: 12px;
+			@include placeholder {
+				font-size: 12px;
+			}
+		}
+		&--calendar {
+			padding-left: 35px;
+			background-image: url($image_path + 'ico_calendar.png');
+			background-repeat: no-repeat;
+			background-position: 7px center;
+			background-size: auto 58%;
+		}
+		&--profile {
+			@include respond-to(md) {
+				font-size: 12px;
+			}
+		}
+	}
+	&__before {
+		float: right;
+		font-size: 12px;
+		color: #2a2a2a;
+		&--email-approve {
+			position: absolute;
+			font-size: 10px;
+			font-weight: 700;
+			text-transform: uppercase;
+			border-radius: 2px;
+			padding: 0px 11px;
+			line-height: 26px;
+			color: #fff;
+			top: 5px;
+			bottom: 5px;
+			right: 5px;
+			z-index: 1;
+			&.false {
+				background-color: #ed1a3b;
+			}
+			&.true {
+				background-color: #23af30;
+			}
+		}
+	}
+	&.field--new-voting {
+		margin-bottom: 20px;
+		& > * {
+			display: inline-block;
+			vertical-align: middle;
+			font-size: 0;
+		}
+		label {
+			width: 45%;
+			padding-right: 30px;
+			font-size: 14px;
+			& > div {
+				color: #38aee0;
+				font-size: 14px;
+				font-weight: 700;
+				& > div {
+					color: #8a9199;
+					font-size: 12px;
+					font-weight: 400;
+				}
+			}
+		}	
+		input {
+			width: calc(100% - 45%);
+			font-size: 14px;
+			border: 1px solid rgba(101, 107, 115, 0.3);
+			padding: 15px 24px;
+			font-size: 14px;
+			font-weight: 400;
+			border-radius: 25px;
+		}
+		.field {
+			&__input {
+				&--error {
+					border: 1px solid red;
+				}
+			}
+		}
+	}
+}

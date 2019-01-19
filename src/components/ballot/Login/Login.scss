@@ -1,0 +1,288 @@
+@import '../../../styles/ballot/_variables.scss';
+
+.login {
+    &__logo {
+        display: block;
+        width: 92px;
+        height: 45px;
+        background-color: transparent;
+        background-image: url($image_path + 'logo.png');
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        margin: 20px auto;
+    }
+    &__welcome {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 570px;
+        width: 570px;
+        color: #fff;
+        h1 {
+            padding: 0 85px;
+            color: #f6f6f6;
+            font-size: 48px;
+            font-weight: 100;
+            text-align: center;
+        }
+        h3 {
+            padding: 0 85px;
+            margin: 40px 0;
+            color: white;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            text-align: center;
+        }
+    }
+    &__form {
+        padding: 10px 85px 60px;
+        background-color: rgba(255, 255, 255, 0.05);
+        .field{
+            margin: 15px 0 20px; 
+        }
+    }
+    &__submit{
+        text-align: center;
+        a{
+            display: block;
+            color: #fff;
+            margin-top: 15px;
+        }
+    }
+    .Select {
+        margin: 15px 0 20px;
+        font-size: 14px;
+        &-input {
+            background-color: transparent;
+            height: 50px;
+        }
+        &-control,
+        &.is-open .Select-control {
+            box-shadow: none;
+            background-color: transparent;
+            color: #fff;
+            //border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        &.is-open .Select-input {
+            
+            background-color: transparent;
+        }
+        &-control {
+            //border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: transparent;
+            height: auto;
+            & > *:last-child {
+                padding-right: 0px;
+            }
+        }
+        &.is-focused:not(.is-open) > .Select-control {
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: transparent;
+        } 
+        &.is-focused:not(.is-open) .Select-input {
+            background-color: transparent;
+            color: #fff;
+        } 
+        .Select-placeholder, 
+        &.Select--single > .Select-control .Select-value {
+            line-height: 1.7;
+            color: #fff;
+            display: block;
+            padding: 14px 25px 14px 25px;
+            text-align: left;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            height: auto;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        &.Select.has-value.Select--single > .Select-control .Select-value .Select-value-label, 
+        &.Select.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
+            padding: 0px 0px;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        &-menu-outer {
+            border: 1px solid gainsboro;
+            box-shadow: none;
+            width: calc(100% - 1px);
+            border-radius: 0 0 2px 2px;
+        }
+        &-option {
+            padding: 10px 12px;
+            margin: 0;
+            font-size: 14px;
+            background: #fafafa;
+            &.is-selected,
+            &.is-focused {
+                background: #f4f4f4
+            }
+        }
+        &-arrow {
+            display: none;
+            border-color: #222 transparent transparent;
+            &:hover {
+                border-top-color: #222;
+                border-color: #222 transparent transparent;
+            }
+            &-zone {
+                padding-right: 1px;
+                padding-top: 4px;
+                border-left: 0;
+                width: 40px;
+                &:hover {
+                    & > .Select-arrow {
+                        border-top-color: #222;
+                        border-color: #222 transparent transparent;
+                    }
+                }
+            }
+        }
+        .Select-arrow-zone:hover > .Select-arrow {
+            border-top-color: #222;
+        }
+
+        &.is-open {
+            & > .Select-control .Select-arrow {
+                border-color: transparent transparent #222;
+                &:hover {
+                    border-color: transparent transparent #222;
+                }
+                &-zone {
+                    width: 40px;
+                    &:hover {
+                        .Select-arrow {
+                            border-color: transparent transparent #222;
+                        }
+                    }
+                }
+            }
+        }
+        &--chevroned {
+            .Select {
+                &-arrow {
+                    border: 0;
+                    position: relative;
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        width: 8px;
+                        height: 8px;
+                        border-bottom: 2px solid #222222;
+                        border-right: 2px solid #222222;
+                        transform: rotate(45deg);
+                        right: -5px;
+                        top: 50%;
+                        margin-top: -7px;
+                    }
+                    &-zone {
+                        border-left: 0;
+                    }
+                }       
+                
+            }
+            &.is-open {
+                .Select {
+                    &-arrow {
+                        &:before {
+                            transform: rotate(225deg);
+                            margin-top: -2px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    &__projects{
+        padding: 0;
+        list-style: none;
+        button{
+            padding: 25px auto;
+            font-size: 16px;
+            margin-bottom:20px;
+        }
+    }
+    &__select{
+        label{
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: .3px;
+        }
+        h4{
+            text-align: center;
+        }
+    }
+    .hidden{
+        display: none;
+    }
+}
+.seed{
+    &__form{
+        padding: 10px 75px 60px;
+        background-color: rgba(255, 255, 255, 0.05);
+        label.small{
+            display: inline-block;
+            width: 30%;
+            margin-right: 5%;
+            &:nth-child(3n){
+                margin-right: 0;
+            }
+        }
+    }
+    &__loader{
+        padding: 60px 85px 60px;
+        .cssload-aim{
+            position: relative;
+            width: 78px;
+            height: 78px;
+            left: 35%;
+            left: calc(50% - 42px);
+            border-radius: 49px;
+            background-color: rgba (255,255,255, 0);
+            border-width: 39px;
+            border-style: double;
+            border-color:transparent	rgb(255,255,255);
+            box-sizing:border-box;
+            transform-origin:	50% 50%;
+            animation: cssload-aim 2.3s linear infinite;
+        }
+        @keyframes cssload-aim{
+                0%{transform:rotate(0deg);}
+                100%{transform:rotate(360deg);}
+        }
+    }
+    &__key{
+        h3{
+            padding: 0;
+        }
+        div{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 0 0 50px;
+            font-size: 14px;
+        }
+    }
+    &__seed{
+        padding: 15px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border: 2px dotted #fff;
+    }
+}
+.deploy{
+    &__select{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        button{
+            width: 45%;
+        }
+    }
+}

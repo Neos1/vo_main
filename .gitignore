@@ -1,0 +1,7 @@
+.vscode
+node_modules/
+
+src/node_modules
+
+dist/win-unpacked
+dist/builder-effective-config.yaml

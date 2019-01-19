@@ -1,0 +1,133 @@
+@import './../../node_modules/react-select/scss/default.scss';
+
+.Select {
+    margin-bottom: 14px;
+    &-control,
+    &.is-open .Select-control {
+        border: 1px solid gainsboro;
+        box-shadow: none;
+        background-color: #fff;
+        color: #555;
+        border-radius: 2px;
+        height: 39px;
+    }
+    &-control {
+        & > *:last-child {
+            padding-right: 0px;
+        }
+    }
+    &.is-focused:not(.is-open) > .Select-control {
+        box-shadow: none;
+        border: 1px solid gainsboro;
+    } 
+    &.Select-placeholder, 
+    &.Select--single > .Select-control .Select-value {
+        padding: 8px 12px;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.5;
+        padding-right: 35px;
+    }
+    &.Select.has-value.Select--single > .Select-control .Select-value .Select-value-label, 
+    &.Select.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
+        padding: 2px 0px;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    &-menu-outer {
+        border: 1px solid gainsboro;
+        box-shadow: none;
+        width: calc(100% - 1px);
+        border-radius: 0 0 2px 2px;
+    }
+    &-option {
+        padding: 10px 12px;
+        margin: 0;
+        font-size: 14px;
+        background: #fafafa;
+        &.is-selected,
+        &.is-focused {
+            background: #f4f4f4
+        }
+    }
+    &-arrow {
+        border-color: #222 transparent transparent;
+        &:hover {
+            border-top-color: #222;
+            border-color: #222 transparent transparent;
+        }
+        &-zone {
+            padding-right: 1px;
+	        padding-top: 4px;
+            border-left: 1px solid gainsboro;
+            width: 40px;
+            &:hover {
+                & > .Select-arrow {
+                    border-top-color: #222;
+                    border-color: #222 transparent transparent;
+                }
+            }
+        }
+    }
+    .Select-arrow-zone:hover > .Select-arrow {
+        border-top-color: #222;
+    }
+
+    &.is-open {
+        & > .Select-control .Select-arrow {
+            border-color: transparent transparent #222;
+            &:hover {
+                border-color: transparent transparent #222;
+            }
+            &-zone {
+                width: 40px;
+                &:hover {
+                    .Select-arrow {
+                        border-color: transparent transparent #222;
+                    }
+                }
+            }
+        }
+    }
+    &--chevroned {
+        .Select {
+            &-arrow {
+                border: 0;
+                position: relative;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 8px;
+                    height: 8px;
+                    border-bottom: 2px solid #222222;
+                    border-right: 2px solid #222222;
+                    transform: rotate(45deg);
+                    right: -5px;
+                    top: 50%;
+                    margin-top: -7px;
+                }
+                &-zone {
+                    border-left: 0;
+                }
+            }       
+            
+        }
+        &.is-open {
+            .Select {
+                &-arrow {
+                    &:before {
+                        transform: rotate(225deg);
+                        margin-top: -2px;
+                    }
+                }
+            }
+        }
+    }
+    &-right {
+        float: right;
+    }
+    &-menu-outer {
+        z-index: 1;
+    }
+}

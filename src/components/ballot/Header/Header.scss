@@ -1,0 +1,132 @@
+@import '../../../styles/ballot/_variables.scss';
+@import '../../../styles/ballot/_mixins.scss';
+
+.header {
+    background-color: #fff;
+    padding: 20px 50px;
+    @include clearfix;
+    &__logo {
+        display: block;
+        width: 92px;
+        height: 45px;
+        background-color: transparent;
+        background-image: url($image_path + 'logo-fff.png');
+        background-size: contain;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        float: left;
+    }
+    &__nav {
+        float: left;
+        margin-left: 50px;
+        padding: 4px 0;
+    }
+    &__account {
+        padding: 3px 0;
+        float: right;
+    }
+    &__logout {
+        cursor: pointer;
+        border: 0;
+        padding: 0 25px;
+        border-radius: 4px;
+        background-color: #ffffff;
+        box-shadow: 0px 0px 15px 0px rgba(69, 181, 230, 0.2);
+        height: 40px;
+        background-image: url($image_path + 'exit.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    &-nav {
+        &__item {
+            float: left;
+            color: #2567aa;
+            padding: 10px 25px;
+            text-decoration: none;
+            transition: color .3s;
+            position: relative;
+            &:after,
+            &:before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                opacity: 1;
+                background-position: center center;
+                transition: opacity .3s;
+            }
+            &:after {
+                opacity: 0;
+            }
+            &:hover,
+            &--active {
+                color: #45b5e6;
+            }
+            &--active {
+                &:before {
+                    opacity: 0;
+                }
+                &:after {
+                    opacity: 1;
+                }
+            }
+            &--list {
+                &:before,
+                &:after {
+                    margin-top: -7px;
+                    width: 12px;
+                    height: 12px;
+                }
+                &:before {
+                    background-image: url($image_path + 'forma.png');
+                }
+                &:after {
+                    background-image: url($image_path + 'forma-active.png');
+                }
+            }
+            &--home {
+                &:before,
+                &:after {
+                    margin-top: -7px;
+                    width: 12px;
+                    height: 12px;
+                }
+                &:before {
+                    background-image: url($image_path + 'home.png');
+                }
+                &:after {
+                    background-image: url($image_path + 'home-active.png');
+                }
+            }
+            &--settings {
+                &:before,
+                &:after {
+                    margin-top: -7px;
+                    width: 12px;
+                    height: 12px;
+                }
+                &:before {
+                    background-image: url($image_path + 'gear.png');
+                }
+                &:after {
+                    background-image: url($image_path + 'gear-active.png');
+                }
+            }
+        }
+    }
+    &-account {
+        & > * {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        &__data {
+            margin-left: 30px;
+        }
+        &__name {
+            color: #8a9199;
+        }
+        &__avatar {
+            margin: 0 50px;
+        }
+    }
+}

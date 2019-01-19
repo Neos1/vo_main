@@ -1,0 +1,95 @@
+@import '../../node_modules/rc-calendar/assets/index.css';
+@import './_fonts.scss';
+@import './_variables.scss';
+@import './_buttons.scss';
+@import './_select.scss';
+@import './_mixins.scss';
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: $font_family;
+    font-size: 14px;
+    position: relative;
+    background-color: #ebf5fa;
+	padding-bottom: 100px;
+    &.body-login {
+        overflow: hidden;
+        background-color: #1e5271;
+        background-image: url($image_path_relative + 'bg.png');
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        padding: 0;
+    }
+    &:after {
+        content: '';
+        z-index: 16;
+        pointer-events: none;
+        overflow: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        background: rgba(255, 255, 255, 0.95);
+        opacity: 0;
+        transition: opacity .4s .1s;
+    }
+    &.dialog-overlay {
+        &:after {
+            opacity: 1;
+        }
+    }
+    @include respond-to(md) {
+        overflow-x: hidden;   
+    }
+    
+}
+
+* {
+    box-sizing: border-box;    
+}
+
+button {
+    margin: 0;
+}
+
+input, textarea, select, button {
+    font-family: $font_family;
+    margin: 0;
+}
+
+form {
+    margin: 0
+}
+table {
+    border-collapse: collapse;
+}
+.hidden-md {
+    display: block;
+    @include respond-to(md) {
+        display: none!important;
+    }
+}
+.visible-md {
+    display: none;
+    @include respond-to(md) {
+        display: block!important;
+    }
+}
+.visible-xl {
+    display: none;
+    @include respond-to(xl) {
+        display: block!important;
+    }
+}
+
+.hidden-xl {
+    display: block;
+    @include respond-to(xl) {
+        display: none!important;
+    }
+}
