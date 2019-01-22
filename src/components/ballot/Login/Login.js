@@ -36,8 +36,10 @@ class Login extends React.Component {
     @observable ERC20 = {
         hash: '',
         symbol:'',
+        name:'',
         totalSupply: ''
     }
+    @observable txHash = ''
 
     @observable seed = [];
 
@@ -117,7 +119,7 @@ class Login extends React.Component {
                                     </label>
                                 </div>
                                 <div className={styles.login__submit}>
-                                    <button onClick={this.handleSubmit} type="button" className="btn btn--block btn--blue">Войти</button>
+                                    <button onClick={this.handleSubmit} type="button" className="btn btn--block btn--blue btn--arrow">Войти</button>
                                     <a href="#" onClick={this.handleGetSeed}> У меня есть резервная фраза </a>
                                     <a href="#" onClick={this.handleCreateKey}> Хочу создать новый ключ </a>
                                 </div>
@@ -153,9 +155,11 @@ class Login extends React.Component {
                                         && (this.step != 37)
                                         && (this.step != 38)
                                         && (this.step != 40)
-                                        && (this.step != 41)) ? styles.hidden : ''}`}>
+                                        && (this.step != 41)
+                                        && (this.step != 51)
+                                        && (this.step != 52)) ? styles.hidden : ''}`}>
                                 
-                                <div className={`${ ((this.step != 21) && (this.step != 11)  && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40)) ? styles.hidden : ''}`}>
+                                <div className={`${ ((this.step != 21) && (this.step != 11)  && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51)) ? styles.hidden : ''}`}>
                                     <div className="cssload-aim"></div>
                                     { this.step == 21? <h3>Проверяем резервную фразу</h3> : ''}
                                     { this.step == 24? <h3>Идет сохранение ключа</h3> : ''}
@@ -163,6 +167,7 @@ class Login extends React.Component {
                                     { this.step == 33? <h3>Проверяем адрес проекта</h3>: ''}
                                     { this.step == 37? <h3>Производим проверку контракта ERC20...</h3>: ''}
                                     { this.step == 40? <h3>Производим загрузку контракта, это может занять до 5 минут..</h3>: ''}
+                                    { this.step == 51? <h3>Производим загрузку контракта ERC20, это может занять до 5 минут..</h3>: ''}
                                 </div>
 
                                 <div className={`${styles.seed__key} ${ (this.step != 22) ? styles.hidden : ''}`}>
@@ -190,12 +195,15 @@ class Login extends React.Component {
                                 <div className={`${styles.seed__key} ${ (this.step != 41) ? styles.hidden : ''}`}>
                                     <h3>Контракт успешно загружен, теперь вы можете выбрать этот проект в списке проектов</h3>
                                 </div>
+                                <div className={`${styles.seed__key} ${ (this.step != 52) ? styles.hidden : ''}`}>
+                                    <h3>Контракт успешно загружен</h3>
+                                </div>
 
                                 <div className={styles.login__submit}>
                                     <button onClick={this.handleChangePassword} type="button" className={`btn btn--block btn--blue ${this.step !== 22 ? styles.hidden : ''}`}>Далее</button>
                                     <button onClick={this.backToStart} type="button" className={`btn btn--block btn--blue ${this.step !== 25 ? styles.hidden : ''}`}>Далее</button>
                                     <button onClick={this.backToProjects} type="button" className={`btn btn--block btn--blue ${(this.step !== 34) && (this.step !== 41  ) ? styles.hidden : ''}`}>Продолжить</button>
-                                    <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${this.step !== 38 ? styles.hidden : ''}`}>Продолжить</button>
+                                    <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${(this.step !== 38) && (this.step !== 52) ? styles.hidden : ''}`}>Продолжить</button>
                                 </div>
                             </div>
                             
@@ -271,7 +279,7 @@ class Login extends React.Component {
                                         </h4>
                                         <p className={styles.deploy__select}>
                                             <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владельцы проекта уже имеют токены ERC-20, распределенные в соответствии с их долями</button>
-                                            <button onClick={this.backToProjects} type="button" className="btn btn--block btn--blue">Владельцы проекта еще не имеют токенов</button>
+                                            <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Владельцы проекта еще не имеют токенов</button>
                                            
                                         </p>
                                     </div>
@@ -351,6 +359,40 @@ class Login extends React.Component {
                                     <button onClick={this.deploySolidity} type="button" className="btn btn--block btn--blue">Продолжить</button>
                                 </div> 
                             </div>
+                            
+                            {/** Создание ERC20 токена */}
+                            <div className={`${styles.seed__form} ${this.step !== 5 ? styles.hidden : ''}`}>
+                                <h3>Создание нового проекта</h3>
+                                <div className={styles.login__select}> 
+                                    <h4>
+                                        Шаг 1
+                                    </h4>
+                                    <h4>
+                                        Назначение владельцев проекта  
+                                    </h4>
+                                    <p>
+                                    Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже. Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth. Все ERC20 токены будут начислены на указанный ниже кошелек, после чего их можно будет распределить на необходимые адреса.
+                                    </p>
+                                    <p>{this.account.addresses[0]}   {Number((this.account.balances[0]/ 1.0e18)).toFixed(4)} ETH</p>
+                                    <div className={styles.deploy__input}>
+                                        <label> Укажите название токена (будет записано в блокчейн)
+                                        <SimpleInput onChange={this.getTokenName}/>
+                                        </label>
+                                        <label> Укажите символ токена
+                                        <SimpleInput onChange={this.getTokenChar}/>
+                                        </label>
+                                        <label> Укажите общее количество токенов
+                                        <SimpleInput onChange={this.getTokenCount}/>
+                                        </label>
+                                        <label> Введите пароль ключа
+                                        <SimpleInput type='password' onChange={this.getPasswordCheck}/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className={styles.login__submit}>
+                                    <button onClick={this.createTokenContract} type="button" className="btn btn--block btn--blue">Продолжить</button>
+                                </div> 
+                            </div>
 
                         </div>
                     </div>
@@ -392,6 +434,10 @@ class Login extends React.Component {
                         this.seed = this.account.randomSeed.split(' ')
                     })
 
+                    let wallets = window.__ENV == 'development'
+                        ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
+                        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
+                    this.wallets = wallets;
             })
         }
     }
@@ -442,20 +488,18 @@ class Login extends React.Component {
                     if (err) throw err;
                 })
             } else {
-                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './wallets.json'), JSON.stringify(this.wallets), 'utf8', (err)=>{
+                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), JSON.stringify(this.wallets), 'utf8', (err)=>{
                     if (err) throw err;
                 })
             }
         })
     }
-
     @action getBalance = () => {
         async.map(this.account.addresses, web3.eth.getBalance, (err, balances) => {
             this.account.balances = balances
             console.log(this.account.balances)
         })
     }
-
     @action
     getProjectName = (e) => {
         this.contract.name = e.target.value
@@ -470,103 +514,133 @@ class Login extends React.Component {
     }
 
     @action
-    sendTx = (address, value) => {
-        let correct = this.account.keystore.keyFromPassword(this.account.passwordCheck, (err, pwDerivedKey)=>{
-
-            if (err) throw err;
-
-            let isCorrect = this.account.keystore.isDerivedKeyCorrect(pwDerivedKey);
-            let txnCount = web3.eth.getTransactionCount(address);
-
-            let txOptions = {
-                gasLimit: 3000000,
-                gasPrice: 1000000000,
-                value: 0*1.0e18,
-                nonce: web3.utils.toHex(txnCount),
-                data: value
-            }
-
-            let rawTx = txutils.createContractTx(address, txOptions)
-
-
-            if (isCorrect){
-                
-                let signedTx = signing.signTx(this.account.keystore, pwDerivedKey, rawTx.tx, address);
-
-
-                web3.eth.sendSignedTransaction(`0x${signedTx}`, (err, data) => {
-                    console.log('error: ' + err)
-                    console.log('txhash: ' + data)
-                }).on('receipt', ()=>{
-                    console.log
-                    this.createProject(this.ERC20.hash, this.ERC20.name)
-                });
-
-
-            }
-        })
+    getTokenName = (e)=>{
+        this.ERC20.name = e.target.value
     }
     @action
-    deploySolidity = () =>{
-        let contract = window.__ENV === 'prodiction' 
+    getTokenChar = (e)=>{
+        this.ERC20.symbol = e.target.value
+    }
+    @action
+    getTokenCount = (e)=>{
+        this.ERC20.totalSupply = e.target.value
+    }
+    @action 
+    createTokenContract = () =>{
+        if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (this.ERC20.totalSupply !="")){
+            this.step = 51;
+            this.deployToken("token");
+        }else{
+            alert("Введите все данные")
+        }
+        
+    }
+
+    @action deployToken = (type)=> {
+        let ERC20 = window.__ENV === 'prodiction' 
+        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), 'utf8')
+        : fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/ERC20.sol", 'utf8');
+        
+        let project = window.__ENV === 'prodiction' 
         ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/project.sol'), 'utf8')
-        : fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/project.sol", 'utf8')
-        this.sol = contract
+        : fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/project.sol", 'utf8');
+
+
         window.BrowserSolc.getVersions((soljsonSources, soljsonReleases) =>{
-            console.info(soljsonReleases)
-            let version = soljsonReleases["0.4.25"];
-    
+            let version = soljsonReleases["0.4.24"];
+            let contract = type === 'token' ? ERC20 : project;
+
+
+
             window.BrowserSolc.loadVersion(version, (c) =>{
                 let compiler = c;
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                var result = compiler.compile(this.sol, true);
-                for(let key of Object.keys(result.contracts)){
+                let result = compiler.compile(contract, true);
 
-                    let project = {
-                        name:"",
-                        abi: ""
-                    }
+                console.log(result)
 
-                    let metadata = JSON.parse(result.contracts[key].metadata);
-                    let bytecode = result.contracts[key].bytecode;
-                        bytecode= bytecode + web3.utils.toHex(this.ERC20.hash) + web3.utils.toHex(this.contract.name)
-                    let abi = metadata.output.abi;  
-                    let address = (this.account.keystore.getAddresses());
+                for( let key of Object.keys(result.contracts) ){
 
-                    project.name = key;
-                    project.abi = abi;
-                    
-                    let contract = new web3.eth.Contract(project.abi)
-                    contract.deploy({
-                        data: bytecode,
-                        arguments:[this.ERC20.hash]
-                    }).send({
-                        from: this.account.addresses[0],
-                        gas: 3000000,
-                        gasPrice: 1000000000
-                    })
-                    .on('error', (err)=>{ console.log(err)})
-                    .on('transactionHash', (txHash)=>{console.log(`txhash - ${txHash}`)})
-                    .on('reciept', (reciept)=>{console.log(reciept.contractAddress)})
+                    if (result.contracts[key].metadata !== ""){
+                        console.log(key)
+                        let metadata = JSON.parse(result.contracts[key].metadata);
 
-                    //this.sendTx(address[0], bytecode)
-
-                    this.config.projects.push(project);
-                    if (window.__ENV == 'development'){
-                        fs.writeFile('C:/Users/User/Documents/git/voter/src/config.json', JSON.stringify(this.config), 'utf8', (err)=>{
-                            if (err) throw err;
-                        })
-                    } else {
-                        fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), 'utf8', (err)=>{
-                            if (err) throw err;
-                        })
-                    }
-
+                        let bytecode = result.contracts[key].bytecode;
+                        let abi = metadata.output.abi;
+                        
+    
+                        let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : [this.ERC20.hash];
+                        console.log(deployArgs)
+        
+                        let contract = new web3.eth.Contract(abi);
+    
+                        this.sendTx(contract.deploy({data: `0x${bytecode}`, arguments: deployArgs}), type, key, abi);
+                    };
+                   
                 }
-
             });
         });
+    }
+    @action deploySolidity = () =>{
+        this.step = 40
+        this.deployToken('contract')
+    }
+    @action
+    sendTx = (transaction, type, key, abi) => {
+
+        let options = {
+            data: transaction.encodeABI(),
+            gasPrice: web3.utils.toHex(10000000000),
+            gasLimit: web3.utils.toHex(600000),
+            value: '0x0'
+        };
+
+        this.account.keystore.keyFromPassword(this.account.passwordCheck, (err, pwDerivedKey)=>{
+            let privateKey = this.account.keystore.exportPrivateKey(this.account.addresses[0], pwDerivedKey);
+            web3.eth.accounts.signTransaction(options, `0x${privateKey}`).then( data =>{
+                web3.eth.sendSignedTransaction(data.rawTransaction)
+                .on('error', (err)=>{ console.log(err)})
+                .on('transactionHash', (txHash)=>{
+                    this.txHash = txHash
+                    console.log(`txhash - ${this.txHash}`)
+                })
+
+
+                setTimeout(()=>{
+                    let interval = setInterval(()=>{
+                        web3.eth.getTransactionReceipt(this.txHash)
+                        .then( data =>{
+                            if(data.contractAddress){
+                                let contractAddress  = data.contractAddress
+                                let project = type !== 'token' ? {"name": key, "address": contractAddress, "abi" : abi} : "";
+                                clearInterval(interval)
+
+                                if(type!=="token"){
+                                   
+                                    this.step = 41
+                                    this.config.projects.push(project);
+                                    console.log(window.__ENV)
+                                    if (window.__ENV == 'development'){
+                                        fs.writeFile('C:/Users/User/Documents/git/voter/src/config.json', JSON.stringify(this.config), 'utf8', (err)=>{
+                                            if (err) throw err;
+                                        })
+                                    } else {
+                                        fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), 'utf8', (err)=>{
+                                            if (err) throw err;
+                                        })
+                                    }
+                                } else {
+                                    this.step = 52;
+                                }
+                                
+                            }
+                        })
+                    },5000)
+                },5000)
+            });  
+        });
+        
     }
 
     @action
@@ -582,6 +656,7 @@ class Login extends React.Component {
         this.selected = selected.value;
         this.account.keystore = lightwallet.keystore.deserialize(JSON.stringify(this.wallets[selected.value].wallet_object))
         this.account.addresses.push(selected.value);
+        this.getBalance();
     }
     @action
     handleGetSeed = (e) => {
@@ -688,14 +763,12 @@ class Login extends React.Component {
         })
         console.log(this.ERC20.hash)
         
-        let defaultABI = window.__ENV = 'production'
+        let defaultABI = window.__ENV === 'development'
             ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/ERC20.abi", 'utf8'))
             : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), 'utf8'))
 
         console.log(defaultABI)
         
-        //let contractABI = JSON.parse(JSON.stringify(this.config.projects[0].abi));
-
         let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
         contract.methods.totalSupply().call({from: this.account.addresses[0]}).then(result=>{
             this.ERC20.totalSupply = result
@@ -745,6 +818,11 @@ class Login extends React.Component {
     backToProjects = () =>{
         this.step = 3;
     }
+    @action 
+    toCreateToken = () =>{
+        this.step = 5;
+    }
+   
     @action 
     handleGoToProject = (e) => {
         e.preventDefault();

@@ -50,6 +50,14 @@
             display: block;
             color: #fff;
             margin-top: 15px;
+            opacity: .5;
+            &:hover{
+                opacity: 1;
+            }
+            &:focus{
+                opacity: 1;
+                color: #B3E8FF;
+            }
         }
     }
     .Select {
@@ -89,6 +97,9 @@
             background-color: transparent;
             color: #fff;
         } 
+        &.is-focused .Select-placeholder{
+            background-color: rgba($color: #FFFFFF, $alpha: .2);
+        }
         .Select-placeholder, 
         &.Select--single > .Select-control .Select-value {
             line-height: 1.7;
@@ -125,8 +136,7 @@
             }
         }
         &-arrow {
-            display: none;
-            border-color: #222 transparent transparent;
+            border-color: rgba(230, 223, 223, 0.6) transparent transparent;
             &:hover {
                 border-top-color: #222;
                 border-color: #222 transparent transparent;
@@ -138,27 +148,27 @@
                 width: 40px;
                 &:hover {
                     & > .Select-arrow {
-                        border-top-color: #222;
-                        border-color: #222 transparent transparent;
+                        border-top-color: rgba(230, 223, 223, 0.6);
+                        border-color: rgba(230, 223, 223, 0.6) transparent transparent;
                     }
                 }
             }
         }
         .Select-arrow-zone:hover > .Select-arrow {
-            border-top-color: #222;
+            border-top-color: rgba(230, 223, 223, 0.6);
         }
 
         &.is-open {
             & > .Select-control .Select-arrow {
-                border-color: transparent transparent #222;
+                border-color: transparent transparent rgba(230, 223, 223, 0.6);
                 &:hover {
-                    border-color: transparent transparent #222;
+                    border-color: transparent transparent rgba(230, 223, 223, 0.6)  ;
                 }
                 &-zone {
                     width: 40px;
                     &:hover {
                         .Select-arrow {
-                            border-color: transparent transparent #222;
+                            border-color: transparent transparent rgba(230, 223, 223, 0.6);
                         }
                     }
                 }

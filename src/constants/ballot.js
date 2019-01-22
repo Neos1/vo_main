@@ -2,7 +2,7 @@ window.fs = window.require('fs');
 const path = require('path')
 const ACCOUNTS = window.__ENV == 'development'
     ? JSON.parse(window.fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
-    : JSON.parse(window.fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './wallets.json'), 'utf8'))
+    : JSON.parse(window.fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
 /*{
     "0xd6cd1cf10a681cabe674942459d1b2f955c7bd69": {
         wallet_object: {
