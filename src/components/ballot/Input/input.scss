@@ -26,24 +26,35 @@
     &__input {
 		display: block;
 		width: 100%;
-		border-radius: 2px;
 		outline: none;
-		background-color: rgba($color: #fff, $alpha: .3);
-		color: #555;
+		background-color: rgba($color: #fff, $alpha: .2);
+		color: rgba($color: #ffffff, $alpha: .8);
 		min-width: 120px;
 		transition: border-color .3s;
 		font-size: 14px;
-		border: 1px solid rgba(101, 107, 115, 0.3);
-		padding: 15px 24px;
+		border:none;
+		padding: 9px 24px;
 		font-size: 14px;
 		font-weight: 400;
-		border-radius: 3px;
+		transition: .4s;
+		&:hover{
+			background-image: linear-gradient(180deg, rgba($color: #fff, $alpha: 0) 50%, rgba($color: #fff, $alpha: .2) 90%);
+		}
+		&:focus{
+			background-image: linear-gradient(180deg, rgba(9, 255, 225, 0) 52%, #68E3FE 150%);
+		}
+		&[type='password']{
+			color:#fff;
+			font: large Verdana,sans-serif;
+  		letter-spacing: 1px;
+			text-align: center;
+		}
 		@include placeholder {
 			font-family: $font_family;
 			font-size: 14px;
 		}
 		&--error {
-			border: 1px solid red;
+			background-image: linear-gradient(180deg, rgba(9, 255, 225, 0) 41%, #ff0000 240%)
 		}
 		&--auth {
 			border: 0;
