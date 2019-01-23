@@ -1,10 +1,21 @@
 import { observable, computed, action, runInAction } from "mobx";
-import { ACCOUNTS } from "../../constants/ballot";
+
 //import contracts from '../../contracts';
 import storage from "../../utils/storage";
 
 import avatar from '../../img/avatar.png';
 import eventEmitter from "../../utils/event-emitter";
+
+
+
+window.fs = window.require('fs');
+
+const path = require('path')
+const PATH_TO_WALLETS = window.__ENV == 'development'
+    ? "C:/Users/User/Documents/git/voter/src/wallets.json"
+    : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json')
+
+
 
 
 class AccountModel {
@@ -13,11 +24,18 @@ class AccountModel {
     @observable wallet_object;
     @observable account_type;
     @observable tokens = 0;
+    @observable accounts = JSON.parse(window.fs.readFileSync(PATH_TO_WALLETS, 'utf8'));
+
 
     constructor() {
         const _self = this;
         const address = storage.getItem('account');
+        window.fs.watchFile(PATH_TO_WALLETS, (curr, prev)=>{
+            _self.accounts = JSON.parse(window.fs.readFileSync(PATH_TO_WALLETS, 'utf8'))
+        }) 
+
         if (!address) return;
+
         if (web3.currentProvider && web3.currentProvider.connected) {
             _self.setAccount(address);
         } else {
@@ -40,9 +58,9 @@ class AccountModel {
 
     @computed 
     get options() {
-       return Object.keys(ACCOUNTS).map(item => ({
+       return Object.keys(this.accounts).map(item => ({
             value: item,
-            label: ACCOUNTS[item].name + ' - ' + item
+            label: this.accounts[item].name + ' - ' + item
         }))
     }
 
@@ -60,11 +78,11 @@ class AccountModel {
 
     @action
     setAccount(address) {
-        if (!ACCOUNTS[address]) return null;
+        if (!this.accounts[address]) return null;
         const _self = this;
-        _self.name = ACCOUNTS[address].name;
+        _self.name = this.accounts[address].name;
         _self.address = address;
-        _self.wallet_object = ACCOUNTS[address].wallet_object;
+        _self.wallet_object = this.accounts[address].wallet_object;
         storage.setItem('account', address);
         runInAction(() => {
             _self.getAccountType()
@@ -104,5 +122,4 @@ class AccountModel {
 }
 
 const accountStore = new AccountModel(); 
-
 export default accountStore;
