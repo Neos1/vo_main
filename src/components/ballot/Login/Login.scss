@@ -1,6 +1,11 @@
 @import '../../../styles/ballot/_variables.scss';
 
 .login {
+    &__back{
+        text-decoration: none;
+        color:#fff;
+        font-size: 15px;
+    }
     &__logo {
         display: block;
         width: 92px;

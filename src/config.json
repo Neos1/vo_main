@@ -1,10 +1,5 @@
 {
-  "wallet": "0x9c57d40f414f72d9176aeb05d79811312c30a465",
-  "password": "1234QWEasdEWQdsa",
-  "seed": "anger warfare illegal exotic episode adapt photo ahead access square angle talk",
   "host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
-  "contracts": "0x27e7323a56b424a27da3c45c9f883bca72581cca",
-  "erc20": "0x51687e6c9fa6c34ce370355b778f239d413715bd",
   "projects": [{
     "name": ":Ballot",
     "abi": [{

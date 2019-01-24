@@ -12,8 +12,8 @@ window.fs = window.require('fs');
 
 const path = require('path')
 const PATH_TO_WALLETS = window.__ENV == 'development'
-    ? "C:/Users/User/Documents/git/voter/src/wallets.json"
-    : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json')
+    ? "C:/Users/User/Documents/git/voter/src/wallets/"
+    : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/')
 
 
 
@@ -24,15 +24,32 @@ class AccountModel {
     @observable wallet_object;
     @observable account_type;
     @observable tokens = 0;
-    @observable accounts = JSON.parse(window.fs.readFileSync(PATH_TO_WALLETS, 'utf8'));
-
+    @observable accounts = {};
 
     constructor() {
         const _self = this;
         const address = storage.getItem('account');
-        window.fs.watchFile(PATH_TO_WALLETS, (curr, prev)=>{
-            _self.accounts = JSON.parse(window.fs.readFileSync(PATH_TO_WALLETS, 'utf8'))
+        
+        let files = window.fs.readdirSync(PATH_TO_WALLETS); 
+        console.info(files)
+            files.map( file =>{
+                let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
+                _self.accounts = Object.assign(_self.accounts, wallet)
+            });
+
+        window.fs.watch(PATH_TO_WALLETS, (evtType, file)=>{
+            if (file) {
+                if(evtType === 'change'){
+                    let wallets = _self.accounts
+                    this.accounts = {}
+                    let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
+                    this.accounts = Object.assign(wallets, wallet)
+                }
+            } else {
+                console.info('filename not provided');
+            }
         }) 
+        
 
         if (!address) return;
 
@@ -58,7 +75,8 @@ class AccountModel {
 
     @computed 
     get options() {
-       return Object.keys(this.accounts).map(item => ({
+        console.info(Object.keys(this.accounts))
+        return Object.keys(this.accounts).map(item => ({
             value: item,
             label: this.accounts[item].name + ' - ' + item
         }))
@@ -121,5 +139,5 @@ class AccountModel {
     }
 }
 
-const accountStore = new AccountModel(); 
+const accountStore = window.accountStore = new AccountModel(); 
 export default accountStore;

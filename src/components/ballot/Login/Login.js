@@ -28,10 +28,10 @@ window.BrowserSolc = BrowserSolc;
 class Login extends React.Component {
     
     @observable step = 0;
+    @observable previousStep = [];
     @observable selected = 0;
     @observable sol = ''
     @observable config = {};
-    @observable wallets = {};
 
     @observable ERC20 = {
         hash: '',
@@ -47,6 +47,7 @@ class Login extends React.Component {
         name: '',
         hash: ''
     }
+    @observable wallets = {}
     @observable account = {
         password:"",
         passwordCheck:"",
@@ -62,13 +63,6 @@ class Login extends React.Component {
         window.onerror = (e) =>{
             return;
         }
-
-        let wallets = window.__ENV == 'development'
-            ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
-            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
-        
-        
-        this.wallets = wallets;
 
         let config = window.__ENV == 'development'
         ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/config.json", 'utf8'))
@@ -95,7 +89,8 @@ class Login extends React.Component {
         let projects = this.config.projects.map((project, index)=>{
             return  <li key={index}><button type="button" className="btn btn--block btn--blue">{project.name}</button></li>
         })
-       
+
+
 
         if (accountStore.authorized) return <Redirect to="/cabinet" />
         return (
@@ -103,6 +98,7 @@ class Login extends React.Component {
                 <Container>
                     <div className={styles.login__container}>
                         <div className={styles.login__welcome}>
+                            <a href="#" className={`${styles.login__back} ${this.step == 0? styles.hidden : ''}`} onClick={this.goBack}> &lArr; НАЗАД </a>
                             {/* Окно логина */}
                             <div className={`${styles.login__form} ${this.step !== 0 ? styles.hidden : ''}`}>
                                 <h3>Вход в систему голосования</h3>
@@ -443,20 +439,25 @@ class Login extends React.Component {
                     if (err) console.info(err) 
                     console.log('test')
                     this.account.keystore = ks;
-                    this.step = 12;
-                    console.info(ks)
                     this.newAddresses();
                     this.setWeb3Provider(this.account.keystore);
+                    console.info(ks)
+                    this.step = 12;
 
                     let pwDerKey = this.account.keystore.keyFromPassword (this.account.password, (err, pwDerivedKey) => {
                         this.account.randomSeed = this.account.keystore.getSeed(pwDerivedKey);
                         this.seed = this.account.randomSeed.split(' ')
+                        this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
+                        let addresses = this.account.keystore.getAddresses();
+                        this.wallets = window.__ENV == 'development'
+                            ? JSON.parse(fs.readFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, 'utf8'))
+                            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), 'utf8'))
+                        console.log(this.wallets)
                     })
+
                     
-                    let wallets = window.__ENV == 'development'
-                        ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
-                        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
-                    this.wallets = wallets;
+
+                    
             })
         }
     }
@@ -496,6 +497,7 @@ class Login extends React.Component {
         this.account.keystore.keyFromPassword(this.account.password, (err, pwDerivedKey) => {
             this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
             let addresses = this.account.keystore.getAddresses();
+            console.info(addresses)
             this.account.addresses = addresses
             this.wallets[addresses[0]] = {
                 wallet_object:{},
@@ -507,13 +509,9 @@ class Login extends React.Component {
 
             this.getBalance();
             if (window.__ENV == 'development'){
-                fs.writeFile('C:/Users/User/Documents/git/voter/src/wallets.json', JSON.stringify(this.wallets), 'utf8', (err)=>{
-                    if (err) throw err;
-                })
+                fs.writeFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, JSON.stringify(this.wallets), 'utf8')
             } else {
-                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), JSON.stringify(this.wallets), 'utf8', (err)=>{
-                    if (err) throw err;
-                })
+                fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), JSON.stringify(this.wallets), 'utf8')
             }
         })
     }
@@ -678,25 +676,36 @@ class Login extends React.Component {
 
     // -- Трансформации окон
     @action
+    goBack = ()=>{
+        length = this.previousStep.length
+        this.step = this.previousStep[length-1]
+        this.previousStep.splice(length-1, 1)
+    }
+
+    @action
     handleSelect = (selected) => {
         this.selected = selected.value;
-        this.account.keystore = lightwallet.keystore.deserialize(JSON.stringify(this.wallets[selected.value].wallet_object))
+        console.info(accountStore.accounts[selected.value])
+        this.account.keystore = lightwallet.keystore.deserialize(JSON.stringify(accountStore.accounts[selected.value].wallet_object));
         this.account.addresses.push(selected.value);
         this.getBalance();
     }
     @action
     handleGetSeed = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 2;
     }
     @action 
     handleCreateKey = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 1;
     }
     @action 
     continueCreateKey = (e)=>{
         e.preventDefault();
+       this.previousStep.push(this.step)
         console.log(e.target.password.value)
         if (e.target.password.value == e.target.password_confirm.value){
             e.target.password.classList.remove('field__input--error')
@@ -711,15 +720,18 @@ class Login extends React.Component {
     }
     @action 
     handleShowSeed=()=>{
+       this.previousStep.push(this.step)
         this.step = 12;
     }
     @action 
     inputCreatedSeed = ()=>{
+       this.previousStep.push(this.step)
         this.step = 13;
     }
     @action 
     checkCreatedSeed = (e) =>{
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 21;
         let seed = this.seed.join(' ');
         if ( lightwallet.keystore.isSeedValid(seed) ) {
@@ -732,6 +744,7 @@ class Login extends React.Component {
     }
     @action
     backToStart = ()=>{
+       this.previousStep.push(this.step)
         this.step = 0;
     }
     @action
@@ -750,11 +763,13 @@ class Login extends React.Component {
     }
     @action
     handleChangePassword = () => {
+       this.previousStep.push(this.step)
         this.step = 23;
     }
     @action
     handleSaveKey = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 24;
         this.recoverWallet();
         setTimeout(()=>{
@@ -764,6 +779,7 @@ class Login extends React.Component {
     @action
     recoverFromSeed =(e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         let seed = this.seed.join(' ');
         if(lightwallet.keystore.isSeedValid(seed)){
             this.step = 21;
@@ -776,6 +792,7 @@ class Login extends React.Component {
     @action
     handleSubmit = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         if (e.target.password.value != ''){
             this.account.keystore.keyFromPassword(this.account.password, (err, pwDerivedKey)=>{
                 if (err) throw err
@@ -791,23 +808,28 @@ class Login extends React.Component {
     }
     @action
     selectDeploy = () =>{
+       this.previousStep.push(this.step)
         this.step = 31;
     }
     @action
     existingProject = ()=>{
+       this.previousStep.push(this.step)
         this.step = 32;
     }
     @action
     newProject = ()=>{
+       this.previousStep.push(this.step)
         this.step = 35;
     }
     @action
     newAddress = ()=>{
+       this.previousStep.push(this.step)
         this.step = 36;
     }
     @action
     checkExistingERC = (e)=>{
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 37;
         console.info('Ты не тут')
 
@@ -833,10 +855,12 @@ class Login extends React.Component {
     }
     @action
     continueDeploy = ()=>{
+       this.previousStep.push(this.step)
         this.step = 39;
     }
     @action
     sendDeploy = ()=>{
+       this.previousStep.push(this.step)
         this.step = 40;
         setTimeout(()=>{
             this.step = 41;
@@ -846,6 +870,7 @@ class Login extends React.Component {
     @action 
     checkExistingAddress = (e) =>{
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 33;
         let address = web3.eth.getCode(this.contract.hash).then(data=>{
             data !== '0x'? writeToProjects() : alert('Адрес не валидный');
@@ -870,10 +895,12 @@ class Login extends React.Component {
     }
     @action 
     backToProjects = () =>{
+       this.previousStep.push(this.step)
         this.step = 3;
     }
     @action 
     toCreateToken = () =>{
+       this.previousStep.push(this.step)
         this.step = 5;
     }
    
