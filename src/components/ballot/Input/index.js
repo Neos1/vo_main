@@ -48,6 +48,7 @@ const SimpleInput = observer(({ id, label,index, maxLength, name, type = 'text',
                 htmlFor={id}
                 label={label} />
             <input 
+                placeholder={placeholder}
                 data-index={index}
                 id={id}
                 value={rest.value}

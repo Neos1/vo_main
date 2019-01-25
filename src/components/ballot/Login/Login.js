@@ -21,7 +21,9 @@ const signing = lightwallet.signing
 const HookedWeb3Provider = require("hooked-web3-provider");
 const web3 = window.web3 = new Web3();
 const BrowserSolc = require('../../../assets/browser-solc.min')
-
+const PATH_TO_IMG = window.__ENV == "development"
+    ? "../img/"
+    : "./img/"
 window.BrowserSolc = BrowserSolc;
 
 @inject('accountStore') @observer
@@ -98,13 +100,14 @@ class Login extends React.Component {
                 <Container>
                     <div className={styles.login__container}>
                         <div className={styles.login__welcome}>
-                            <a href="#" className={`${styles.login__back} ${this.step == 0? styles.hidden : ''}`} onClick={this.goBack}> &lArr; НАЗАД </a>
+                            <button className={`${styles.login__back} ${this.step == 0? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
                             {/* Окно логина */}
                             <div className={`${styles.login__form} ${this.step !== 0 ? styles.hidden : ''}`}>
-                                <h3>Вход в систему голосования</h3>
+                                <h3>Вход в систему</h3>
+                                <p>Приготовьтесь к новой эре в сфере голосования</p>
                                 <form name="login_form" onSubmit={this.handleSubmit}>
                                     <div className={styles.login__select}>
-                                        <label> Выберите ваш ключ
+                                        <label> 
                                             <Select
                                                 multi={false}
                                                 searchable={false}
@@ -114,8 +117,9 @@ class Login extends React.Component {
                                                 onChange={this.handleSelect}
                                                 options={accountStore.options} />
                                         </label>
-                                        <label> Введите пароль
-                                            <SimpleInput type="password" name="password" required onChange={this.getPassword}/>
+                                        <label>
+                                            
+                                            <SimpleInput type="password" name="password" placeholder="Введите пароль" required onChange={this.getPassword}/>
                                         </label>
                                     </div>
                                     <div className={styles.login__submit}>
@@ -127,14 +131,14 @@ class Login extends React.Component {
                             </div>
                             
                             {/** Восстановление по сиду */}
-                            <div className={`${styles.seed__form} ${(this.step !== 2 && this.step!== 13)? styles.hidden : ''}`}>
+                            <div className={`${styles.seed__form} recoverSeed ${(this.step !== 2 && this.step!== 13)? styles.hidden : ''}`}>
                                 {this.step == 2? <h3>Восстановление кошелька по резервной фразе</h3>: ''}
                                 {this.step == 13? <h3>Проверка резервной фразы</h3>: ''}
                                 <form name="seed" onSubmit={this.step == 2 ?this.recoverFromSeed: this.checkCreatedSeed}>
                                     <div className={styles.login__select}>
                                         { 
                                             this.seed.map((el, index)=>{
-                                                return (<label key={index+1} className="small"> Слово №{index+1} <SimpleInput required={true} index={index} onChange={this.handleInputSeed}/> </label>)
+                                                return (<label key={index+1} className="small"><span>{index+1}</span> <SimpleInput required={true} index={index} onChange={this.handleInputSeed}/> </label>)
                                             }) 
                                         }
                                     </div>
@@ -212,13 +216,14 @@ class Login extends React.Component {
                             
                             {/** Установка пароля для ключа step: 23 - для существуюего ключа, 1 - для нового */}
                             <div className={`${styles.seed__form} ${((this.step != 23) && (this.step != 1)) ? styles.hidden : ''}`}>
-                                <h3>Установка пароля</h3>
+                                <h3>Для начала  установите&nbsp;пароль</h3>
+                                <p>Рекомендуем установить такой пароль, чтобы вам было легко его запомнить, но посторонние не могли его угадать</p>
                                 <form name="password_input" className={styles.login__select} onSubmit={this.step !== 1? this.handleSaveKey : this.continueCreateKey}>
-                                    <label key="password"  className=""> Введите пароль
-                                        <SimpleInput name="password" required={true} onChange={this.getPassword} type="password"/> 
+                                    <label key="password"  className=""> 
+                                        <SimpleInput name="password" placeholder="Введите пароль" required={true} onChange={this.getPassword} type="password"/> 
                                     </label>
-                                    <label key="password_confirm" required className=""> Введите пароль еще раз
-                                        <SimpleInput  name="password_confirm" required={true} onChange={this.getPasswordCheck} type="password"/> 
+                                    <label key="password_confirm" required className=""> 
+                                        <SimpleInput  name="password_confirm" placeholder="Повторите пароль" required={true} onChange={this.getPasswordCheck} type="password"/> 
                                     </label>
 
                                     <div className={styles.login__submit}>
@@ -232,15 +237,14 @@ class Login extends React.Component {
                                 <h3>Запишите резервную фразу</h3>
                                 <div className={styles.login__select}> 
                                     <p>
-                                        Резервная фраза состоит из 12 слов, она может вам понадобиться для восстановления вашего ключа. 
-                                        Обязательно запишите эти слова и не сообщайте их никому, помните, что эта фраза дает полный контроль над вашим ключом.
+                                        Она нужна для восстановления ключа
                                     </p>
                                     <p className={styles.seed__seed}>
                                         {this.account.randomSeed}
                                     </p>
                                 </div>
                                 <div className={styles.login__submit}>
-                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал резервную фразу</button>
+                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал. Честно.</button>
                                 </div>
                             </div>
                             
@@ -259,20 +263,37 @@ class Login extends React.Component {
                             
                             {/** Окно выбора деплоя: step = 31 - окно добавления проекта, 35 - выбор типа проекта */}
                             <div className={`${styles.seed__form} ${(this.step !== 31) && (this.step !== 35 )? styles.hidden : ''}`}>
-                                <div className={this.step != 31? "hidden": ""}>
-                                    <h3>Добавить новый проект</h3>
+                                <div className={this.step != 31? "": ""}>
+                                    <h3>Добавление проекта</h3>
                                     <div className={styles.login__select}> 
-                                        <p>
+                                        <p className='deploy__desc'>
                                             Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
                                         </p>
-                                        <p className={styles.deploy__select}>
-                                            <button onClick={this.existingProject} type="button" className="btn btn--block btn--blue">У меня есть адрес существующего проекта </button>
-                                            <button onClick={this.newProject} type="button" className="btn btn--block btn--blue">Я хочу создать новый проект</button>
+                                        <p className={`${styles.deploy__select} ${this.step!= 31? 'hidden' : ''}`}>
+                                            <div>
+                                                <button onClick={this.newProject} type="button" className="btn btn--block btn--blue">Создать</button>
+                                                <p>Я хочу создать <span className="note">новый&nbsp;проект</span></p>
+                                            </div>
+                                            <div>
+                                                <button onClick={this.existingProject} type="button" className="btn btn--block btn--blue">Подключить</button>
+                                                <p>У меня есть <span className="note">адрес&nbsp;проекта</span></p>
+                                            </div>
+                                        </p>
+                                        <p className={`${styles.deploy__select} ${this.step!= 35? 'hidden' : ''}`}>
+                                            <div>
+                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владеют</button>
+                                                <p>Владельцы проекта уже владеют токенами</p>
+                                            </div>
+                                            <div>
+                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Не владеют</button>
+                                                <p>Владельцы проекта еще не владеют токенами</p>                         
+                                            </div>
+                                           
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className={this.step != 35? "hidden": ""}>
+                                <div className={"hidden"}>
                                     <h3>Создание нового проекта</h3>
                                     <div className={styles.login__select}> 
                                         <h4>
@@ -281,11 +302,7 @@ class Login extends React.Component {
                                         <h4>
                                             Назначение владельцев проекта
                                         </h4>
-                                        <p className={styles.deploy__select}>
-                                            <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владельцы проекта уже имеют токены ERC-20, распределенные в соответствии с их долями</button>
-                                            <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Владельцы проекта еще не имеют токенов</button>
-                                           
-                                        </p>
+
                                     </div>
                                     <div className={styles.login__submit}>
                                         <a href="#" onClick={this.selectDeploy}>Вернуться к выбору типа проектов</a>
@@ -408,7 +425,66 @@ class Login extends React.Component {
                             </div>
 
                         </div>
+                        <div className={styles.login__description}>
+                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden': '' }`} style={{'max-width':"350px"}}>
+                                <img src={`${PATH_TO_IMG}rocket.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Задача организации, в особенности же укрепление и развитие структуры позволяет выполнять важные задания по разработке систем массового участия.</p>
+                                    <p>Не следует, однако забывать, что рамки и место обучения кадров позволяет оценить значение направлений прогрессивного развития.</p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${this.step !== 1 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}safe.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Пароль должен состоять как минимум из <strong className="note">6 символов.</strong></p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${(this.step !== 12) && (this.step!==13) ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}letter.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p> Резервная фраза состоит из <strong className="note">12 слов</strong></p>
+                                    <p> <strong className="warning">Обязательно запишите</strong> эти слова и не сообщайте их никому</p>
+                                    <p> <strong className="note">Помните!</strong> Эта фраза дает полный контроль над вашим ключом</p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${this.step !== 2 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}lifebuoy.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Нужно ввести последовательно все <strong className="note">слова полученные при регистрации.</strong></p>
+                                    <p>Вы ведь их сохранили или записали?</p>
+                                    <p>Если введете верно, то увидите номер кошелька и получите к нему доступ.</p>
+                                </div>
+                            </div>
+
+
+                            <div className={`${styles.content} ${this.step !== 3 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}sextant.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>За что проголосуем на этот раз?</p>
+                                </div>
+                            </div>
+                            <div className={`${styles.content} ${this.step !== 31 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}briefcase.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Cоздайте новый проект либо подключите уже существующий </p>   
+                                    <p>Вы могли получить адрес проекта <span className="note">где-то там</span></p>   
+                                </div>
+                            </div>
+                            
+                            <div className={`${styles.content} ${this.step !== 35 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}structure.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>При создании проекта необходимо указать его владельцев </p>   
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
+                    
                 </Container>
             </div>
         );
