@@ -18,10 +18,7 @@ body {
 	padding-bottom: 100px;
     &.body-login {
         overflow: hidden;
-        background-color: #1e5271;
-        background-image: url($image_path_relative + 'bg.png');
-        background-repeat: no-repeat;
-        background-position: 50% 50%;
+        background-color: #FFFFFF;
         padding: 0;
     }
     &:after {

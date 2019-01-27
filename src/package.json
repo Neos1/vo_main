@@ -61,6 +61,7 @@
         "bootstrap-4-grid": "^2.4.0",
         "browser-solc": "^1.0.0",
         "buffer": "^5.2.0",
+        "electron-localshortcut": "^3.1.0",
         "enzyme": "^3.7.0",
         "enzyme-adapter-react-16": "^1.6.0",
         "eth-lightwallet": "^3.0.1",

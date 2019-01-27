@@ -1,4 +1,111 @@
 {
-    "host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
-    "projects":[]
+  "host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
+  "projects": [{
+    "name": ":Ballot",
+    "abi": [{
+      "constant": false,
+      "inputs": [{
+        "name": "to",
+        "type": "address"
+      }],
+      "name": "delegate",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }, {
+      "constant": true,
+      "inputs": [],
+      "name": "winningProposal",
+      "outputs": [{
+        "name": "_winningProposal",
+        "type": "uint8"
+      }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }, {
+      "constant": false,
+      "inputs": [{
+        "name": "toVoter",
+        "type": "address"
+      }],
+      "name": "giveRightToVote",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }, {
+      "constant": false,
+      "inputs": [{
+        "name": "toProposal",
+        "type": "uint8"
+      }],
+      "name": "vote",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }, {
+      "inputs": [{
+        "name": "_numProposals",
+        "type": "uint8"
+      }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }]
+  }, {
+    "name": ":UsingERC20",
+    "address": "0x64A6D40BF4c7a17371a26FAc0E7dFAe72b238D28",
+    "abi": [{
+      "constant": false,
+      "inputs": [],
+      "name": "doSomethingThatRequiresERC20tokens",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x044eb018"
+    }, {
+      "constant": true,
+      "inputs": [],
+      "name": "associatedToken",
+      "outputs": [{
+        "name": "",
+        "type": "address"
+      }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xb3fc0d7b"
+    }, {
+      "inputs": [{
+        "name": "_token",
+        "type": "address"
+      }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor",
+      "signature": "constructor"
+    }, {
+      "anonymous": false,
+      "inputs": [{
+        "indexed": false,
+        "name": "amount",
+        "type": "uint256"
+      }, {
+        "indexed": false,
+        "name": "fromAccount",
+        "type": "address"
+      }, {
+        "indexed": false,
+        "name": "totalBalance",
+        "type": "uint256"
+      }],
+      "name": "YayIReceivedTokens",
+      "type": "event",
+      "signature": "0x756d6a6c71462de5bac1476648b732ff4dfadb36468eaaabcecf3111e4e05d86"
+    }]
+  }]
 }

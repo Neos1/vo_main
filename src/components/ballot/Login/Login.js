@@ -7,7 +7,7 @@ import Select from 'react-select';
 import { Redirect } from '../../common/Navigation/Navigation';
 import styles from './Login.scss';
 import * as async from 'async';
-import { resolve } from 'url';
+
 
 const fs = window.require('fs');
 const path  = window.require('path');
@@ -21,17 +21,19 @@ const signing = lightwallet.signing
 const HookedWeb3Provider = require("hooked-web3-provider");
 const web3 = window.web3 = new Web3();
 const BrowserSolc = require('../../../assets/browser-solc.min')
-
+const PATH_TO_IMG = window.__ENV == "development"
+    ? "../img/"
+    : "./img/"
 window.BrowserSolc = BrowserSolc;
 
 @inject('accountStore') @observer
 class Login extends React.Component {
     
     @observable step = 0;
+    @observable previousStep = [];
     @observable selected = 0;
     @observable sol = ''
     @observable config = {};
-    @observable wallets = {};
 
     @observable ERC20 = {
         hash: '',
@@ -47,6 +49,7 @@ class Login extends React.Component {
         name: '',
         hash: ''
     }
+    @observable wallets = {}
     @observable account = {
         password:"",
         passwordCheck:"",
@@ -59,13 +62,9 @@ class Login extends React.Component {
   
     
     componentWillMount(){
-
-        let wallets = window.__ENV == 'development'
-            ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
-            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
-        
-        
-        this.wallets = wallets;
+        window.onerror = (e) =>{
+            return;
+        }
 
         let config = window.__ENV == 'development'
         ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/config.json", 'utf8'))
@@ -92,7 +91,8 @@ class Login extends React.Component {
         let projects = this.config.projects.map((project, index)=>{
             return  <li key={index}><button type="button" className="btn btn--block btn--blue">{project.name}</button></li>
         })
-       
+
+
 
         if (accountStore.authorized) return <Redirect to="/cabinet" />
         return (
@@ -100,47 +100,54 @@ class Login extends React.Component {
                 <Container>
                     <div className={styles.login__container}>
                         <div className={styles.login__welcome}>
+                            <button className={`${styles.login__back} ${this.step == 0? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
                             {/* Окно логина */}
                             <div className={`${styles.login__form} ${this.step !== 0 ? styles.hidden : ''}`}>
-                                <h3>Вход в систему голосования</h3>
-                                <div className={styles.login__select}>
-                                    <label> Выберите ваш ключ
-                                        <Select
-                                            multi={false}
-                                            searchable={false}
-                                            clearable={false}
-                                            placeholder="Выберите файл со своим кошельком"
-                                            value={this.selected}
-                                            onChange={this.handleSelect}
-                                            options={accountStore.options} />
-                                    </label>
-                                    <label> Введите пароль
-                                        <SimpleInput type="password" required onChange={this.getPassword}/>
-                                    </label>
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.handleSubmit} type="button" className="btn btn--block btn--blue btn--arrow">Войти</button>
-                                    <a href="#" onClick={this.handleGetSeed}> У меня есть резервная фраза </a>
-                                    <a href="#" onClick={this.handleCreateKey}> Хочу создать новый ключ </a>
-                                </div>
+                                <h3>Вход в систему</h3>
+                                <p>Приготовьтесь к новой эре в сфере голосования</p>
+                                <form name="login_form" onSubmit={this.handleSubmit}>
+                                    <div className={styles.login__select}>
+                                        <label> 
+                                            <Select
+                                                multi={false}
+                                                searchable={false}
+                                                clearable={false}
+                                                placeholder="Выберите файл со своим кошельком"
+                                                value={this.selected}
+                                                onChange={this.handleSelect}
+                                                options={accountStore.options} />
+                                        </label>
+                                        <label>
+                                            
+                                            <SimpleInput type="password" name="password" placeholder="Введите пароль" required onChange={this.getPassword}/>
+                                        </label>
+                                    </div>
+                                    <div className={styles.login__submit}>
+                                        <button  type="submit" className="btn btn--block btn--blue btn--arrow">Войти</button>
+                                        <a href="#" onClick={this.handleGetSeed}> У меня есть резервная фраза </a>
+                                        <a href="#" onClick={this.handleCreateKey}> Хочу создать новый ключ </a>
+                                    </div>
+                                </form>
                             </div>
                             
                             {/** Восстановление по сиду */}
-                            <div className={`${styles.seed__form} ${(this.step !== 2 && this.step!== 13)? styles.hidden : ''}`}>
+                            <div className={`${styles.seed__form} recoverSeed ${(this.step !== 2 && this.step!== 13)? styles.hidden : ''}`}>
                                 {this.step == 2? <h3>Восстановление кошелька по резервной фразе</h3>: ''}
                                 {this.step == 13? <h3>Проверка резервной фразы</h3>: ''}
-                                <div className={styles.login__select}>
-                                    { 
-                                        this.seed.map((el, index)=>{
-                                            return (<label key={index+1} className="small"> Слово №{index+1} <SimpleInput required={true} index={index} onChange={this.handleInputSeed}/> </label>)
-                                        }) 
-                                    }
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.step == 2 ?this.recoverFromSeed: this.checkCreatedSeed} type="button" className="btn btn--block btn--blue">Продолжить</button>
-                                    {this.step == 2? <a href="#" onClick={this.backToStart}> Вернуться к выбору ключа </a>: ''}
-                                    {this.step == 13?<a href="#" onClick={this.handleShowSeed}> Я забыл резервную фразу </a> : ''}
-                                </div>
+                                <form name="seed" onSubmit={this.step == 2 ?this.recoverFromSeed: this.checkCreatedSeed}>
+                                    <div className={styles.login__select}>
+                                        { 
+                                            this.seed.map((el, index)=>{
+                                                return (<label key={index+1} className="small"><span>{index+1}</span> <SimpleInput required={true} index={index} onChange={this.handleInputSeed}/> </label>)
+                                            }) 
+                                        }
+                                    </div>
+                                    <div className={styles.login__submit}>
+                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        {this.step == 2? <a href="#" onClick={this.backToStart}> Вернуться к выбору ключа </a>: ''}
+                                        {this.step == 13?<a href="#" onClick={this.handleShowSeed}> Я забыл резервную фразу </a> : ''}
+                                    </div>
+                                </form>
                             </div>
                             
                             {/** Окно загрузки  step: 21 - Проверка сида, 22 - сид проверен, 11 - создание ключа */}
@@ -209,18 +216,20 @@ class Login extends React.Component {
                             
                             {/** Установка пароля для ключа step: 23 - для существуюего ключа, 1 - для нового */}
                             <div className={`${styles.seed__form} ${((this.step != 23) && (this.step != 1)) ? styles.hidden : ''}`}>
-                                <h3>Установка пароля</h3>
-                                <div className={styles.login__select}>
-                                <label key="password" className=""> Введите пароль
-                                    <SimpleInput required onChange={this.getPassword} type="password"/> 
-                                </label>
-                                <label key="password_confirm" className=""> Введите пароль еще раз
-                                    <SimpleInput required onChange={this.getPasswordCheck} type="password"/> 
-                                </label>
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.step !== 1? this.handleSaveKey : this.continueCreateKey} type="button" className="btn btn--block btn--blue">Создать</button>
-                                </div>
+                                <h3>Для начала  установите&nbsp;пароль</h3>
+                                <p>Рекомендуем установить такой пароль, чтобы вам было легко его запомнить, но посторонние не могли его угадать</p>
+                                <form name="password_input" className={styles.login__select} onSubmit={this.step !== 1? this.handleSaveKey : this.continueCreateKey}>
+                                    <label key="password"  className=""> 
+                                        <SimpleInput name="password" placeholder="Введите пароль" required={true} onChange={this.getPassword} type="password"/> 
+                                    </label>
+                                    <label key="password_confirm" required className=""> 
+                                        <SimpleInput  name="password_confirm" placeholder="Повторите пароль" required={true} onChange={this.getPasswordCheck} type="password"/> 
+                                    </label>
+
+                                    <div className={styles.login__submit}>
+                                        <button type="submit" className="btn btn--block btn--blue">Создать</button>
+                                    </div>
+                                </form>
                             </div>
                             
                             {/** Окно записи сида step: 12 - Видимое */}
@@ -228,15 +237,14 @@ class Login extends React.Component {
                                 <h3>Запишите резервную фразу</h3>
                                 <div className={styles.login__select}> 
                                     <p>
-                                        Резервная фраза состоит из 12 слов, она может вам понадобиться для восстановления вашего ключа. 
-                                        Обязательно запишите эти слова и не сообщайте их никому, помните, что эта фраза дает полный контроль над вашим ключом.
+                                        Она нужна для восстановления ключа
                                     </p>
                                     <p className={styles.seed__seed}>
                                         {this.account.randomSeed}
                                     </p>
                                 </div>
                                 <div className={styles.login__submit}>
-                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал резервную фразу</button>
+                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал. Честно.</button>
                                 </div>
                             </div>
                             
@@ -255,20 +263,37 @@ class Login extends React.Component {
                             
                             {/** Окно выбора деплоя: step = 31 - окно добавления проекта, 35 - выбор типа проекта */}
                             <div className={`${styles.seed__form} ${(this.step !== 31) && (this.step !== 35 )? styles.hidden : ''}`}>
-                                <div className={this.step != 31? "hidden": ""}>
-                                    <h3>Добавить новый проект</h3>
+                                <div className={this.step != 31? "": ""}>
+                                    <h3>Добавление проекта</h3>
                                     <div className={styles.login__select}> 
-                                        <p>
+                                        <p className='deploy__desc'>
                                             Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
                                         </p>
-                                        <p className={styles.deploy__select}>
-                                            <button onClick={this.existingProject} type="button" className="btn btn--block btn--blue">У меня есть адрес существующего проекта </button>
-                                            <button onClick={this.newProject} type="button" className="btn btn--block btn--blue">Я хочу создать новый проект</button>
+                                        <p className={`${styles.deploy__select} ${this.step!= 31? 'hidden' : ''}`}>
+                                            <div>
+                                                <button onClick={this.newProject} type="button" className="btn btn--block btn--blue">Создать</button>
+                                                <p>Я хочу создать <span className="note">новый&nbsp;проект</span></p>
+                                            </div>
+                                            <div>
+                                                <button onClick={this.existingProject} type="button" className="btn btn--block btn--blue">Подключить</button>
+                                                <p>У меня есть <span className="note">адрес&nbsp;проекта</span></p>
+                                            </div>
+                                        </p>
+                                        <p className={`${styles.deploy__select} ${this.step!= 35? 'hidden' : ''}`}>
+                                            <div>
+                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владеют</button>
+                                                <p>Владельцы проекта уже владеют токенами</p>
+                                            </div>
+                                            <div>
+                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Не владеют</button>
+                                                <p>Владельцы проекта еще не владеют токенами</p>                         
+                                            </div>
+                                           
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className={this.step != 35? "hidden": ""}>
+                                <div className={"hidden"}>
                                     <h3>Создание нового проекта</h3>
                                     <div className={styles.login__select}> 
                                         <h4>
@@ -277,11 +302,7 @@ class Login extends React.Component {
                                         <h4>
                                             Назначение владельцев проекта
                                         </h4>
-                                        <p className={styles.deploy__select}>
-                                            <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владельцы проекта уже имеют токены ERC-20, распределенные в соответствии с их долями</button>
-                                            <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Владельцы проекта еще не имеют токенов</button>
-                                           
-                                        </p>
+
                                     </div>
                                     <div className={styles.login__submit}>
                                         <a href="#" onClick={this.selectDeploy}>Вернуться к выбору типа проектов</a>
@@ -293,109 +314,177 @@ class Login extends React.Component {
                             {/** Существующий проект */}
                             <div className={`${styles.seed__form} ${this.step !== 32  ? styles.hidden : ''}`}>
                                 <h3>Добавить проект</h3>
-                                <div className={styles.login__select}> 
-                                    <p>
-                                        Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
-                                    </p>
-                                    <label> Укажите название проекта
-                                        <SimpleInput onChange={this.getProjectName}/>
-                                    </label>
+                                <form name="existing_project" onSubmit={this.checkExistingAddress}>
+                                    <div className={styles.login__select}> 
+                                        <p>
+                                            Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
+                                        </p>
+                                        <label> Укажите название проекта
+                                            <SimpleInput maxLength="20" required onChange={this.getProjectName}/>
+                                        </label>
 
-                                    <label> Укажите адрес проекта
-                                        <SimpleInput onChange={this.getProjectHash}/>
-                                    </label>
-                                    
-                                    <div className={styles.login__submit}>
-                                        <button onClick={this.checkExistingAddress} type="button" className="btn btn--block btn--blue">Добавить</button>
-                                        <a href="#" onClick={this.selectDeploy}>Вернуться к выбору типа проектов</a>
-                                    </div> 
-                                </div>
+                                        <label> Укажите адрес проекта
+                                            <SimpleInput required onChange={this.getProjectHash}/>
+                                        </label>
+                                        
+                                        <div className={styles.login__submit}>
+                                            <button  type="submit" className="btn btn--block btn--blue">Добавить</button>
+                                            <a href="#" onClick={this.selectDeploy}>Вернуться к выбору типа проектов</a>
+                                        </div> 
+                                    </div>
+                                </form>
                             </div>
                             
                             {/** Новый адрес */}
                             <div className={`${styles.seed__form} ${this.step !== 36  ? styles.hidden : ''}`}>
                                 <h3>Создание нового проекта</h3>
-                                <div className={styles.login__select}> 
-                                    <h4>
-                                        Шаг 1
-                                    </h4>
-                                    <h4>
-                                        Назначение владельцев проекта
-                                    </h4>
-                                    <div className={styles.deploy__input}>
-                                        <label> Введите адрес ERC-20 контракта владельцев
-                                        <SimpleInput onChange={this.getERC20Hash}/>
-                                        </label>
+                                <form name="checkERC" onSubmit={this.checkExistingERC}>
+                                    <div className={styles.login__select}> 
+                                        <h4>
+                                            Шаг 1
+                                        </h4>
+                                        <h4>
+                                            Назначение владельцев проекта
+                                        </h4>
+                                        <div className={styles.deploy__input}>
+                                            <label> Введите адрес ERC-20 контракта владельцев
+                                            <SimpleInput required onChange={this.getERC20Hash}/>
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.checkExistingERC} type="button" className="btn btn--block btn--blue">Продолжить</button>
-                                </div> 
+                                    <div className={styles.login__submit}>
+                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                    </div> 
+                                </form>
                             </div>
 
                             {/** Шаг 2 деплоя существующего ERC20 */}
                             <div className={`${styles.seed__form} ${this.step !== 39  ? styles.hidden : ''}`}>
                                 <h3>Создание нового проекта</h3>
-                                <div className={styles.login__select}> 
-                                    <h4>
-                                        Шаг 2
-                                    </h4>
-                                    <h4>
-                                        Загрузка контракта проекта
-                                    </h4>
-                                    <p>
-                                        Контракт проекта будет загружен в сеть при помощи кошелька, для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth:
-                                    </p>
-                                    <div className={styles.deploy__input}>
-                                        <label> Укажите название проекта (будет записано в блокчейн)
-                                        <SimpleInput onChange={this.getProjectName}/>
-                                        </label>
-                                        <label> Введите пароль ключа
-                                        <SimpleInput type='password' onChange={this.getPasswordCheck}/>
-                                        </label>
+                                <form name="deploy_step_2" onSubmit={this.deploySolidity}>                                
+                                    <div className={styles.login__select}> 
+                                        <h4>
+                                            Шаг 2
+                                        </h4>
+                                        <h4>
+                                            Загрузка контракта проекта
+                                        </h4>
+                                        <p>
+                                            Контракт проекта будет загружен в сеть при помощи кошелька, для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth:
+                                        </p>
+                                        <div className={styles.deploy__input}>
+                                            <label> Укажите название проекта (будет записано в блокчейн)
+                                            <SimpleInput maxLength="20"  required onChange={this.getProjectName}/>
+                                            </label>
+                                            <label> Введите пароль ключа
+                                            <SimpleInput required type='password' onChange={this.getPasswordCheck}/>
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.deploySolidity} type="button" className="btn btn--block btn--blue">Продолжить</button>
-                                </div> 
+                                    <div className={styles.login__submit}>
+                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                    </div> 
+                                </form>
                             </div>
                             
                             {/** Создание ERC20 токена */}
                             <div className={`${styles.seed__form} ${this.step !== 5 ? styles.hidden : ''}`}>
                                 <h3>Создание нового проекта</h3>
-                                <div className={styles.login__select}> 
-                                    <h4>
-                                        Шаг 1
-                                    </h4>
-                                    <h4>
-                                        Назначение владельцев проекта  
-                                    </h4>
-                                    <p>
-                                    Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже. Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth. Все ERC20 токены будут начислены на указанный ниже кошелек, после чего их можно будет распределить на необходимые адреса.
-                                    </p>
-                                    <p>{this.account.addresses[0]}   {Number((this.account.balances[0]/ 1.0e18)).toFixed(4)} ETH</p>
-                                    <div className={styles.deploy__input}>
-                                        <label> Укажите название токена (будет записано в блокчейн)
-                                        <SimpleInput onChange={this.getTokenName}/>
-                                        </label>
-                                        <label> Укажите символ токена
-                                        <SimpleInput onChange={this.getTokenChar}/>
-                                        </label>
-                                        <label> Укажите общее количество токенов
-                                        <SimpleInput onChange={this.getTokenCount}/>
-                                        </label>
-                                        <label> Введите пароль ключа
-                                        <SimpleInput type='password' onChange={this.getPasswordCheck}/>
-                                        </label>
+                                <form name="deploy_project" onSubmit={this.createTokenContract}>
+                                    <div className={styles.login__select}> 
+                                        <h4>
+                                            Шаг 1
+                                        </h4>
+                                        <h4>
+                                            Назначение владельцев проекта  
+                                        </h4>
+                                        <p>
+                                        Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже. Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth. Все ERC20 токены будут начислены на указанный ниже кошелек, после чего их можно будет распределить на необходимые адреса.
+                                        </p>
+                                        <p>{this.account.addresses[0]}   {Number((this.account.balances[0]/ 1.0e18)).toFixed(4)} ETH</p>
+                                        <div className={styles.deploy__input}>
+                                            <label> Укажите название токена (будет записано в блокчейн)
+                                            <SimpleInput required onChange={this.getTokenName}/>
+                                            </label>
+                                            <label> Укажите символ токена
+                                            <SimpleInput required onChange={this.getTokenChar}/>
+                                            </label>
+                                            <label> Укажите общее количество токенов
+                                            <SimpleInput required onChange={this.getTokenCount}/>
+                                            </label>
+                                            <label> Введите пароль ключа
+                                            <SimpleInput name="password" type='password' required onChange={this.getPasswordCheck}/>
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={styles.login__submit}>
-                                    <button onClick={this.createTokenContract} type="button" className="btn btn--block btn--blue">Продолжить</button>
-                                </div> 
+                                    <div className={styles.login__submit}>
+                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                    </div> 
+                                </form>
+                                
                             </div>
 
                         </div>
+                        <div className={styles.login__description}>
+                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden': '' }`} style={{'max-width':"350px"}}>
+                                <img src={`${PATH_TO_IMG}rocket.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Задача организации, в особенности же укрепление и развитие структуры позволяет выполнять важные задания по разработке систем массового участия.</p>
+                                    <p>Не следует, однако забывать, что рамки и место обучения кадров позволяет оценить значение направлений прогрессивного развития.</p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${this.step !== 1 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}safe.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Пароль должен состоять как минимум из <strong className="note">6 символов.</strong></p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${(this.step !== 12) && (this.step!==13) ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}letter.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p> Резервная фраза состоит из <strong className="note">12 слов</strong></p>
+                                    <p> <strong className="warning">Обязательно запишите</strong> эти слова и не сообщайте их никому</p>
+                                    <p> <strong className="note">Помните!</strong> Эта фраза дает полный контроль над вашим ключом</p>
+                                </div>
+                            </div>
+
+                            <div className={`${styles.content} ${this.step !== 2 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}lifebuoy.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Нужно ввести последовательно все <strong className="note">слова полученные при регистрации.</strong></p>
+                                    <p>Вы ведь их сохранили или записали?</p>
+                                    <p>Если введете верно, то увидите номер кошелька и получите к нему доступ.</p>
+                                </div>
+                            </div>
+
+
+                            <div className={`${styles.content} ${this.step !== 3 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}sextant.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>За что проголосуем на этот раз?</p>
+                                </div>
+                            </div>
+                            <div className={`${styles.content} ${this.step !== 31 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}briefcase.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>Cоздайте новый проект либо подключите уже существующий </p>   
+                                    <p>Вы могли получить адрес проекта <span className="note">где-то там</span></p>   
+                                </div>
+                            </div>
+                            
+                            <div className={`${styles.content} ${this.step !== 35 ? 'hidden': '' }`}>
+                                <img src={`${PATH_TO_IMG}structure.png`}></img>
+                                <div className={styles.content__description}>
+                                    <p>При создании проекта необходимо указать его владельцев </p>   
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
+                    
                 </Container>
             </div>
         );
@@ -404,12 +493,14 @@ class Login extends React.Component {
     // -- KeyStore handlers
     @action
     getPassword = (e) => {
-        this.account.password = e.target.value
+        this.account.password = e.target.value;
+        e.target.classList.remove('field__input--error');
 
     }
     @action
     getPasswordCheck = (e) => {
-        this.account.passwordCheck = e.target.value
+        this.account.passwordCheck = e.target.value;
+        e.target.classList.remove('field__input--error');
     }
     @action 
     createWallet = ()=>{
@@ -424,41 +515,50 @@ class Login extends React.Component {
                     if (err) console.info(err) 
                     console.log('test')
                     this.account.keystore = ks;
-                    this.step = 12;
-                    console.info(ks)
                     this.newAddresses();
                     this.setWeb3Provider(this.account.keystore);
+                    console.info(ks)
+                    this.step = 12;
 
                     let pwDerKey = this.account.keystore.keyFromPassword (this.account.password, (err, pwDerivedKey) => {
                         this.account.randomSeed = this.account.keystore.getSeed(pwDerivedKey);
                         this.seed = this.account.randomSeed.split(' ')
+                        this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
+                        let addresses = this.account.keystore.getAddresses();
+                        this.wallets = window.__ENV == 'development'
+                            ? JSON.parse(fs.readFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, 'utf8'))
+                            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), 'utf8'))
+                        console.log(this.wallets)
                     })
 
-                    let wallets = window.__ENV == 'development'
-                        ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/wallets.json", 'utf8'))
-                        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), 'utf8'))
-                    this.wallets = wallets;
+                    
+
+                    
             })
         }
     }
     @action
     recoverWallet =  () => {
-        if (this.account.password === this.account.passwordCheck){
-            let seed = this.seed.join(' ');
-            lightwallet.keystore.createVault({
-                password: this.account.password,
-                seedPhrase: seed,
-                hdPathString: "m/0'/0'/0'"
-                },  (err, ks) => {
-                    if (err) console.info(err) 
-                    console.log('recovered')
-                    console.log(ks.serialize())
-                    this.account.keystore = window.keystore = ks;
-                    console.log(this.account.keystore);
-                    this.newAddresses();
-                    this.setWeb3Provider(this.account.keystore);                    
-            })
+        try{
+            if (this.account.password === this.account.passwordCheck){
+                let seed = this.seed.join(' ');
+                lightwallet.keystore.createVault({
+                    password: this.account.password,
+                    seedPhrase: seed,
+                    hdPathString: "m/0'/0'/0'"
+                    },(err, ks) => {
+                        console.log(ks.serialize())
+                        this.account.keystore = window.keystore = ks;
+                        console.log(this.account.keystore);
+                        this.newAddresses();
+                        this.setWeb3Provider(this.account.keystore);                    
+                })
+            
+            }
+        }catch(err){
+            console.log(err)
         }
+      
     }
     @action 
     setWeb3Provider = (keystore) => {
@@ -473,6 +573,7 @@ class Login extends React.Component {
         this.account.keystore.keyFromPassword(this.account.password, (err, pwDerivedKey) => {
             this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
             let addresses = this.account.keystore.getAddresses();
+            console.info(addresses)
             this.account.addresses = addresses
             this.wallets[addresses[0]] = {
                 wallet_object:{},
@@ -484,13 +585,9 @@ class Login extends React.Component {
 
             this.getBalance();
             if (window.__ENV == 'development'){
-                fs.writeFile('C:/Users/User/Documents/git/voter/src/wallets.json', JSON.stringify(this.wallets), 'utf8', (err)=>{
-                    if (err) throw err;
-                })
+                fs.writeFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, JSON.stringify(this.wallets), 'utf8')
             } else {
-                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'wallets/wallets.json'), JSON.stringify(this.wallets), 'utf8', (err)=>{
-                    if (err) throw err;
-                })
+                fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), JSON.stringify(this.wallets), 'utf8')
             }
         })
     }
@@ -526,14 +623,16 @@ class Login extends React.Component {
         this.ERC20.totalSupply = e.target.value
     }
     @action 
-    createTokenContract = () =>{
-        if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (this.ERC20.totalSupply !="")){
-            this.step = 51;
-            this.deployToken("token");
-        }else{
-            alert("Введите все данные")
+    createTokenContract = (e) =>{
+        e.preventDefault();
+        if (e.target.password.value == this.account.password){
+            if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (this.ERC20.totalSupply !="")){
+                this.step = 51;
+                this.deployToken("token");
+            }else{
+                alert("Введите все данные")
+            }
         }
-        
     }
 
     @action deployToken = (type)=> {
@@ -582,7 +681,8 @@ class Login extends React.Component {
             });
         });
     }
-    @action deploySolidity = () =>{
+    @action deploySolidity = (e) =>{
+        e.preventDefault();
         this.step = 40
         this.deployToken('contract')
     }
@@ -613,7 +713,7 @@ class Login extends React.Component {
                         .then( data =>{
                             if(data.contractAddress){
                                 let contractAddress  = data.contractAddress
-                                let project = type !== 'token' ? {"name": key, "address": contractAddress, "abi" : abi} : "";
+                                let project = type !== 'token' ? {"name": this.contract.name, "address": contractAddress, "abi" : abi} : "";
                                 clearInterval(interval)
 
                                 if(type!=="token"){
@@ -633,7 +733,7 @@ class Login extends React.Component {
                                 } else {
                                     this.step = 52;
                                 }
-                                
+  
                             }
                         })
                     },5000)
@@ -652,40 +752,64 @@ class Login extends React.Component {
 
     // -- Трансформации окон
     @action
+    goBack = ()=>{
+        length = this.previousStep.length
+        this.step = this.previousStep[length-1]
+        this.previousStep.splice(length-1, 1)
+    }
+
+    @action
     handleSelect = (selected) => {
         this.selected = selected.value;
-        this.account.keystore = lightwallet.keystore.deserialize(JSON.stringify(this.wallets[selected.value].wallet_object))
+        console.info(accountStore.accounts[selected.value])
+        this.account.keystore = lightwallet.keystore.deserialize(JSON.stringify(accountStore.accounts[selected.value].wallet_object));
         this.account.addresses.push(selected.value);
         this.getBalance();
     }
     @action
     handleGetSeed = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 2;
     }
     @action 
     handleCreateKey = (e) => {
         e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 1;
     }
     @action 
-    continueCreateKey = ()=>{
-        this.step = 11;
-        this.createWallet();
+    continueCreateKey = (e)=>{
+        e.preventDefault();
+       this.previousStep.push(this.step)
+        console.log(e.target.password.value)
+        if (e.target.password.value == e.target.password_confirm.value){
+            e.target.password.classList.remove('field__input--error')
+            e.target.password_confirm.classList.remove('field__input--error')
+            this.step = 11;
+            this.createWallet();
+        } else {
+            e.target.password.classList.add('field__input--error')
+            e.target.password_confirm.classList.add('field__input--error')
+        }
+        
     }
     @action 
     handleShowSeed=()=>{
+       this.previousStep.push(this.step)
         this.step = 12;
     }
     @action 
     inputCreatedSeed = ()=>{
+       this.previousStep.push(this.step)
         this.step = 13;
     }
     @action 
-    checkCreatedSeed = () =>{
+    checkCreatedSeed = (e) =>{
+        e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 21;
         let seed = this.seed.join(' ');
-        console.log(seed)
         if ( lightwallet.keystore.isSeedValid(seed) ) {
             console.log("valid")
             this.newAddresses();
@@ -696,19 +820,32 @@ class Login extends React.Component {
     }
     @action
     backToStart = ()=>{
+       this.previousStep.push(this.step)
         this.step = 0;
     }
     @action
     handleInputSeed = (e) => {
-        let index = e.target.getAttribute("data-index");
+        let index = Number(e.target.getAttribute("data-index"));
+        e.target.addEventListener('keydown', (k)=>{
+            if(k.keyCode == 13){
+                if (index !== 11){
+                    document.querySelector(`input[data-index="${index+1}"]`).focus()
+                } else {
+                    this.step == 2 ? this.recoverFromSeed: this.checkCreatedSeed
+                }
+            }
+        })
         this.seed[index] = e.target.value;
     }
     @action
     handleChangePassword = () => {
+       this.previousStep.push(this.step)
         this.step = 23;
     }
     @action
     handleSaveKey = (e) => {
+        e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 24;
         this.recoverWallet();
         setTimeout(()=>{
@@ -716,45 +853,59 @@ class Login extends React.Component {
         }, 5000);
     }
     @action
-    recoverFromSeed =() => {
-        this.step = 21;
-        this.recoverWallet();
-        setTimeout(()=>{
-            this.step = 22;
-        }, 5000);
+    recoverFromSeed =(e) => {
+        e.preventDefault();
+       this.previousStep.push(this.step)
+        let seed = this.seed.join(' ');
+        if(lightwallet.keystore.isSeedValid(seed)){
+            this.step = 21;
+            this.recoverWallet();
+            setTimeout(()=>{
+                this.step = 22;
+            }, 5000);
+        } else alert("Проверьте правильность ввода")
     }
     @action
-    handleSubmit = () => {
-
-        if (this.account.password != ''){
+    handleSubmit = (e) => {
+        e.preventDefault();
+       this.previousStep.push(this.step)
+        if (e.target.password.value != ''){
             this.account.keystore.keyFromPassword(this.account.password, (err, pwDerivedKey)=>{
                 if (err) throw err
                 if (this.account.keystore.isDerivedKeyCorrect(pwDerivedKey)){
                     this.setWeb3Provider(this.account.keystore);
                     this.step = 3;
-                } else alert("Неверный пароль")
+                } else {
+                    document.forms.login_form.password.classList.add('field__input--error')
+                }
             })
         }
        
     }
     @action
     selectDeploy = () =>{
+       this.previousStep.push(this.step)
         this.step = 31;
     }
     @action
     existingProject = ()=>{
+       this.previousStep.push(this.step)
         this.step = 32;
     }
     @action
     newProject = ()=>{
+       this.previousStep.push(this.step)
         this.step = 35;
     }
     @action
     newAddress = ()=>{
+       this.previousStep.push(this.step)
         this.step = 36;
     }
     @action
-    checkExistingERC = ()=>{
+    checkExistingERC = (e)=>{
+        e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 37;
         console.info('Ты не тут')
 
@@ -780,10 +931,12 @@ class Login extends React.Component {
     }
     @action
     continueDeploy = ()=>{
+       this.previousStep.push(this.step)
         this.step = 39;
     }
     @action
     sendDeploy = ()=>{
+       this.previousStep.push(this.step)
         this.step = 40;
         setTimeout(()=>{
             this.step = 41;
@@ -791,7 +944,9 @@ class Login extends React.Component {
     }
 
     @action 
-    checkExistingAddress = () =>{
+    checkExistingAddress = (e) =>{
+        e.preventDefault();
+       this.previousStep.push(this.step)
         this.step = 33;
         let address = web3.eth.getCode(this.contract.hash).then(data=>{
             data !== '0x'? writeToProjects() : alert('Адрес не валидный');
@@ -816,10 +971,12 @@ class Login extends React.Component {
     }
     @action 
     backToProjects = () =>{
+       this.previousStep.push(this.step)
         this.step = 3;
     }
     @action 
     toCreateToken = () =>{
+       this.previousStep.push(this.step)
         this.step = 5;
     }
    
