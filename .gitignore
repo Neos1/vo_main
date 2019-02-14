@@ -2,6 +2,7 @@
 node_modules/
 
 src/node_modules
-
+dist/
+build/
 dist/win-unpacked
 dist/builder-effective-config.yaml

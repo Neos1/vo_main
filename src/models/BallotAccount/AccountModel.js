@@ -34,16 +34,23 @@ class AccountModel {
         console.info(files)
             files.map( file =>{
                 let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
-                _self.accounts = Object.assign(_self.accounts, wallet)
+                let wallet_object = {}
+                wallet_object[wallet.address] = wallet
+                _self.accounts = Object.assign(_self.accounts, wallet_object)
+
             });
 
         window.fs.watch(PATH_TO_WALLETS, (evtType, file)=>{
             if (file) {
                 if(evtType === 'change'){
+                    let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
                     let wallets = _self.accounts
                     this.accounts = {}
-                    let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
-                    this.accounts = Object.assign(wallets, wallet)
+
+                    let wallet_object = {}
+                    wallet_object[wallet.address] = wallet
+
+                    this.accounts = Object.assign(wallets, wallet_object)
                 }
             } else {
                 console.info('filename not provided');
@@ -75,10 +82,10 @@ class AccountModel {
 
     @computed 
     get options() {
-        console.info(Object.keys(this.accounts))
-        return Object.keys(this.accounts).map(item => ({
+        console.log(Object.keys(this.accounts))
+        return Object.keys(this.accounts).map((item, index) => ({
             value: item,
-            label: this.accounts[item].name + ' - ' + item
+            label: this.accounts[item].address
         }))
     }
 
@@ -100,7 +107,7 @@ class AccountModel {
         const _self = this;
         _self.name = this.accounts[address].name;
         _self.address = address;
-        _self.wallet_object = this.accounts[address].wallet_object;
+        _self.wallet_object = this.accounts[address];
         storage.setItem('account', address);
         runInAction(() => {
             _self.getAccountType()
