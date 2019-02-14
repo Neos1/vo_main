@@ -42,6 +42,8 @@ class Login extends React.Component {
         name:'',
         totalSupply: ''
     }
+
+    @observable date = ''
     @observable txHash = ''
 
     @observable seed = [];
@@ -754,17 +756,15 @@ class Login extends React.Component {
                         this.seed = this.account.randomSeed.split(' ')
                         this.seed.map(word=>{
                             let length = word.length;
-                            console.log(`length = ${length}`)
                             let hiddenWord = '*'.repeat(length)
-                            console.log(`hiddenWord = ${hiddenWord}`)
                             this.hiddenSeed += ` ${hiddenWord}`
-                            console.log(`hiddenSeed = ${this.hiddenSeed}`)
                         })
                         this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
                         let addresses = this.account.keystore.getAddresses();
+                        let name = `UTC--${this.date}--${addresses[0].replace(/^0x/, '')}`
                         this.wallets = window.__ENV == 'development'
-                            ? JSON.parse(fs.readFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, 'utf8'))
-                            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), 'utf8'))
+                            ? JSON.parse(fs.readFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${name}.json`, 'utf8'))
+                            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), 'utf8'))
                         console.log(this.wallets)
                     })
 
@@ -826,11 +826,12 @@ class Login extends React.Component {
             this.wallets[addresses[0]].name = 'Sample';
             
 
+            let name = `UTC--${this.date}--${addresses[0].replace(/^0x/, '')}`
             this.getBalance();
             if (window.__ENV == 'development'){
-                fs.writeFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${addresses[0]}.json`, JSON.stringify(encKeystore), 'utf8')
+                fs.writeFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${name}.json`, JSON.stringify(encKeystore), 'utf8')
             } else {
-                fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${addresses[0]}.json`), JSON.stringify(encKeystore), 'utf8')
+                fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(encKeystore), 'utf8')
             }
         })
     }
@@ -1018,7 +1019,9 @@ class Login extends React.Component {
     @action 
     handleCreateKey = (e) => {
         e.preventDefault();
-       this.previousStep.push(this.step)
+        let date = new Date();
+        this.date = `${date.getUTCFullYear()}-${date.getUTCDate()}-${date.getUTCDay()}T${date.getUTCHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}.${date.getMilliseconds()*1000000}Z`
+        this.previousStep.push(this.step)
         this.step = 1;
     }
     @action 
