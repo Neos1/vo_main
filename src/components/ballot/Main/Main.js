@@ -1,17 +1,19 @@
 import React from 'react';
-
-import { withRouter } from 'react-router';
 import RequiredAuthorization from '../RequiredAuthorization/RequiredAuthorization';
+import Header from '../Header';
+import Container from '../Container';
 import Questions from '../Questions/Questions';
-import Voting from '../Voting/Voting';
-import Header from '../Header/Header';
+
 
 class Main extends React.Component {
     render() {
         return (
             <RequiredAuthorization>
-                <div>
-                    <Header />
+                <div> 
+                    <Header/>
+                    <Container>
+                        <Questions/>
+                    </Container>
                 </div>
             </RequiredAuthorization>
         );

@@ -524,7 +524,7 @@
 $loader-size: 100px;
 $loader-dot-size: ($loader-size / 5);
 $loader-height: ($loader-dot-size * 2);
-$loader-dot-color: #116fff;
+$loader-dot-color: #447ACC;
 
 // HTML
 #loader-walk {
@@ -594,7 +594,7 @@ $loader-dot-color: #116fff;
         top: 50%;
         width:0;
         opacity: 0;
-        border: 3px solid #116fff;
+        border: 3px solid #447ACC;
         transform: translateY(-50%);
         transition: .3s ease-in;
     }
@@ -605,7 +605,7 @@ $loader-dot-color: #116fff;
         transform: translate(-50%, 0%) scale(1);
       }
     .stroke-still {
-        stroke: rgba($color: #116FFF, $alpha: .5);
+        stroke: rgba($color: #447ACC, $alpha: .5);
     }
     
     & > img {
@@ -616,20 +616,25 @@ $loader-dot-color: #116fff;
         opacity: .5;
     }
     &>p{
-        margin: 100px 0 0;
-        width: 100%;
+        margin: 100px 0 0 -30%;
+        width: 160%;
         color: #37474F;
         opacity: .5;
+        &+strong {
+            display: inline-block;
+            width: 165%;
+            margin: 5px 0 0 -35%;
+        }
     }
     &.success{
         .stroke-still {
-            stroke: rgba($color: #116FFF, $alpha: 1);
+            stroke: rgba($color: #447ACC, $alpha: 1);
         }
         & > img {
             opacity: 1;
         }
         .progress-line{
-            width:120px;
+            width: 78px;
             opacity: 1;
         }
 
@@ -674,13 +679,13 @@ $loader-dot-color: #116fff;
   
 
   @keyframes stroke-color {
-    0%  { stroke: #116FFF; }
-    24% { stroke: #116FFF; }
-    25% { stroke: #116FFF; }
-    49% { stroke: #116FFF; }
-    50% { stroke: #116FFF; }
-    74% { stroke: #116FFF; }
-    75% { stroke: #116FFF; }
-    99% { stroke: #116FFF; }
+    0%  { stroke: #447ACC; }
+    24% { stroke: #447ACC; }
+    25% { stroke: #447ACC; }
+    49% { stroke: #447ACC; }
+    50% { stroke: #447ACC; }
+    74% { stroke: #447ACC; }
+    75% { stroke: #447ACC; }
+    99% { stroke: #447ACC; }
   }
   

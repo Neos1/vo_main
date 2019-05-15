@@ -1,7 +1,7 @@
 /*-------------------------------------------------------*/
 /* declarations */
 
-function preparePath(lng, path) { return `/${lng}${path}`; }
+function preparePath(lng, path) { return `/${path}`; }
 function getRoutePrefix() { return ':lng'; }
 
 /*-------------------------------------------------------*/

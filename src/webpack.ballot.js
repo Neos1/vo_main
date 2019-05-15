@@ -26,16 +26,21 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '../build/ballot'),
         filename: 'bundle.js',
-        publicPath: ''
+        publicPath: '',
     },
     resolve: {
         extensions: ['.js', '.jsx']
     },
     module: {
-        rules: [{
+        rules: [
+            {
             test: /\.jsx?$/,
             exclude: [/node_modules/],
             use: ['babel-loader'],
+        }, {
+            test: /\.worker\.js$/,
+            exclude: [/node_modules/],
+            use: ['worker-loader', 'babel-loader']
         }, {
             test: /\.s?css$/,
             use: [{

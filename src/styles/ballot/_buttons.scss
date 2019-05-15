@@ -28,11 +28,11 @@
         width: 100%;
     }
     &--blue {
-        background: #434BDF;
+        background: #447ACC;
         //box-shadow: 0px 0px 15px 3px rgba(0, 178, 255, 0.53);
         transition: .4s;
         &:hover {
-            background: #565EFC;
+            background: #4288F3;
             box-shadow: none;
             
             &:before, &:after{
@@ -40,11 +40,14 @@
             }
         }
         &:active{
-            background-image: #3840CC;
+            background-image: #2659A6;
             &:before, &:after{
                 opacity: 1;
             }
         }
+    }
+    &--small {
+        padding: 7px 6px;
     }
     &--white{
         background-color: #fff;

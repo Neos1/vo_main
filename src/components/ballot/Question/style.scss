@@ -1,0 +1,109 @@
+.question {
+  margin-bottom: 10px;
+  background-color: #FFFFFF;
+  padding: 20px 20px 0;
+  box-sizing: border-box;
+  transition: .3s;
+  overflow: hidden;
+  cursor: pointer;
+  &-expanded {
+    display: none;
+    border-top: 1px solid rgba($color: #CCCCCC, $alpha: .3);
+    transition: .3s;
+    &__split {
+      border-bottom: 1px solid rgba($color: #CCCCCC, $alpha: .3);
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      &-info {
+        width: 70%;
+        padding: 20px;
+        overflow: hidden;
+        border-right: 1px solid rgba($color: #CCCCCC, $alpha: .3);
+        p {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+          font-size: 14px;
+          color: #5B778D;
+          span {
+            &:nth-child(1){
+              width: 50%;
+            }
+            &:nth-child(2){
+              width:10%
+            }
+            &:nth-child(3){
+              width: 40%;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+      &-start { 
+        width: calc(30% - 1px);
+        text-align: center;
+        label {
+          span{
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: 500;
+            text-align: right;
+            text-transform: uppercase;
+            color: #5B778D;
+          }
+          button {
+            padding: 10px;
+            img{
+              height: 30px;
+            }
+          }
+        }
+      }
+    }
+    &__formula {
+      padding: 20px;
+      box-sizing: border-box;
+      &-heading {
+        font-size: 16px;
+        font-weight: bold;
+        color: #5B778D;
+      }
+      &-formula {
+        font-size: 16px;
+        font-weight: normal;
+        color: #5B778D;
+      }
+    }
+  }
+  &-id {
+    font-weight: bold;
+    font-size: 24px;
+    color: #447ACC;
+  }
+  &-caption {
+    display: inline-block;
+    margin: 0 0 0 10px;
+    font-weight: normal;
+    font-size: 24px;
+    color: #000000;
+  }
+  &-text {
+    font-weight: normal;
+    font-size: 14px;
+    color: rgba($color: #5B778D, $alpha: .6) ;
+  }
+  &-duration {
+    margin: 30px 0 10px;
+    font-weight: normal;
+    font-size: 14px;
+    color: rgba($color: #A6B4BF, $alpha: .6) ;
+  }
+}
+.opened {
+  background-color: #FBFBFB;
+  &>.question-expanded {
+    display: block
+  }
+}

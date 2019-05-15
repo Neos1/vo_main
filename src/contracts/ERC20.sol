@@ -2,7 +2,7 @@
 pragma solidity ^0.4.24;
 
 
-contract Test {
+contract ERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;

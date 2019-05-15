@@ -4,29 +4,28 @@ import { observable, action } from 'mobx';
 import Container from '../Container';
 import {SimpleInput} from '../Input/index';
 import Select from 'react-select';
-import { Redirect } from '../../common/Navigation/Navigation';
 import styles from './Login.scss';
-import * as async from 'async';
-
+import Worker from '../../../workers/wallet.worker';
+import {unite} from './combiner';
+import {BrowserRouter as Router, Route, Link, Redirect} from "react-router-dom";
+ 
 
 const fs = window.require('fs');
-const path  = window.require('path');
-
+const path = window.path = window.require('path');
+window.ejsWallet = require('ethereumjs-wallet');
+window.hdKey = require('ethereumjs-wallet/hdkey');
+window.bip39 = require('bip39')
 const Web3 = require('web3');
 
-window.web3 = web3;
-const lightwallet = require('../../../assets/lightwallet.min')
-const txutils = lightwallet.txutils
-const signing = lightwallet.signing
-const HookedWeb3Provider = require("hooked-web3-provider");
-const web3 = window.web3 = new Web3();
+
+
 const BrowserSolc = require('../../../assets/browser-solc.min')
 const PATH_TO_IMG = window.__ENV == "development"
     ? "../img/"
     : "./img/"
 window.BrowserSolc = BrowserSolc;
 
-@inject('accountStore') @observer
+@inject('accountStore', 'contractModel') @observer
 class Login extends React.Component {
     
     @observable step = 0;
@@ -51,31 +50,32 @@ class Login extends React.Component {
     @observable showSeed = false;
     @observable contract = {
         name: '',
-        hash: ''
+        hash: '',
+        total: '',
+        deployed: 0
     }
     @observable wallets = {}
     @observable account = {
+        wallet:{},
         password:"",
         passwordCheck:"",
         randomSeed:"",
         balances:[],
-        addresses:[],
-        keystore: {},
-        web3KS:{}
+        addresses:'',
+        keystore: {}
     };
 
-  
+    
     
     componentWillMount(){
         window.onerror = (e) =>{
             return;
         }
-
         let config = window.__ENV == 'development'
-        ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/config.json", 'utf8'))
-        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), 'utf8'))
-
-        web3.setProvider(config.host);
+        ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./config.json"), "utf8"))
+        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), "utf8"))
+        const web3 = new Web3(config.host); //window.__ENV == 'development'? new Web3('ws://localhost:7545') :  new Web3(config.host);
+        window.web3 = web3;
         this.config = window.config = config;
     }
 
@@ -93,13 +93,18 @@ class Login extends React.Component {
     render() {
         const props = this.props;
         const accountStore = props.accountStore;
+        const contractModel = props.accountStore;
         let projects = this.config.projects.map((project, index)=>{
-            return  <li key={index}><button type="button" className="btn btn--block btn--blue">{project.name}</button></li>
+            return  <li key={index}>
+                        <Link to="/cabinet">
+                            <button className="btn btn--block btn--blue" data-project={index} onClick={this.handleGoToProject}>{project.name}</button>
+                        </Link>
+                    </li>
         })
 
 
 
-        if (accountStore.authorized) return <Redirect to="/cabinet" />
+        if (accountStore.authorized) return <Redirect to="/questions" />
         return (
             <div className={styles.login}>
                 <Container>
@@ -128,7 +133,7 @@ class Login extends React.Component {
                                         </label>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button  type="submit" className="btn btn--block btn--blue btn--arrow">Войти</button>
+                                        <button  type="submit"  className="btn btn--block btn--blue btn--arrow">Войти</button>
                                         <a href="#" onClick={this.handleGetSeed}> У меня есть резервная фраза </a>
                                         <a href="#" onClick={this.handleCreateKey}> Хочу создать новый ключ </a>
                                     </div>
@@ -434,11 +439,11 @@ class Login extends React.Component {
                                 
                                 <div className={`${ ((this.step != 21) && (this.step != 11)  && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51)) ? styles.hidden : ''}`}>
                                     <div id="loader-walk" className={this.step == 40? 'hidden' : ''}>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
+                                        <div className="dot"></div>
                                     </div>
                                     { this.step == 21? <h3>Проверяем резервную фразу</h3> : ''}
                                     { this.step == 24? <h3>Идет сохранение ключа</h3> : ''}
@@ -453,10 +458,10 @@ class Login extends React.Component {
                                             <div className="progress">
                                                 <div className={`progress-block  ${this.substep == 1? 'active' : ''} ${this.substep > 1? "success": ''}`}>
                                                     <svg width="80" height="80" viewBox="0 0 80 80">
-                                                        <polyline class="line-cornered stroke-still" points="5,0 80,0 80,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-still" points="0,0 0,80 75,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" stroke-width="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="5,0 80,0 80,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="0,0 0,80 75,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" strokeWidth="10" fill="none"></polyline>
                                                     </svg>
                                                     <img src={PATH_TO_IMG+'code.png'}></img>
                                                     <p>Компиляция</p>
@@ -464,35 +469,47 @@ class Login extends React.Component {
                                                 </div>
                                                 <div className={`progress-block  ${this.substep == 2? 'active' : ''} ${this.substep > 2? "success": ''}`}>
                                                     <svg width="80" height="80" viewBox="0 0 80 80">
-                                                    <polyline class="line-cornered stroke-still" points="5,0 80,0 80,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-still" points="0,0 0,80 75,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" stroke-width="10" fill="none"></polyline>
+                                                    <polyline className="line-cornered stroke-still" points="5,0 80,0 80,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="0,0 0,80 75,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" strokeWidth="10" fill="none"></polyline>
                                                     </svg>
                                                     <img src={PATH_TO_IMG+'drone.png'}></img>
                                                     <p>Отправка</p>
                                                     <div className="progress-line"></div>
                                                 </div>
-                                                <div className={`progress-block  ${this.substep == 2? 'active' : ''} ${this.substep > 2? "success": ''}`}>
+                                                <div className={`progress-block  ${this.substep == 3? 'active' : ''} ${this.substep > 3? "success": ''}`}>
                                                     <svg width="80" height="80" viewBox="0 0 80 80">
-                                                        <polyline class="line-cornered stroke-still" points="5,0 80,0 80,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-still" points="0,0 0,80 75,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" stroke-width="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="5,0 80,0 80,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="0,0 0,80 75,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" strokeWidth="10" fill="none"></polyline>
                                                     </svg>
                                                     <img src={PATH_TO_IMG+'etherium.png'}></img>
                                                     <p>Получение хэша</p>
                                                     <div className="progress-line"></div>
                                                 </div>
-                                                <div className={`progress-block  ${this.substep == 2? 'active' : ''} ${this.substep > 2? "success": ''}`}>
+                                                <div className={`progress-block  ${this.substep == 4? 'active' : ''} ${this.substep > 4? "success": ''}`}>
                                                     <svg width="80" height="80" viewBox="0 0 80 80">
-                                                    <polyline class="line-cornered stroke-still" points="5,0 80,0 80,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-still" points="0,0 0,80 75,80" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" stroke-width="10" fill="none"></polyline>
-                                                        <polyline class="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" stroke-width="10" fill="none"></polyline>
+                                                    <polyline className="line-cornered stroke-still" points="5,0 80,0 80,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="0,0 0,80 75,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" strokeWidth="10" fill="none"></polyline>
                                                     </svg>
                                                     <img src={PATH_TO_IMG+'/reciept.png'}></img>
                                                     <p>Получение чека</p>
+                                                    <div className="progress-line"></div>
+                                                </div>
+                                                <div className={`progress-block  ${this.substep == 5? 'active' : ''} ${this.substep > 5? "success": ''}`}>
+                                                    <svg width="80" height="80" viewBox="0 0 80 80">
+                                                    <polyline className="line-cornered stroke-still" points="5,0 80,0 80,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-still" points="0,0 0,80 75,80" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,0 80,0 80,40" strokeWidth="10" fill="none"></polyline>
+                                                        <polyline className="line-cornered stroke-animation" points="0,40 0,80 80,80 80,40" strokeWidth="10" fill="none"></polyline>
+                                                    </svg>
+                                                    <img src={PATH_TO_IMG+'/questions.png'}></img>
+                                                    <p>Загрузка вопросов</p>
+                                                    <strong>{`Загружено ${this.contract.deployed} из  ${this.contract.total}`}</strong> 
                                                 </div>
                                             </div>
 
@@ -512,8 +529,8 @@ class Login extends React.Component {
                                 <div className={`${styles.seed__key} ${ (this.step != 22) ? styles.hidden : ''}`}>
                                     <h3>Резервная фраза проверена, ваш ключ:</h3>
                                     <div className={styles.seed__wallet}>
-                                        <p>Ваш ключ: <strong className="note">{this.account.addresses[0]}</strong></p>  
-                                        <p>Баланс: <strong className="note">{this.account.balances[0] / 1.0e18} Eth</strong></p>
+                                        <p>Ваш ключ: <strong className="note">{this.account.addresses}</strong></p>  
+                                        <p>Баланс: <strong className="note">{this.account.balances / 1.0e18} Eth</strong></p>
                                     </div>
 
                                 </div>
@@ -542,7 +559,7 @@ class Login extends React.Component {
                             </div>
 
                         <div className={styles.login__description}>
-                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden': '' }`} style={{'max-width':"350px"}}>
+                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden': '' }`} style={{'maxWidth':"350px"}}>
                                 <img src={`${PATH_TO_IMG}rocket.png`}></img>
                                 <div className={styles.content__description}>
                                     <p>Задача организации, в особенности же укрепление и развитие структуры позволяет выполнять важные задания по разработке систем массового участия.</p>
@@ -647,10 +664,10 @@ class Login extends React.Component {
                                 <img src={`${PATH_TO_IMG}document.png`}></img>
                                 <div className={styles.content__description}>
                                     <p>Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже</p>
-                                    <p>{this.account.addresses[0]}</p>   
+                                    <p>{this.account.addresses}</p>   
                                     <p>
                                         <strong>Баланс: </strong> 
-                                        <strong className="note">{Number((this.account.balances[0]/ 1.0e18)).toFixed(4)} ETH</strong>
+                                        <strong className="note">{Number((this.account.balances/ 1.0e18)).toFixed(4)} ETH</strong>
                                     </p>
                                     <p>Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth.</p>
                                     <p>Все ERC20 токены будут начислены на этот кошелек, после чего их можно будет распределить на необходимые адреса.</p>   
@@ -720,7 +737,6 @@ class Login extends React.Component {
         let unique = [...new Set(this.passwordMatches)]
         if ((unique.length == 1) && (unique[0]==true)){
             this.account.password = e.target.value
-            console.log(this.account.password)
         } else {
             this.account.password = '';
         }
@@ -734,63 +750,90 @@ class Login extends React.Component {
     }
     @action 
     createWallet = ()=>{
-        
-        if (this.account.password === this.account.passwordCheck){
-            this.account.randomSeed = lightwallet.keystore.generateRandomSeed();
-            lightwallet.keystore.createVault({
-                password: this.account.password,
-                seedPhrase: this.account.randomSeed,
-                //random salt 
-                hdPathString: "m/0'/0'/0'"
-                }, (err, ks) => {
-                    if (err) console.info(err) 
-                    console.log('test')
-                    this.account.keystore = ks;
-                    this.newAddresses();
-                    this.setWeb3Provider(this.account.keystore);
-                    console.info(ks)
-                    this.step = 12;
+        if (this.account.password === this.account.passwordCheck){  
+            let worker = new Worker();
+            let mnemonic = bip39.generateMnemonic();
+            let address;
+            let privKey;
+            this.account.randomSeed = mnemonic;
+            this.seed = mnemonic.split(' ');
 
-                    let pwDerKey = this.account.keystore.keyFromPassword (this.account.password, (err, pwDerivedKey) => {
-                        this.account.randomSeed = this.account.keystore.getSeed(pwDerivedKey);
-                        this.seed = this.account.randomSeed.split(' ')
-                        this.seed.map(word=>{
-                            let length = word.length;
-                            let hiddenWord = '*'.repeat(length)
-                            this.hiddenSeed += ` ${hiddenWord}`
-                        })
-                        this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
-                        let addresses = this.account.keystore.getAddresses();
-                        let name = `UTC--${this.date}--${addresses[0].replace(/^0x/, '')}`
-                        this.wallets = window.__ENV == 'development'
-                            ? JSON.parse(fs.readFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${name}.json`, 'utf8'))
-                            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), 'utf8'))
-                        console.log(this.wallets)
-                    })
+            let message = {
+                action: 'create',
+                mnemonic: mnemonic,
+                password: this.account.password
+            }
 
-                    
+ 
+            worker.postMessage ({payload: message});
 
-                    
-            })
+            worker.onmessage = (e) => {
+                let {wallet, privateKey, v3wallet} = e.data;
+                this.account.wallet = wallet;
+                window.wall = wallet;
+                this.account.keystore = v3wallet;
+                this.account.addresses = v3wallet.address
+                address = this.account.addresses;
+                privKey = privateKey;
+                this.seed.map( word => {
+                    let length = word.length;
+                    let hiddenWord = '*'.repeat(length)
+                    this.hiddenSeed += ` ${hiddenWord}`
+                })
+
+
+                this.newAddresses(address, privKey);
+                this.setWeb3Provider(this.account.keystore);
+    
+                let name = `UTC--${this.date}--${address}`
+    
+                this.wallets = window.__ENV == 'development'
+                ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), "utf8"))
+                : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), "utf8"))
+    
+                this.handleShowSeed();
+                worker.terminate();
+            }
         }
     }
     @action
-    recoverWallet =  () => {
+    recoverWallet = (method) => {
         try{
-            if (this.account.password === this.account.passwordCheck){
-                let seed = this.seed.join(' ');
-                lightwallet.keystore.createVault({
-                    password: this.account.password,
-                    seedPhrase: seed,
-                    hdPathString: "m/0'/0'/0'"
-                    },(err, ks) => {
-                        console.log(ks.serialize())
-                        this.account.keystore = window.keystore = ks;
-                        console.log(this.account.keystore);
-                        this.newAddresses();
-                })
-            
+
+            let mnemonic = this.seed.join(' ');
+            let worker = new Worker ();
+            let address;
+            let privKey;
+            let message = {
+                action: method,
+                password: this.account.password,
+                mnemonic,
+            };
+            worker.postMessage({payload:message});
+
+            worker.onmessage = (e) => {
+                let {action, wallet, privateKey, v3wallet} = e.data;
+                this.account.wallet = wallet;
+                window.wall = wallet;
+                this.account.keystore = v3wallet;
+                this.account.addresses = v3wallet.address;
+                address = this.account.addresses;
+                privKey = privateKey;
+                this.newAddresses(address, privKey);
+
+                switch (action) {
+                    case "create" :
+                        this.step = 25;
+                        break;
+                    case "recover" :
+                        this.step = 22;
+                        break;
+                    default :
+                        break;
+                }
+                worker.terminate();
             }
+
         }catch(err){
             console.log(err)
         }
@@ -798,48 +841,28 @@ class Login extends React.Component {
     }
     @action 
     setWeb3Provider = (keystore) => {
-        let web3Provider = new HookedWeb3Provider({
-            host: this.config.host,
-            transaction_signer: keystore
-        })
-        web3.setProvider(web3Provider);
+        web3.setProvider(this.config.host);
     }
     @action
-    newAddresses = () => {
-        this.account.keystore.keyFromPassword(this.account.password, (err, pwDerivedKey) => {
-            this.account.keystore.generateNewAddress(pwDerivedKey,  "1");
-            let addresses = this.account.keystore.getAddresses();
+    newAddresses = (address, privKey) => {
 
-            let privateKey = this.account.keystore.exportPrivateKey(addresses[0], pwDerivedKey);
+        let account = web3.eth.accounts.privateKeyToAccount(privKey);
+        let wallet = web3.eth.accounts.wallet.add(account);
+        this.account.addresses = address
+        this.wallets[address] = {};
+        this.wallets[address] = this.account.keystore;
 
-            let account = web3.eth.accounts.privateKeyToAccount(`0x${privateKey}`);
-            let wallet = web3.eth.accounts.wallet.add(account);
-            let encKeystore = web3.eth.accounts.wallet.encrypt(this.account.password)[0];
+        let name = `UTC--${this.date}--${address}`
+        this.getBalance();
+        if (window.__ENV == 'development'){
+            fs.writeFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), JSON.stringify(this.account.keystore), "utf8")
+        } else {
+            fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(this.account.keystore), "utf8")
+        }
 
-
-            this.account.addresses = addresses
-            this.wallets[addresses[0]] = {
-                wallet_object:{},
-                name: ""
-            };
-            this.wallets[addresses[0]].wallet_object = this.account.keystore;
-            this.wallets[addresses[0]].name = 'Sample';
-            
-
-            let name = `UTC--${this.date}--${addresses[0].replace(/^0x/, '')}`
-            this.getBalance();
-            if (window.__ENV == 'development'){
-                fs.writeFileSync(`C:/Users/User/Documents/git/voter/src/wallets/${name}.json`, JSON.stringify(encKeystore), 'utf8')
-            } else {
-                fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(encKeystore), 'utf8')
-            }
-        })
     }
     @action getBalance = () => {
-        async.map(this.account.addresses, web3.eth.getBalance, (err, balances) => {
-            this.account.balances = balances
-            console.log(this.account.balances)
-        })
+        web3.eth.getBalance(this.account.addresses).then(data=>{this.account.balances = data})
     }
     @action
     getProjectName = (e) => {
@@ -880,49 +903,42 @@ class Login extends React.Component {
     }
 
     @action deployToken = (type)=> {
-        let ERC20 = window.__ENV === 'prodiction' 
-        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), 'utf8')
-        : fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/ERC20.sol", 'utf8');
         
-        let project = window.__ENV === 'prodiction' 
-        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/project.sol'), 'utf8')
-        : fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/project.sol", 'utf8');
+        type !== 'token' ? unite() : '';
+        let ERC20 = window.__ENV === 'production' 
+        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), "utf8")
+        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/ERC20.sol"), "utf8");
+        
+        let questions = window.__ENV === 'production' 
+        ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/sysQuestions.json'), "utf8"))
+        : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/sysQuestions.json"), "utf8"));
+        this.contract.total = Object.keys(questions).length;
+
+        let project = window.__ENV === 'production' 
+        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter/output.sol'), "utf8")
+        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter/output.sol"), "utf8");
 
 
         window.BrowserSolc.getVersions((soljsonSources, soljsonReleases) =>{
             let version = soljsonReleases["0.4.24"];
             let contract = type === 'token' ? ERC20 : project;
-
-
+            let contractID = type === 'token' ? ':ERC20' : ':Voter';
 
             window.BrowserSolc.loadVersion(version, (c) =>{
-                let compiler = c;
+                let compiler = c;   
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                let result = compiler.compile(contract, true);
-                result? this.substep = 2:'';
-
+                window.result = compiler.compile(contract, false);
+                result ? this.substep = 2:'';
                 console.log(result)
-
-                for( let key of Object.keys(result.contracts) ){
-
-                    if (result.contracts[key].metadata !== ""){
-                        console.log(key)
-                        let metadata = JSON.parse(result.contracts[key].metadata);
-
-                        let bytecode = result.contracts[key].bytecode;
-                        let abi = metadata.output.abi;
-                        
-    
-                        let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : [this.ERC20.hash];
-                        console.log(deployArgs)
-        
-                        let contract = new web3.eth.Contract(abi);
-    
-                        this.sendTx(contract.deploy({data: `0x${bytecode}`, arguments: deployArgs}), type, key, abi);
-                    };
-                   
-                }
+                if (result.contracts[contractID].interface !== ""){
+                    let bytecode = result.contracts[contractID].bytecode;
+                    let metadata = JSON.parse(result.contracts[contractID].metadata);
+                    let abi = metadata.output.abi;
+                    let contract = new web3.eth.Contract(abi);
+                    let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : '';
+                    this.sendTx(contract.deploy({data: `0x${bytecode}`, arguments: deployArgs}), type, key, abi);
+                };
             });
         });
     }
@@ -938,9 +954,11 @@ class Login extends React.Component {
         let options = {
             data: transaction.encodeABI(),
             gasPrice: web3.utils.toHex(10000000000),
-            gasLimit: web3.utils.toHex(600000),
+            gasLimit: web3.utils.toHex(6000000),
             value: '0x0'
         };
+
+
 
         let privateKey = web3.eth.accounts.wallet[0].privateKey
         web3.eth.accounts.signTransaction(options, privateKey).then( data =>{
@@ -949,7 +967,10 @@ class Login extends React.Component {
             .on('error', (err)=>{ console.log(err)})
             .on('transactionHash', (txHash)=>{
                 this.txHash = txHash
-                console.log(`txhash - ${this.txHash}`)
+                console.log(txHash)
+            })
+            .on('receipt', (data)=> {
+                console.log(data)
             })
 
 
@@ -957,27 +978,41 @@ class Login extends React.Component {
                 this.substep = 4;
                 let interval = setInterval(()=>{
                     web3.eth.getTransactionReceipt(this.txHash)
-                    .then( data =>{
+                    .then((data) =>{
                         if(data.contractAddress){
-                            let contractAddress  = data.contractAddress
-                            let project = type !== 'token' ? {"name": this.contract.name, "address": contractAddress, "abi" : abi} : "";
+                            this.substep = 5;
+                            let contract = new web3.eth.Contract(abi, data.contractAddress);
+                            window.contract = contract;
+                            let project = type !== 'token' ? {"name": this.contract.name, "address": data.contractAddress, "abi" : abi} : "";
                             clearInterval(interval)
-
-                            if(type!=="token"){
-                                
-                                this.step = 41
+                            if(type !== "token"){
                                 this.config.projects.push(project);
-                                console.log(window.__ENV)
                                 if (window.__ENV == 'development'){
-                                    fs.writeFile('C:/Users/User/Documents/git/voter/src/config.json', JSON.stringify(this.config), 'utf8', (err)=>{
+                                    fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 } else {
-                                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), 'utf8', (err)=>{
+                                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 }
+                                
+                                let questionsLength;
+                                contract.methods.getCount().call({from: web3.eth.accounts.wallet[0].address}).then((res) => {
+                                    questionsLength = res;
+ 
+                                    const sysQuestion = window.__ENV === 'production' 
+                                        ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/sysQuestions.json'), "utf8"))
+                                        : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/sysQuestions.json"), "utf8"));
+                                    let sysQuestionsLength = Object.keys(sysQuestion).length; 
+
+                                    if (questionsLength <= sysQuestionsLength) {
+                                        let i = 1;
+                                        this.sendQuestion(i, sysQuestion, sysQuestionsLength, contract, data.contractAddress, privateKey);
+                                    }
+                                }) 
                             } else {
+                                this.contract.hash = data.contractAddress;
                                 this.step = 52;
                             }
 
@@ -985,8 +1020,62 @@ class Login extends React.Component {
                     })
                 },5000)
             },5000)
-        });  
-        
+        }); 
+    }
+    @action sendQuestion = (index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey) => {
+        if (index <= sysQuestionsLength) {
+            let nonce; 
+
+            web3.eth.getTransactionCount(web3.eth.accounts.wallet[0].address, 'pending', (err, data)=>{
+                nonce = Number(data);
+            });
+
+            let question = contract.methods.question(index)
+                .call({from: web3.eth.accounts.wallet[0].address}).then((question)=>{
+                    if (question.caption == '') {
+                        let id =  sysQuestion[index].id;
+                        let group = sysQuestion[index].group;
+                        let name = sysQuestion[index].name;
+                        let caption = sysQuestion[index].caption;
+                        let time = sysQuestion[index].time;
+                        let method = sysQuestion[index].method;
+                        let formula = sysQuestion[index].formula;
+
+                        let dataTx = contract.methods.saveNewQuestion(id, group, 0, name, caption, time, contractAddress, method, formula).encodeABI();
+                        let rawTx = {
+                            to: contractAddress,
+                            data: dataTx,
+                            gasPrice: web3.utils.toHex(1000000000),
+                            gasLimit: web3.utils.toHex(600000),
+                            value: '0x0',
+                            nonce: web3.utils.toHex(nonce),
+                        } 
+                        console.log(JSON.stringify(rawTx));
+                        nonce += 1; 
+                        
+
+                        web3.eth.accounts.signTransaction(rawTx, privateKey).then(data =>{
+                            web3.eth.sendSignedTransaction(data.rawTransaction)
+                                .on('receipt', (receipt)=>{
+                                    console.log(receipt)
+                                    index += 1;
+                                    this.contract.deployed = index - 1;
+                                    console.log(`index = ${index}`)
+                                    this.sendQuestion(index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey);
+                                })
+                                .on('error', (err)=> { 
+                                    console.error(err);
+                                    this.sendQuestion(index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey); 
+                                })
+                        })
+                    } else {
+                        index += 1;
+                        this.sendQuestion(index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey);
+                    }
+            });
+        } else {
+            this.step = 41;
+        }
     }
 
     @action
@@ -1001,14 +1090,13 @@ class Login extends React.Component {
     goBack = ()=>{
         length = this.previousStep.length
         this.step = this.previousStep[length-1]
-        this.previousStep.splice(length-1, 1)
+        this.previousStep.splice(length-1, 1)   
     }
 
     @action
     handleSelect = (selected) => {
         this.selected = selected.value;
-        this.account.web3KS = accountStore.accounts[this.selected]
-        console.log(this.account)
+        this.account.keystore = accountStore.accounts[this.selected]
     }
     @action
     handleGetSeed = (e) => {
@@ -1028,7 +1116,6 @@ class Login extends React.Component {
     continueCreateKey = (e)=>{
         e.preventDefault();
        this.previousStep.push(this.step)
-        console.log(e.target.password.value)
         let regex = new RegExp(/^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9])(?=.*[!&$%&? "]).{6,}$/g)
         if (regex.test(e.target.password.value) && (e.target.password.value == e.target.password_confirm.value)){
             e.target.password.classList.remove('field__input--error')
@@ -1057,9 +1144,9 @@ class Login extends React.Component {
        this.previousStep.push(this.step)
         this.step = 21;
         let seed = this.seed.join(' ');
-        if ( lightwallet.keystore.isSeedValid(seed) ) {
-            console.log("valid")
-            this.newAddresses();
+        if ( bip39.validateMnemonic(seed) ) {
+            let privKey = web3.eth.accounts.wallet[0].privateKey
+            this.newAddresses(this.account.addresses, privKey);
             setTimeout(()=>{
                 this.step = 0;
             },1500)
@@ -1094,22 +1181,16 @@ class Login extends React.Component {
         e.preventDefault();
        this.previousStep.push(this.step)
         this.step = 24;
-        this.recoverWallet();
-        setTimeout(()=>{
-            this.step = 25;
-        }, 5000);
+        this.recoverWallet('create');
     }
     @action
     recoverFromSeed =(e) => {
         e.preventDefault();
        this.previousStep.push(this.step)
         let seed = this.seed.join(' ');
-        if(lightwallet.keystore.isSeedValid(seed)){
+        if(bip39.validateMnemonic(seed)){
             this.step = 21;
-            this.recoverWallet();
-            setTimeout(()=>{
-                this.step = 22;
-            }, 5000);
+            this.recoverWallet('recover');
         } else alert("Проверьте правильность ввода")
     }
     @action
@@ -1117,14 +1198,15 @@ class Login extends React.Component {
         e.preventDefault();
        this.previousStep.push(this.step)
         if (e.target.password.value != ''){
-            let web3KS = JSON.stringify(this.account.web3KS)
-            let account = web3.eth.accounts.decrypt(web3KS, this.account.password)
-            
+            let account = web3.eth.accounts.decrypt(this.account.keystore, this.account.password)
             if (account){
                 web3.eth.accounts.wallet.add(account)
                 this.step = 3
-                this.account.addresses[0] = web3.eth.accounts.wallet[0].address;
-                web3.eth.getBalance(this.account.addresses[0]).then(data=>{this.account.balances[0] = data})
+                this.account.addresses = web3.eth.accounts.wallet[0].address;
+                web3.eth.getBalance(this.account.addresses).then(data=>{
+                    console.log(`getBalance = ${data}`)
+                    this.account.balances = data
+                })
             } else {
                 document.forms.login_form.password.classList.add('field__input--error')
             }
@@ -1161,19 +1243,18 @@ class Login extends React.Component {
         let address = web3.eth.getCode(this.ERC20.hash).then(data=>{
             data !== '0x'? this.step = 38 : alert('Адрес не валидный');
         })
-        console.log(this.ERC20.hash)
         
         let defaultABI = window.__ENV === 'development'
-            ? JSON.parse(fs.readFileSync("C:/Users/User/Documents/git/voter/src/contracts/ERC20.abi", 'utf8'))
-            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), 'utf8'))
-
-        console.log(defaultABI)
+            ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"), "utf8"))
+            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), "utf8"))
         
         let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
-        contract.methods.totalSupply().call({from: this.account.addresses[0]}).then(result=>{
+        contract.methods.totalSupply().call({from: this.account.addresses}).then(result=>{
+            console.log(result)
             this.ERC20.totalSupply = result
         })
-        contract.methods.symbol().call({from: this.account.addresses[0]}).then(result=>{
+        contract.methods.symbol().call({from: this.account.addresses}).then(result=>{
+            console.log(result)
             this.ERC20.symbol = result
         })
 
@@ -1207,11 +1288,11 @@ class Login extends React.Component {
            }
            this.config.projects.push(project)
             if (window.__ENV == 'development'){
-                fs.writeFile('C:/Users/User/Documents/git/voter/src/config.json', JSON.stringify(this.config), 'utf8', (err)=>{
+                fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config), "utf8", (err)=>{
                     if (err) throw err;
                 })
             } else {
-                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), 'utf8', (err)=>{
+                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), "utf8", (err)=>{
                     if (err) throw err;
                 })
             }
@@ -1227,15 +1308,48 @@ class Login extends React.Component {
     toCreateToken = () =>{
        this.previousStep.push(this.step)
         this.step = 5;
+    }   
+    @action checkQuestions = (contract, address, selected) =>{
+        const props = this.props;
+        const contractModel = props.contractModel; 
+        let questionCount
+        contract.methods.getCount().call({from: web3.eth.accounts.wallet[0].address})
+            .then((count) => {
+                questionCount = Number(count);
+                const sysQuestion = window.__ENV === 'production' 
+                ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/sysQuestions.json'), "utf8"))
+                : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/sysQuestions.json"), "utf8"));
+                let sysQuestionsLength = Object.keys(sysQuestion).length; 
+
+                this.contract.deployed = questionCount
+                this.contract.total = sysQuestionsLength
+                let privateKey = web3.eth.accounts.wallet[0].privateKey;
+                if (questionCount <= sysQuestionsLength) {
+                    console.log(true);
+                    this.step = 40;
+                    this.substep = 5;
+                    let i = 1;
+                    this.sendQuestion(i, sysQuestion, sysQuestionsLength, contract, address, privateKey);
+                } else {
+                    contractModel.setContract(contract);
+                    accountStore.setAccount(selected);
+                }
+            })
     }
-   
+
     @action 
     handleGoToProject = (e) => {
         e.preventDefault();
+        console.log(e.target);
         if (!this.selected) return;
         const props = this.props;
         const accountStore = props.accountStore; 
-        accountStore.setAccount(this.selected);
+        const projectId = e.target.getAttribute('data-project');
+        const project = this.config.projects[projectId]
+        const abi = JSON.parse(JSON.stringify(project.abi).toString());
+        const address = project.address
+        let contract = new web3.eth.Contract(abi, address);
+        this.checkQuestions(contract, address, this.selected)
     }
     // -- Трансформации окон
 }
