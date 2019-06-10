@@ -430,7 +430,8 @@
 
     &__loader{
         position: absolute;
-        width: 100%;
+        left: 25%;
+        width: 50%;
         height: 100%;
         padding: 80px 85px 60px;
         text-align: center;
@@ -656,6 +657,10 @@ $loader-dot-color: #447ACC;
             transform-origin: center center;
         }
     }
+}
+.fullwidth {
+    width: 100%;
+    left: 50%;
 }
 
   

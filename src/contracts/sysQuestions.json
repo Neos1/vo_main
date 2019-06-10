@@ -2,73 +2,11 @@
   "1": {
     "id": 1,
     "group": 0,
-    "name": "test 1",
-    "caption": "test1test1test1",
+    "name": "Добавить Вопрос",
+    "caption": "Добавление нового вопроса",
     "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "2": {
-    "id": 2,
-    "group": 0,
-    "name": "test 2",
-    "caption": "test2test2test2",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "3": {
-    "id": 3,
-    "group": 0,
-    "name": "test 3",
-    "caption": "test3test3test3",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "4": {
-    "id": 4,
-    "group": 0,
-    "name": "test 4",
-    "caption": "test4test4test4",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "5": {
-    "id": 5,
-    "group": 0,
-    "name": "test 5",
-    "caption": "test5test5test5",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "6": {
-    "id": 6,
-    "group": 0,
-    "name": "test 6",
-    "caption": "test6test6test6",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "7": {
-    "id": 7,
-    "group": 0,
-    "name": "test 7",
-    "caption": "test7test7test7",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
-  },
-  "8": {
-    "id": 8,
-    "group": 0,
-    "name": "test 8",
-    "caption": "test8test8test8",
-    "time": 20,
-    "method": "0x00000000",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54)→condition (quorum=20%))"
+    "method": "0x686c52c4",
+    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "parameters": ["GroupId", "uint", "Name", "string", "Caption", "string", "Time", "uint", "MethodSelector", "bytes4", "Formula", "string", "parameters", "bytes32[]"]
   }
 }

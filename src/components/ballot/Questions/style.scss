@@ -8,7 +8,7 @@
   flex-flow: row nowrap;
 }
 .section {
-  display: inline-block;
+  //display: inline-block;
   &-vote{
     width: 35%;
     height: 100%;
@@ -72,7 +72,7 @@
         }
         .Select {
           display: inline-block;
-          width: 80px;
+          width: 165px;
           height: 20px !important;
           margin-bottom: 0;
           box-sizing: border-box;

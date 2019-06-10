@@ -4,8 +4,10 @@ import { observable, action } from 'mobx';
 import Container from '../Container';
 import {SimpleInput} from '../Input/index';
 import Select from 'react-select';
+import Loader from '../../common/Loader';
 import styles from './Login.scss';
-import Worker from '../../../workers/wallet.worker';
+import walletWorker from '../../../workers/wallet.worker';
+import accountWorker from '../../../workers/login.worker';
 import {unite} from './combiner';
 import {BrowserRouter as Router, Route, Link, Redirect} from "react-router-dom";
  
@@ -104,13 +106,26 @@ class Login extends React.Component {
 
 
 
-        if (accountStore.authorized) return <Redirect to="/questions" />
+        if (accountStore.authorized) return <Redirect to="/votings" />
         return (
             <div className={styles.login}>
                 <Container>
                     <div className={styles.login__container}>
                         <div className={styles.login__welcome}>
-                            <button className={`${styles.login__back} ${this.step == 0? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
+
+                            <button 
+                                className={`
+                                ${styles.login__back} 
+                                ${((this.step == 0)
+                                    ||(this.step == 21)
+                                    ||(this.step == 24)
+                                    ||(this.step == 11)
+                                    ||(this.step == 33)
+                                    ||(this.step == 37)
+                                    ||(this.step == 8)
+                                    ||(this.step == 51)
+                                    ||(this.step == 40)) 
+                                    ? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
                             {/* Окно логина */}
                             <div className={`${styles.login__form} ${this.step !== 0 ? styles.hidden : ''}`}>
                                 <h3>Вход в систему</h3>
@@ -435,24 +450,20 @@ class Login extends React.Component {
                                         && (this.step != 40)
                                         && (this.step != 41)
                                         && (this.step != 51)
-                                        && (this.step != 52)) ? styles.hidden : ''}`}>
+                                        && (this.step != 52)
+                                        && (this.step != 8)) ? styles.hidden : ''} ${this.step == 40 ? "fullwidth" : ''}`}>
                                 
-                                <div className={`${ ((this.step != 21) && (this.step != 11)  && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51)) ? styles.hidden : ''}`}>
-                                    <div id="loader-walk" className={this.step == 40? 'hidden' : ''}>
-                                        <div className="dot"></div>
-                                        <div className="dot"></div>
-                                        <div className="dot"></div>
-                                        <div className="dot"></div>
-                                        <div className="dot"></div>
-                                    </div>
+                                <div className={`${ ((this.step != 21) && (this.step != 11)  && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : ''}`}>
+                                    <Loader className={this.step == 40? 'hidden' : ''}/>
                                     { this.step == 21? <h3>Проверяем резервную фразу</h3> : ''}
                                     { this.step == 24? <h3>Идет сохранение ключа</h3> : ''}
                                     { this.step == 11? <h3>Идет создание ключа</h3> : ''}
                                     { this.step == 33? <h3>Проверяем адрес проекта</h3>: ''}
                                     { this.step == 37? <h3>Производим проверку контракта ERC20</h3>: ''}
+                                    { this.step == 8? <h3>Производим дешифровку ключа</h3>: ''}
                                     { this.step == 51? <div><h3>Загружаем контракт ERC20 <p className='subtext'>Это может занять до 5 минут</p></h3></div>: ''}
                                     { this.step == 40? 
-                                        <div>
+                                        <div c>
                                             <h3 style={{marginBottom: '20px'}}>Производим загрузку контракта</h3> 
                                             <p className='subtext' style={{marginBottom: '30px'}}>Это может занять до 5 минут</p>
                                             <div className="progress">
@@ -751,7 +762,7 @@ class Login extends React.Component {
     @action 
     createWallet = ()=>{
         if (this.account.password === this.account.passwordCheck){  
-            let worker = new Worker();
+            let worker = new walletWorker();
             let mnemonic = bip39.generateMnemonic();
             let address;
             let privKey;
@@ -801,7 +812,7 @@ class Login extends React.Component {
         try{
 
             let mnemonic = this.seed.join(' ');
-            let worker = new Worker ();
+            let worker = new walletWorker ();
             let address;
             let privKey;
             let message = {
@@ -855,9 +866,9 @@ class Login extends React.Component {
         let name = `UTC--${this.date}--${address}`
         this.getBalance();
         if (window.__ENV == 'development'){
-            fs.writeFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), JSON.stringify(this.account.keystore), "utf8")
+            fs.writeFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         } else {
-            fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(this.account.keystore), "utf8")
+            fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         }
 
     }
@@ -918,6 +929,10 @@ class Login extends React.Component {
         ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter/output.sol'), "utf8")
         : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter/output.sol"), "utf8");
 
+        let abi = window.__ENV === 'production' 
+        ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
+        : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
+
 
         window.BrowserSolc.getVersions((soljsonSources, soljsonReleases) =>{
             let version = soljsonReleases["0.4.24"];
@@ -928,15 +943,15 @@ class Login extends React.Component {
                 let compiler = c;   
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                window.result = compiler.compile(contract, false);
+                window.result = compiler.compile(contract, true);
+                console.log(result);
                 result ? this.substep = 2:'';
-                console.log(result)
                 if (result.contracts[contractID].interface !== ""){
                     let bytecode = result.contracts[contractID].bytecode;
                     let metadata = JSON.parse(result.contracts[contractID].metadata);
                     let abi = metadata.output.abi;
                     let contract = new web3.eth.Contract(abi);
-                    let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : '';
+                    let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : [this.ERC20.hash];
                     this.sendTx(contract.deploy({data: `0x${bytecode}`, arguments: deployArgs}), type, key, abi);
                 };
             });
@@ -967,7 +982,6 @@ class Login extends React.Component {
             .on('error', (err)=>{ console.log(err)})
             .on('transactionHash', (txHash)=>{
                 this.txHash = txHash
-                console.log(txHash)
             })
             .on('receipt', (data)=> {
                 console.log(data)
@@ -983,16 +997,16 @@ class Login extends React.Component {
                             this.substep = 5;
                             let contract = new web3.eth.Contract(abi, data.contractAddress);
                             window.contract = contract;
-                            let project = type !== 'token' ? {"name": this.contract.name, "address": data.contractAddress, "abi" : abi} : "";
+                            let project = type !== 'token' ? {"name": this.contract.name, "address": data.contractAddress} : "";
                             clearInterval(interval)
                             if(type !== "token"){
                                 this.config.projects.push(project);
                                 if (window.__ENV == 'development'){
-                                    fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config), "utf8", (err)=>{
+                                    fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 } else {
-                                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), "utf8", (err)=>{
+                                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 }
@@ -1022,6 +1036,25 @@ class Login extends React.Component {
             },5000)
         }); 
     }
+    @action prepareFormula(formula) {
+        const FORMULA_REGEXP = new RegExp(/(group)|((?:0x*[a-zA-Z0-9]{40}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
+        let matched = formula.match(FORMULA_REGEXP);
+        console.log(matched)
+        
+        let convertedFormula = [];
+        
+        matched[0] == 'group'? convertedFormula.push(0) : convertedFormula.push(1)
+        matched[2] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
+        matched[3] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
+        convertedFormula.push(Number(matched[4].replace('%', '')))
+
+        if (matched.length == 6) {
+           matched[5] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
+        }
+        console.log(convertedFormula);
+        return convertedFormula;
+    }
+
     @action sendQuestion = (index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey) => {
         if (index <= sysQuestionsLength) {
             let nonce; 
@@ -1029,9 +1062,10 @@ class Login extends React.Component {
             web3.eth.getTransactionCount(web3.eth.accounts.wallet[0].address, 'pending', (err, data)=>{
                 nonce = Number(data);
             });
+            
 
             let question = contract.methods.question(index)
-                .call({from: web3.eth.accounts.wallet[0].address}).then((question)=>{
+                .call({from: web3.eth.accounts.wallet[0].address}).then(async (question)=>{
                     if (question.caption == '') {
                         let id =  sysQuestion[index].id;
                         let group = sysQuestion[index].group;
@@ -1039,28 +1073,30 @@ class Login extends React.Component {
                         let caption = sysQuestion[index].caption;
                         let time = sysQuestion[index].time;
                         let method = sysQuestion[index].method;
-                        let formula = sysQuestion[index].formula;
 
-                        let dataTx = contract.methods.saveNewQuestion(id, group, 0, name, caption, time, contractAddress, method, formula).encodeABI();
+                        let formula = await this.prepareFormula(sysQuestion[index].formula);
+
+                        let params = sysQuestion[index].parameters.map( param =>{ 
+                            return web3.utils.utf8ToHex(param)
+                        });
+                        let dataTx = contract.methods.saveNewQuestion([id, group, time], 0, name, caption, contractAddress, method, formula, params).encodeABI();
+                        
                         let rawTx = {
                             to: contractAddress,
                             data: dataTx,
                             gasPrice: web3.utils.toHex(1000000000),
-                            gasLimit: web3.utils.toHex(600000),
+                            gasLimit: web3.utils.toHex(6000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
                         } 
-                        console.log(JSON.stringify(rawTx));
                         nonce += 1; 
                         
 
                         web3.eth.accounts.signTransaction(rawTx, privateKey).then(data =>{
                             web3.eth.sendSignedTransaction(data.rawTransaction)
                                 .on('receipt', (receipt)=>{
-                                    console.log(receipt)
                                     index += 1;
                                     this.contract.deployed = index - 1;
-                                    console.log(`index = ${index}`)
                                     this.sendQuestion(index, sysQuestion, sysQuestionsLength, contract, contractAddress, privateKey);
                                 })
                                 .on('error', (err)=> { 
@@ -1196,27 +1232,60 @@ class Login extends React.Component {
     @action
     handleSubmit = (e) => {
         e.preventDefault();
-       this.previousStep.push(this.step)
+        let loginWorker = new accountWorker();
+         this.previousStep.push(this.step);
+         this.step = 8;
         if (e.target.password.value != ''){
-            let account = web3.eth.accounts.decrypt(this.account.keystore, this.account.password)
-            if (account){
-                web3.eth.accounts.wallet.add(account)
-                this.step = 3
-                this.account.addresses = web3.eth.accounts.wallet[0].address;
-                web3.eth.getBalance(this.account.addresses).then(data=>{
-                    console.log(`getBalance = ${data}`)
-                    this.account.balances = data
-                })
-            } else {
-                document.forms.login_form.password.classList.add('field__input--error')
+            loginWorker.postMessage(JSON.stringify({
+                    keystore: this.account.keystore, 
+                    password: this.account.password
+                }));
+            loginWorker.onmessage = async(e) => {
+                const { privateKey, error } = e.data;
+                if (privateKey != null){
+                    let account = await web3.eth.accounts.privateKeyToAccount(privateKey)
+                    web3.eth.accounts.wallet.add(account)
+                    this.step = 3
+                    this.account.addresses = web3.eth.accounts.wallet[0].address;
+                    web3.eth.getBalance(this.account.addresses).then(data=>{
+                        this.account.balances = data
+                    })
+                    loginWorker.terminate();
+                } else {
+                    document.forms.login_form.password.classList.add('field__input--error')
+                    this.step = 0;
+                    alert('Проверьте правильность ввода пароля')
+                    loginWorker.terminate();
+                }
             }
         }
-       
     }
     @action
     selectDeploy = () =>{
-       this.previousStep.push(this.step)
-        this.step = 31;
+       this.previousStep.push(this.step);
+       this.step = 31;
+        let abi = window.__ENV === 'production' 
+            ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
+            : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
+        let address = this.contract.hash;
+        let name = this.contract.name;
+        let contract = new web3.eth.Contract(abi, address);
+        contract.methods.getERCAddress().call({from: web3.eth.accounts.wallet[0].address}).then(result=>{
+            if (result == address) {
+                let project = {"name": this.contract.name, "address": address};
+                this.config.projects.push(project);
+                if (window.__ENV == 'development'){
+                    fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
+                        if (err) throw err;
+                    })
+                } else {
+                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
+                        if (err) throw err;
+                    })
+                }
+                this.step = 34;
+            }
+        })
     }
     @action
     existingProject = ()=>{
@@ -1250,11 +1319,9 @@ class Login extends React.Component {
         
         let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
         contract.methods.totalSupply().call({from: this.account.addresses}).then(result=>{
-            console.log(result)
             this.ERC20.totalSupply = result
         })
         contract.methods.symbol().call({from: this.account.addresses}).then(result=>{
-            console.log(result)
             this.ERC20.symbol = result
         })
 
@@ -1288,11 +1355,11 @@ class Login extends React.Component {
            }
            this.config.projects.push(project)
             if (window.__ENV == 'development'){
-                fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config), "utf8", (err)=>{
+                fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
                     if (err) throw err;
                 })
             } else {
-                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config), "utf8", (err)=>{
+                fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
                     if (err) throw err;
                 })
             }
@@ -1325,7 +1392,6 @@ class Login extends React.Component {
                 this.contract.total = sysQuestionsLength
                 let privateKey = web3.eth.accounts.wallet[0].privateKey;
                 if (questionCount <= sysQuestionsLength) {
-                    console.log(true);
                     this.step = 40;
                     this.substep = 5;
                     let i = 1;
@@ -1340,13 +1406,14 @@ class Login extends React.Component {
     @action 
     handleGoToProject = (e) => {
         e.preventDefault();
-        console.log(e.target);
         if (!this.selected) return;
         const props = this.props;
         const accountStore = props.accountStore; 
         const projectId = e.target.getAttribute('data-project');
         const project = this.config.projects[projectId]
-        const abi = JSON.parse(JSON.stringify(project.abi).toString());
+        const abi = window.__ENV === 'production' 
+            ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
+            : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
         const address = project.address
         let contract = new web3.eth.Contract(abi, address);
         this.checkQuestions(contract, address, this.selected)

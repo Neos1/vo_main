@@ -20,7 +20,7 @@ const PATH_TO_WALLETS = window.__ENV == 'development'
 
 class AccountModel {
     @observable name;
-    @observable address;// = '0xd02b332792c6ebbab85783fea8383c693ae462b2';
+    @observable address; //='0xd02b332792c6ebbab85783fea8383c693ae462b2';
     @observable wallet_object;
     @observable account_type;
     @observable tokens = 0;
@@ -100,7 +100,6 @@ class AccountModel {
 
     @action
     setAccount(address) {
-        console.log(this.accounts);
         if (!this.accounts[address]) return null;
         const _self = this;
         _self.name = "Кошелек";

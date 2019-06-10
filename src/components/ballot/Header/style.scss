@@ -5,6 +5,7 @@
   width: 100%;
   height: 50px; 
   background-color:#457ACC;
+  z-index: 999;
   .nav {
     display: flex;
     flex-flow: row nowrap;
@@ -34,7 +35,7 @@
           border-right: 1px solid rgba($color: #000558, $alpha: .1);
           cursor: pointer;
           transition: .2s all;
-          &_active {
+          &.active {
             background-color: #3468B8;
             &:after {
               content: "";

@@ -4,6 +4,7 @@ const electronLocalshortcut = require('electron-localshortcut');
 
 const path = require('path');
 const url = require('url');
+const solc = require('solc');
 
 let mainWindow;
 

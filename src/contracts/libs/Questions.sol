@@ -25,8 +25,8 @@ library Questions {
         address target;
         // method to be called
         bytes4 methodSelector;
-        //voting formula
-        string formula;
+        uint[] formula;
+        bytes32[] parameters;
     }
 
     struct List {
@@ -47,10 +47,6 @@ library Questions {
         _self.uniqNames[name] = questionId;
         _self.questionIdIndex++;
         return questionId;
-    }
-
-    function getCount(List storage _self) internal returns (uint count) {
-        return _self.questionIdIndex;
     }
 
     function exists(List storage _self, bytes32 _name) internal view returns (bool) {

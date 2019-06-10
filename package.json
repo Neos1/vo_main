@@ -20,7 +20,8 @@
   "homepage": "https://github.com/Neos1/vo_temp#readme",
   "devDependencies": {
     "electron": "^3.0.11",
-    "electron-builder": "^20.38.3"
+    "electron-builder": "^20.38.3",
+    "worker-loader": "^2.0.0"
   },
   "build": {
     "files": [
@@ -32,6 +33,12 @@
         "portable"
       ]
     },
+    "linux": {
+      "target": "deb"
+    },
+    "mac": {
+      "target": "dmg"
+    },
     "nsis": {
       "warningsAsErrors": false
     },
@@ -42,6 +49,10 @@
     "asar": false
   },
   "dependencies": {
-    "electron-localshortcut": "^3.1.0"
+    "bip39": "^3.0.1",
+    "electron-localshortcut": "^3.1.0",
+    "ethereumjs-wallet": "^0.6.3",
+    "solc": "^0.5.7",
+    "webpack": "^4.30.0"
   }
 }

@@ -9,6 +9,7 @@ import lists from '../../../img/lists.png';
 import groupIcon from '../../../img/addGroup_Icon.svg'
 import questionIcon from '../../../img/addQuestion_Icon.svg'
 import Question from '../Question/Question';
+import { Redirect } from 'react-router';
 
 @inject('accountStore', 'contractModel') @observer
 class Questions extends Component {
@@ -16,8 +17,10 @@ class Questions extends Component {
     super(props);
     this.state = {
       loading: true,
+      redirect: false, 
       selectedType: '',
-      selectedRange: ''
+      selectedRange: '',
+      page: 0,
     }
   }
 
@@ -28,20 +31,19 @@ class Questions extends Component {
   }
 
   async getData() {
+    this.setState({
+      loading: true
+    })
+
     const { contractModel, accountStore } = this.props;
     const { address } = accountStore;
     const { contract } = contractModel;
-    let questions = [];
-    let length = await contract.methods.getCount().call({from: address})
-      
-    for (let i = 1; i <= (length-1); i++) {
-      let question = await contract.methods.question(i).call({from: address})
-      console.log(question)
-      questions.push(question)
-    }
+    
+    let questions = await contractModel.getQuestions('system');
     this.questions = questions;
+
     this.setState({
-      loading: false
+      loading: false,
     })
   }
 
@@ -61,14 +63,32 @@ class Questions extends Component {
     this.setState({selectedType: selected.value});
   }
   selectRange(selected) {
-    this.setState({selectedRange: selected.value});
+    this.setState({page: selected.value});
+    this.filterQuestions()
+  }
+
+  filterQuestions() {
+    let filters = {
+      page: this.state.page
+    }
+    const { contractModel } = this.props;
+    contractModel.filterQuestionsByPage(filters);
+  }
+  preparePrimaryVotings(id) {
+    const { contractModel } = this.props;
+    contractModel.prepareVoting(id);
+    this.setState({
+      redirect: true
+    })
   }
 
   render() { 
-
+    const { contractModel } = this.props;
+    const { redirect } = this.state;
     let renderQuestions = this.questions.map((question, index)=> <Question key={index+1} data={question} index={index+1}/>)
     let loader = this.getLoader();
 
+    if (redirect) return <Redirect to='/votings'/>
     return ( 
       <div className={styles.wrapper}>
         <section className={`${styles.section} ${styles['section-vote']}`}>
@@ -77,12 +97,12 @@ class Questions extends Component {
             <div className={styles['section-vote__buttons']}>
               <label>
                 <span> добавить <br/> группу</span>
-                <button className={'btn btn--blue btn--small'}> 
+                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 1)}> 
                   <img src={groupIcon}/> 
                 </button>
               </label>
               <label>
-                <button className={'btn btn--blue btn--small'}> 
+                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 2)}> 
                   <img src={questionIcon}/> 
                 </button>
                 <span> добавить <br/> вопрос</span>
@@ -102,11 +122,10 @@ class Questions extends Component {
                 multi={false}
                 searchable={false}
                 clearable={false}
-                value={0}
-                placeholder={'0-10'}
-                value={this.state.selectedRange}
+                placeholder={'Выберитe номер'}
+                value={this.state.page}
                 onChange={this.selectRange.bind(this)}
-                options={[{value: 0, label: "0-10"}, {value: 1, label: "10-20"}]}
+                options={contractModel.questionsPages}
               />
             </label>
 

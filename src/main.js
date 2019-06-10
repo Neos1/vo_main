@@ -11,10 +11,10 @@ let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     useContentSize:true,
-    minWidth:960,
-    minHeight:560,
-    width: 960,
-    height: 560
+    minWidth:1280,
+    minHeight:720,
+    width: 1280,
+    height: 720
   });
   mainWindow.loadURL('http://localhost:8080');
   mainWindow.on('closed', () => mainWindow = null);

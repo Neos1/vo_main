@@ -6,7 +6,7 @@ import questions from '../../../img/questions_icon.svg';
 import users from '../../../img/users_icon.svg';
 import settings from '../../../img/settings_icon.svg';
 
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
 @inject('accountStore')@observer
 class Header extends Component {
@@ -52,32 +52,32 @@ class Header extends Component {
           <ul className={styles['nav-list']}>
             <li>
               <img src={votings} className={styles.icon}/>
-              <Link 
+              <NavLink 
                 className={styles.link}
                 to="/votings"
               > Голосования 
-              </Link>
+              </NavLink>
             </li>
             <li>
               <img src={questions} className={styles.icon}/>
-              <Link 
-                className={`${styles.link} ${styles.link_active}`}  
+              <NavLink 
+                className={styles.link}  
                 to="/questions"
-              > Вопросы </Link>
+              > Вопросы </NavLink>
             </li>
             <li>
               <img src={users} className={styles.icon}/>
-              <Link 
+              <NavLink 
                 className={styles.link } 
                 to="/users"
-              > Пользователи </Link>
+              > Пользователи </NavLink>
             </li>
             <li>
               <img src={settings} className={styles.icon}/>
-              <Link  
+              <NavLink  
                 className={styles.link} 
                 to="/settings"
-              > Настройки</Link>
+              > Настройки</NavLink>
             </li>
           </ul>
           <div 
