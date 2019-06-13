@@ -1,6 +1,7 @@
 pragma solidity 0.5;
 
 import "../libs/QuestionGroups.sol";
+import "../libs/UserGroups.sol";
 import "../libs/Questions.sol";
 import "../libs/Votings.sol";
 import "./VoterInterface.sol";

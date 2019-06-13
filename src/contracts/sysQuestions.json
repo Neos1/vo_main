@@ -8,5 +8,15 @@
     "method": "0x686c52c4",
     "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
     "parameters": ["GroupId", "uint", "Name", "string", "Caption", "string", "Time", "uint", "MethodSelector", "bytes4", "Formula", "string", "parameters", "bytes32[]"]
+  },
+  "2": {
+    "id": 2,
+    "group": 0,
+    "name": "Подключить группу пользователей",
+    "caption": "Подключить новую группу пользователей для участия в голосованиях",
+    "time": 10,
+    "method": "0x00000000",
+    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "parameters": ["Name","string","Type","string","Address","address"]
   }
 }
