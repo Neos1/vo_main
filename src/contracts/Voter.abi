@@ -1,631 +1,755 @@
 [
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "getVotingDescision",
-    "outputs": [
-      {
-        "name": "result",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x0d24ef38"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "question",
-    "outputs": [
-      {
-        "name": "groupId",
-        "type": "uint256"
-      },
-      {
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "name": "caption",
-        "type": "string"
-      },
-      {
-        "name": "text",
-        "type": "string"
-      },
-      {
-        "name": "time",
-        "type": "uint256"
-      },
-      {
-        "name": "target",
-        "type": "address"
-      },
-      {
-        "name": "methodSelector",
-        "type": "bytes4"
-      },
-      {
-        "name": "_formula",
-        "type": "uint256[]"
-      },
-      {
-        "name": "_parameters",
-        "type": "bytes32[]"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0x1e16f68b"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "votings",
-    "outputs": [
-      {
-        "name": "votingIdIndex",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0x352485b7"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getUserWeight",
-    "outputs": [
-      {
-        "name": "weight",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x42429139"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getUserVote",
-    "outputs": [
-      {
-        "name": "vote",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x4f301d47"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getERCTotal",
-    "outputs": [
-      {
-        "name": "balance",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x5b1bb4a2"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "groups",
-    "outputs": [
-      {
-        "name": "groupIdIndex",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0x5bf89d9e"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_idsAndTime",
-        "type": "uint256[]"
-      },
-      {
-        "name": "_status",
-        "type": "uint8"
-      },
-      {
-        "name": "_caption",
-        "type": "string"
-      },
-      {
-        "name": "_text",
-        "type": "string"
-      },
-      {
-        "name": "_target",
-        "type": "address"
-      },
-      {
-        "name": "_methodSelector",
-        "type": "bytes4"
-      },
-      {
-        "name": "_formula",
-        "type": "uint256[]"
-      },
-      {
-        "name": "_parameters",
-        "type": "bytes32[]"
-      }
-    ],
-    "name": "saveNewQuestion",
-    "outputs": [
-      {
-        "name": "_saved",
-        "type": "bool"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x686c52c4"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getERCSymbol",
-    "outputs": [
-      {
-        "name": "symbol",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x7264420a"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "questions",
-    "outputs": [
-      {
-        "name": "questionIdIndex",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0x77a49821"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getCount",
-    "outputs": [
-      {
-        "name": "length",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xa87d942c"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getUserBalance",
-    "outputs": [
-      {
-        "name": "balance",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xb7013dc1"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "name": "setERC20",
-    "outputs": [
-      {
-        "name": "erc20",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc29a6fda"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "closeVoting",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc631b292"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_questionId",
-        "type": "uint256"
-      },
-      {
-        "name": "_status",
-        "type": "uint8"
-      },
-      {
-        "name": "_starterGroup",
-        "type": "uint256"
-      },
-      {
-        "name": "_data",
-        "type": "bytes"
-      }
-    ],
-    "name": "startNewVoting",
-    "outputs": [
-      {
-        "name": "id",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc7ce7f10"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_choice",
-        "type": "uint256"
-      }
-    ],
-    "name": "sendVote",
-    "outputs": [
-      {
-        "name": "result",
-        "type": "uint256"
-      },
-      {
-        "name": "votePos",
-        "type": "uint256"
-      },
-      {
-        "name": "voteNeg",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc8f5714e"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "ERC20",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0xcc4aa204"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getERCAddress",
-    "outputs": [
-      {
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xd094b706"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "addresses",
-    "outputs": [
-      {
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "name": "instance",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xda0321cd"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "getVotingsCount",
-    "outputs": [
-      {
-        "name": "count",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xdae7c92c"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_groupType",
-        "type": "uint8"
-      },
-      {
-        "name": "_name",
-        "type": "string"
-      }
-    ],
-    "name": "saveNewGroup",
-    "outputs": [
-      {
-        "name": "id",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xf729d56b"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_who",
-        "type": "address"
-      },
-      {
-        "name": "_value",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferERC20",
-    "outputs": [
-      {
-        "name": "newBalance",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xf7448a31"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "returnTokens",
-    "outputs": [
-      {
-        "name": "status",
-        "type": "bool"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xf9718fc8"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "_id",
-        "type": "uint256"
-      }
-    ],
-    "name": "voting",
-    "outputs": [
-      {
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "name": "caption",
-        "type": "string"
-      },
-      {
-        "name": "text",
-        "type": "string"
-      },
-      {
-        "name": "startTime",
-        "type": "uint256"
-      },
-      {
-        "name": "endTime",
-        "type": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function",
-    "signature": "0xfd4a77f1"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_votingId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getVotes",
-    "outputs": [
-      {
-        "name": "_votes",
-        "type": "uint256[3]"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xff981099"
-  },
-  {
-    "inputs": [
-      {
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor",
-    "signature": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "name": "groupId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "indexed": false,
-        "name": "caption",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "name": "text",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "name": "time",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "target",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "methodSelector",
-        "type": "bytes4"
-      }
-    ],
-    "name": "NewQuestion",
-    "type": "event",
-    "signature": "0xf74c837bcb7177c5fc07298a351f91ebaf73da24a2665c4dd592976c4e1780c9"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "questionId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "status",
-        "type": "uint8"
-      },
-      {
-        "indexed": false,
-        "name": "starterGroup",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "starterAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "startblock",
-        "type": "uint256"
-      }
-    ],
-    "name": "NewVoting",
-    "type": "event",
-    "signature": "0x20cd0a5d2be6a115945cf28e1511206f69d34a385fb4b9c8ee18f39fa52471c7"
-  }
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getVotingDescision",
+		"outputs": [
+			{
+				"name": "result",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x0d24ef38"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "question",
+		"outputs": [
+			{
+				"name": "groupId",
+				"type": "uint256"
+			},
+			{
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"name": "caption",
+				"type": "string"
+			},
+			{
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"name": "time",
+				"type": "uint256"
+			},
+			{
+				"name": "target",
+				"type": "address"
+			},
+			{
+				"name": "methodSelector",
+				"type": "bytes4"
+			},
+			{
+				"name": "_formula",
+				"type": "uint256[]"
+			},
+			{
+				"name": "_parameters",
+				"type": "bytes32[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x1e16f68b"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "votings",
+		"outputs": [
+			{
+				"name": "votingIdIndex",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x352485b7"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserGroup",
+		"outputs": [
+			{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "groupType",
+				"type": "string"
+			},
+			{
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"name": "groupAddress",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x352704b7"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getQuestionGroupsLength",
+		"outputs": [
+			{
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x392e1c84"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getUserWeight",
+		"outputs": [
+			{
+				"name": "weight",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x42429139"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getUserVote",
+		"outputs": [
+			{
+				"name": "vote",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x4f301d47"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getERCTotal",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x5b1bb4a2"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "groups",
+		"outputs": [
+			{
+				"name": "groupIdIndex",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x5bf89d9e"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_idsAndTime",
+				"type": "uint256[]"
+			},
+			{
+				"name": "_status",
+				"type": "uint8"
+			},
+			{
+				"name": "_caption",
+				"type": "string"
+			},
+			{
+				"name": "_text",
+				"type": "string"
+			},
+			{
+				"name": "_target",
+				"type": "address"
+			},
+			{
+				"name": "_methodSelector",
+				"type": "bytes4"
+			},
+			{
+				"name": "_formula",
+				"type": "uint256[]"
+			},
+			{
+				"name": "_parameters",
+				"type": "bytes32[]"
+			}
+		],
+		"name": "saveNewQuestion",
+		"outputs": [
+			{
+				"name": "_saved",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x686c52c4"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getERCSymbol",
+		"outputs": [
+			{
+				"name": "symbol",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x7264420a"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "questions",
+		"outputs": [
+			{
+				"name": "questionIdIndex",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x77a49821"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getQuestionGroup",
+		"outputs": [
+			{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "groupType",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x7fd60dfd"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"name": "_address",
+				"type": "address"
+			},
+			{
+				"name": "_type",
+				"type": "string"
+			}
+		],
+		"name": "saveNewUserGroup",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x952b627c"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getCount",
+		"outputs": [
+			{
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xa87d942c"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getUserBalance",
+		"outputs": [
+			{
+				"name": "balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xb7013dc1"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"name": "setERC20",
+		"outputs": [
+			{
+				"name": "erc20",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xc29a6fda"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "closeVoting",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xc631b292"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_questionId",
+				"type": "uint256"
+			},
+			{
+				"name": "_status",
+				"type": "uint8"
+			},
+			{
+				"name": "_starterGroup",
+				"type": "uint256"
+			},
+			{
+				"name": "_data",
+				"type": "bytes"
+			}
+		],
+		"name": "startNewVoting",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xc7ce7f10"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_choice",
+				"type": "uint256"
+			}
+		],
+		"name": "sendVote",
+		"outputs": [
+			{
+				"name": "result",
+				"type": "uint256"
+			},
+			{
+				"name": "votePos",
+				"type": "uint256"
+			},
+			{
+				"name": "voteNeg",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xc8f5714e"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "ERC20",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0xcc4aa204"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getERCAddress",
+		"outputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xd094b706"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "userGroups",
+		"outputs": [
+			{
+				"name": "groupIdIndex",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0xd7843f54"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "addresses",
+		"outputs": [
+			{
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"name": "instance",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xda0321cd"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getVotingsCount",
+		"outputs": [
+			{
+				"name": "count",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xdae7c92c"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getUserGroupsLength",
+		"outputs": [
+			{
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0xec4d819c"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_groupType",
+				"type": "uint8"
+			},
+			{
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "saveNewGroup",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xf729d56b"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_who",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "transferERC20",
+		"outputs": [
+			{
+				"name": "newBalance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xf7448a31"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "returnTokens",
+		"outputs": [
+			{
+				"name": "status",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xf9718fc8"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "voting",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"name": "caption",
+				"type": "string"
+			},
+			{
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"name": "startTime",
+				"type": "uint256"
+			},
+			{
+				"name": "endTime",
+				"type": "uint256"
+			},
+			{
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0xfd4a77f1"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_votingId",
+				"type": "uint256"
+			}
+		],
+		"name": "getVotes",
+		"outputs": [
+			{
+				"name": "_votes",
+				"type": "uint256[3]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xff981099"
+	},
+	{
+		"inputs": [
+			{
+				"name": "_address",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor",
+		"signature": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "groupId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"name": "caption",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"name": "time",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "target",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "methodSelector",
+				"type": "bytes4"
+			}
+		],
+		"name": "NewQuestion",
+		"type": "event",
+		"signature": "0xf74c837bcb7177c5fc07298a351f91ebaf73da24a2665c4dd592976c4e1780c9"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "questionId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"name": "starterGroup",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "starterAddress",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "startblock",
+				"type": "uint256"
+			}
+		],
+		"name": "NewVoting",
+		"type": "event",
+		"signature": "0x20cd0a5d2be6a115945cf28e1511206f69d34a385fb4b9c8ee18f39fa52471c7"
+	}
 ]

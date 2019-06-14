@@ -3,7 +3,7 @@ pragma solidity 0.5;
 import "../libs/QuestionGroups.sol";
 import "../libs/Questions.sol";
 import "../libs/Votings.sol";
-
+import "../libs/UserGroups.sol";
 
 /**
  * @title VoterInterface
@@ -14,6 +14,7 @@ interface VoterInterface {
     using QuestionGroups for QuestionGroups.List;
     using Questions for Questions.List;
     using Votings for Votings.List;
+    using UserGroups for UserGroups.List;
 
     
     // DIFINTIONS

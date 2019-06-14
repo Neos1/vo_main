@@ -3,19 +3,7 @@
 	"projects": [
 		{
 			"name": "1",
-			"address": "0xFf884f9B5d47fd1628Badea8ff420abFEA24a9B8"
-		},
-		{
-			"name": "123",
-			"address": "0xd425573AADB5D9a545a6190F628f5347f84536eE"
-		},
-		{
-			"name": "1123123",
-			"address": "0xedffF336eD02483529578b642447E75177CC9087"
-		},
-		{
-			"name": "1212",
-			"address": "0x22d14124bf0c4D7d19f86AD697d6310a781592C2"
+			"address": "0x473e1B71a26D42b0306BaA1f2136E65aDF4736F4"
 		}
 	]
 }

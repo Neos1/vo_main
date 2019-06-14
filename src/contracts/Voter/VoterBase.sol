@@ -19,6 +19,7 @@ contract VoterBase is VoterInterface {
     Questions.List public questions;
     QuestionGroups.List public groups;
     Votings.List public votings;
+    UserGroups.List public userGroups;
 
     IERC20 public ERC20;
 
@@ -26,12 +27,14 @@ contract VoterBase is VoterInterface {
         questions.init();
         groups.init();
         votings.init();
+        userGroups.init();
     }
 
     // METHODS
     function setERC20(address _address) public returns (address erc20) {
         ERC20 = IERC20(_address);
     }
+
     /*
      * @notice creates new question to saveNewQuestion function
      * @param _groupId question group id
@@ -72,7 +75,6 @@ contract VoterBase is VoterInterface {
         return question;
     }
     
-
     /*
      * @notice adds new question to question library
      * @param _groupId question group id
@@ -117,6 +119,7 @@ contract VoterBase is VoterInterface {
         return true;
     }
 
+
     /**
      * @notice adds new question to question library
      * @param _groupType question group type
@@ -129,6 +132,11 @@ contract VoterBase is VoterInterface {
     ) external returns (uint id) {
         // validate params
         // call groups.save()
+    }
+    
+    function getCount() external returns (uint length) {
+        uint count = questions.questionIdIndex;
+        return count;
     }
 
     /**
@@ -161,10 +169,39 @@ contract VoterBase is VoterInterface {
         );
     }
 
-    function getCount() external returns (uint length) {
-        uint count = questions.questionIdIndex;
-        return count;
+    function getQuestionGroup(uint _id) public view returns (
+        string name,
+        QuestionGroups.GroupType groupType
+    ) {
+        return (
+            groups.group[_id].name,
+            groups.group[_id].groupType
+        );
     }
+
+    function getQuestionGroupsLength() public view returns (uint length) {
+        return groups.groupIdIndex ;
+    }
+    function getUserGroup(uint _id) public view returns (
+        string name,
+        string groupType,
+        UserGroups.GroupStatus status,
+        address groupAddress
+    ) {
+        return (
+            userGroups.group[_id].name,
+            userGroups.group[_id].groupType,
+            userGroups.group[_id].status,
+            userGroups.group[_id].groupAddr
+        );
+    }
+
+    function getUserGroupsLength() public view returns (uint length) {
+        return userGroups.groupIdIndex ;
+    }
+
+
+
 
     /**
      * @notice adds new voting to voting library
@@ -227,9 +264,11 @@ contract VoterBase is VoterInterface {
             votings.voting[votingId].data
         );
     }
+
     function getVotingsCount() external returns (uint count) {
         return votings.votingIdIndex;
     }
+
     function getVotingDescision(uint _id) external returns (uint result) {
         return votings.descision[_id];
     }   
@@ -300,7 +339,6 @@ contract VoterBase is VoterInterface {
         return true;
     }
 
-
     function sendVote(uint _choice) external returns (uint result, uint256 votePos, uint256 voteNeg) {
         uint _voteId = votings.votingIdIndex - 1;
         uint timestamp = votings.voting[_voteId].endTime;
@@ -324,11 +362,9 @@ contract VoterBase is VoterInterface {
         );
     }
 
-     
     function getERCAddress() external returns (address _address) {
         return address(ERC20);
     }
-
 
     function getUserBalance() external returns (uint256 balance) {
         uint256 _balance = ERC20.balanceOf(msg.sender);
@@ -338,6 +374,7 @@ contract VoterBase is VoterInterface {
     function getERCTotal() returns (uint256 balance) {
         return ERC20.totalSupply();
     }
+
     function getERCSymbol() returns (string symbol) {
         return ERC20.symbol();
     }
@@ -346,10 +383,12 @@ contract VoterBase is VoterInterface {
         uint _voteId = votings.votingIdIndex;
         return votings.voting[_voteId].votes[address(ERC20)][msg.sender];
     }
+
     function getUserWeight() external returns (uint256 weight) {
         uint _voteId = votings.votingIdIndex;
         return votings.voting[_voteId].voteWeigths[address(ERC20)][msg.sender];
     }
+
     function transferERC20(address _who, uint256 _value) external returns (uint256 newBalance) {
         ERC20.transferFrom(msg.sender, _who, _value);
         return ERC20.balanceOf(msg.sender);
@@ -361,4 +400,14 @@ contract VoterBase is VoterInterface {
             address(this)
         );
     }
+
+    function saveNewUserGroup (string _name, address _address,  string _type) {
+        UserGroups.UserGroup memory userGroup = UserGroups.UserGroup({
+            name: _name,
+            groupType: _type,
+            status: UserGroups.GroupStatus.ACTIVE,
+            groupAddr: _address
+        });
+        userGroups.save(userGroup);
+    } 
 }

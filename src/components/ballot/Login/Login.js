@@ -949,7 +949,11 @@ class Login extends React.Component {
                 if (result.contracts[contractID].interface !== ""){
                     let bytecode = result.contracts[contractID].bytecode;
                     let metadata = JSON.parse(result.contracts[contractID].metadata);
-                    let abi = metadata.output.abi;
+                    let compiled_abi = JSON.stringify(metadata.output.abi);
+                    let old_abi = JSON.stringify(abi);
+                    if (compiled_abi != old_abi) {
+                        abi = JSON.parse(compiled_abi);
+                    }
                     let contract = new web3.eth.Contract(abi);
                     let deployArgs = type === 'token' ? [this.ERC20.name, this.ERC20.symbol, this.ERC20.totalSupply] : [this.ERC20.hash];
                     this.sendTx(contract.deploy({data: `0x${bytecode}`, arguments: deployArgs}), type, key, abi);
@@ -1002,11 +1006,17 @@ class Login extends React.Component {
                             if(type !== "token"){
                                 this.config.projects.push(project);
                                 if (window.__ENV == 'development'){
-                                    fs.writeFile(path.join(window.process.env.INIT_CWD, '/config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
+                                    fs.writeFile(path.join(window.process.env.INIT_CWD, './config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
+                                        if (err) throw err;
+                                    })
+                                    fs.writeFile(path.join(window.process.env.INIT_CWD, './contracts/Voter.abi'), JSON.stringify(abi, null, '\t'), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 } else {
                                     fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './config.json'), JSON.stringify(this.config, null, '\t'), "utf8", (err)=>{
+                                        if (err) throw err;
+                                    })
+                                    fs.writeFile(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), JSON.stringify(abi, null, '\t'), "utf8", (err)=>{
                                         if (err) throw err;
                                     })
                                 }
@@ -1404,16 +1414,17 @@ class Login extends React.Component {
     }
 
     @action 
-    handleGoToProject = (e) => {
+    handleGoToProject = async (e) => {
         e.preventDefault();
         if (!this.selected) return;
         const props = this.props;
         const accountStore = props.accountStore; 
         const projectId = e.target.getAttribute('data-project');
         const project = this.config.projects[projectId]
-        const abi = window.__ENV === 'production' 
+        const abi = await window.__ENV === 'production' 
             ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
             : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
+        console.log(abi)
         const address = project.address
         let contract = new web3.eth.Contract(abi, address);
         this.checkQuestions(contract, address, this.selected)

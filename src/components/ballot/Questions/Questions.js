@@ -97,12 +97,12 @@ class Questions extends Component {
             <div className={styles['section-vote__buttons']}>
               <label>
                 <span> добавить <br/> группу</span>
-                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 1)}> 
+                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 2)}> 
                   <img src={groupIcon}/> 
                 </button>
               </label>
               <label>
-                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 2)}> 
+                <button className={'btn btn--blue btn--small'} onClick={this.preparePrimaryVotings.bind(this, 3)}> 
                   <img src={questionIcon}/> 
                 </button>
                 <span> добавить <br/> вопрос</span>

@@ -4,9 +4,9 @@ pragma solidity 0.5;
 library UserGroups {
 
     enum GroupStatus {
-        // deleted or inactive question
+        // deleted or inactive group
         INACTIVE,
-        // active question
+        // active group
         ACTIVE
     }
 
@@ -40,15 +40,5 @@ library UserGroups {
     function exists(List storage _self, bytes32 _name) internal view returns (bool) {
         return _self.uniqNames[_name] != 0;
     }
-
-    function saveNewUserGroup (string _name, address _address,  string _type) {
-      UserGroups.UserGroup memory userGroup = UserGroups.UserGroup({
-          name: _name,
-          groupType: _type,
-          status: UserGroups.GroupStatus.ACTIVE,
-          groupAddr: _address
-      });
-      userGroups.save(userGroup);
-    } 
 
 }

@@ -15,7 +15,7 @@
     "name": "Подключить группу пользователей",
     "caption": "Подключить новую группу пользователей для участия в голосованиях",
     "time": 10,
-    "method": "0x00000000",
+    "method": "0x952b627c",
     "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
     "parameters": ["Name","string","Type","string","Address","address"]
   },
@@ -25,9 +25,9 @@
     "name": "Добавить группу вопросов",
     "caption": "Добавить новую группу вопросов",
     "time": 10,
-    "method": "0x00000000",
+    "method": "0xf729d56b",
     "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
-    "parameters": ["Name","string","Type","string","Address","address"]
+    "parameters": ["Name","string"]
   }
   
 }

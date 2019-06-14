@@ -8,11 +8,14 @@ class ContractModel {
     system: [],
     other: []
   }
+  @observable votings = [];
+  @observable userGroups = [];
+  @observable questionGroups = [];
+
   @observable bufferQuestions = {
     system: [],
     other: []
   }
-  @observable votings = [];
   @observable bufferVotings = [];
 
   @observable votingTemplate = {
@@ -103,7 +106,6 @@ class ContractModel {
     let length = await this.contract.methods.getVotingsCount().call({from: address})
       for (i ; i <= (length-1); i++) {
         let voting = await this.contract.methods.voting(i).call({from: address})
-
         this.votings.push(voting)
       }
     this.votings.map((voting, index)=> {
@@ -166,7 +168,59 @@ class ContractModel {
 
 //* votings end
 
- 
+//* users groups
+
+  @action async getUserGroups() {
+    const { contract, userGroups } = this;
+    const { _address: contractAddress } = contract;
+    let savesUserGroups;
+
+    if (localStorage.getItem(`userGroups${contractAddress}`)) {
+      savesUserGroups = localStorage.getItem(`userGroups${contractAddress}`);
+      this.userGroups = savesUserGroups;
+    }
+
+    let i = userGroups.length != 0 ? userGroups.length + 1 : 1;
+    let userAddress = web3.eth.accounts.wallet[0].address;
+
+    let groupsLength = await contract.methods.getUserGroupsLength().call({from: userAddress});
+
+    for (i; i <= groupsLength - 1; i++) {
+      let group = await contract.methods.getUserGroup(i).call({from: userAddress});
+      userGroups.push(group);
+    }
+    console.log(userGroups);
+  }
+//* users groups end
+
+//* question groups
+  @action async getQuestionGroups() {
+    const { contract, questionGroups } = this;
+    const { _address: contractAddress } = contract;
+    let savesQuestionGroups;
+
+    if (localStorage.getItem(`questionGroups${contractAddress}`)) {
+      savesQuestionGroups = localStorage.getItem(`questionGroups${contractAddress}`);
+      this.userGroups = savesQuestionGroups;
+    }
+
+    let i = questionGroups.length != 0 ? questionGroups.length + 1 : 1;
+    let userAddress = web3.eth.accounts.wallet[0].address;
+
+    let groupsLength = await contract.methods.getQuestionGroupsLength().call({from: userAddress});
+
+    for (i; i <= groupsLength - 1; i++) {
+      let group = await contract.methods.getQuestionGroup(i).call({from: userAddress});
+      questionGroups.push(group);
+    }
+
+    console.log(questionGroups);
+  }
+//* question groups end
+
+
+
+
 
 //* options with questions for selects
   @computed get options() {
