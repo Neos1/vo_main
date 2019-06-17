@@ -178,7 +178,23 @@ class Voting extends Component {
     const {data, contractModel} = this.props;
     let questionId = data[0];
     let formula = contractModel.questions.system[questionId-1]._formula; 
-    return formula;
+
+    let f = formula.map(text=> Number(text));
+    let r = [];
+    let ready = '( )'
+    f[0] === 0 ? r.push('group(ERC20) => condition( ') : r.push('user(0x298e231fcf67b4aa9f41f902a5c5e05983e1d5f8) => condition( ') ;
+    f[1] === 0 ? r.push('quorum') : r.push('positive') ;
+    f[2] === 0 ? r.push(' <= ') : r.push(' >= ') ;
+    f.length == 5 ? r.push(`${f[3]} %`) : r.push(`${f[3]} % )`)
+    if (f.length == 5) {
+      f[4] === 0 ? r.push(' of quorum)') : r.push(' of all)') ;
+    }
+
+    formula = r.join('');
+    ready = ready.replace(' ', formula);
+
+
+    return ready;
   }
   getVotesPercents() {
     const {contractModel, index} = this.props;
@@ -308,7 +324,7 @@ class Voting extends Component {
       
       return (
         <p key={index}>
-          <span>{param[0]}</span>
+          <span>{web3.utils.hexToUtf8(param[0])}</span>
           <span> - </span>
           <span>{value}</span>
         </p>
@@ -321,10 +337,10 @@ class Voting extends Component {
 
     return ( 
       <div className={styles.voting + ' ' + `${this.state.expanded ? "opened":''}`} >
-        <div className={styles['voting-about']} >
+        <div className={styles['voting-about']} onClick={this.toggleExpand.bind(this)} >
           <div className={styles['voting-about__info']} >
             <span className={styles['voting-id']}>{data.id}</span>
-            <h1 className={styles['voting-caption']} onClick={this.toggleExpand.bind(this)} >{data.caption}</h1>
+            <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>
             <p className={styles['voting-duration']}>Начало <strong>{timeStart}</strong> часа(ов)</p>
             <p className={styles['voting-duration']}>Конец <strong>{timeEnd}</strong> часа(ов)</p>

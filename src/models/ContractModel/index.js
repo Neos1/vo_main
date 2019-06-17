@@ -56,7 +56,7 @@ class ContractModel {
     
     if (localStorage.getItem(`questions[${type}][${this.contract._address}]`)) {
       questions = JSON.parse(localStorage.getItem(`questions[${type}][${this.contract._address}]`));
-      this.questions[type] = questions.reverse();
+      //this.questions[type] = questions.reverse();
     }
 
     let i = this.questions[type].length ? this.questions[type].length + 1 : 1;
@@ -311,8 +311,22 @@ class ContractModel {
       .on('transactionHash',(txHash)=>{ console.log(txHash)})
       .on('receipt',(receipt)=>{ 
         this.userVote.status = 1;
-        console.log(receipt)
+        this.refreshLastVoting();
         })
+  }
+
+  @action async refreshLastVoting() {
+    const {contract} = this;
+    const address = web3.eth.accounts.wallet[0].address;
+
+    let votingsCount = await contract.methods.getVotingsCount().call({from: address});
+    let index = votingsCount - 1;
+    let voting = await contract.methods.voting(index).call({from: address});
+    console.log(voting);
+    let savedVotings = this.votings.reverse();
+    savedVotings[index-1] = voting;
+    console.log(savedVotings);
+    this.votings = savedVotings;
   }
 }
 

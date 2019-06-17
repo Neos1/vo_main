@@ -27,12 +27,12 @@ contract VoterBase is VoterInterface {
         questions.init();
         groups.init();
         votings.init();
-        userGroups.init();
     }
 
     // METHODS
     function setERC20(address _address) public returns (address erc20) {
         ERC20 = IERC20(_address);
+        userGroups.init(_address);
     }
 
     /*

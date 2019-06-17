@@ -28,6 +28,24 @@ class Question extends Component {
     }
     return params;
   }
+  getFormula(rawFormula) {
+    let f = rawFormula.map(text=> Number(text));
+    let r = [];
+    let ready = '( )'
+    f[0] === 0 ? r.push('group(ERC20) => condition( ') : r.push('user(0x298e231fcf67b4aa9f41f902a5c5e05983e1d5f8) => condition( ') ;
+    f[1] === 0 ? r.push('quorum') : r.push('positive') ;
+    f[2] === 0 ? r.push(' <= ') : r.push(' >= ') ;
+    f.length == 5 ? r.push(`${f[3]} %`) : r.push(`${f[3]} % )`)
+    if (f.length == 5) {
+      f[4] === 0 ? r.push(' of quorum)') : r.push(' of all)') ;
+    }
+
+    let formula = r.join('');
+    ready = ready.replace(' ', formula);
+
+
+    return ready;
+  }
 
   prepareVoting(index, params){
     const {contractModel} = this.props;
@@ -63,6 +81,7 @@ class Question extends Component {
             )
     })
 
+    let formula = this.getFormula(data._formula);
     return ( 
       <div className={styles.question + ' ' + `${this.state.expanded ? "opened":''}`} >
         <div className={styles['question-about']}  onClick={this.toggleExpand.bind(this)}>
@@ -95,7 +114,7 @@ class Question extends Component {
           </div>
           <div className={styles['question-expanded__formula']}>
             <p className={styles['question-expanded__formula-heading']}>Формула голосования</p>
-            <p  className={styles['question-expanded__formula-formula']}>{data._formula}</p>
+            <p  className={styles['question-expanded__formula-formula']}>{formula}</p>
           </div>
         </div>
       </div>

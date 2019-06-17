@@ -52,7 +52,9 @@ class Votings extends Component {
     })
 
     this.getData();
-
+  }
+  componentWillReceiveProps() {
+    this.filterVotings();
   }
 
   async getData() {
@@ -394,7 +396,6 @@ class Votings extends Component {
       to: this.state.to
     }
     contractModel.filterVotings(params);
-
   }
   validateInputs(target) {
     let inputs = target.querySelectorAll('input');

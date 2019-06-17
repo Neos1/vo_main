@@ -72,8 +72,15 @@ library UserGroups {
         mapping (uint => UserGroup) group;
     }
 
-    function init(List storage _self) internal {
+    function init(List storage _self, address _ERC20) internal {
         _self.groupIdIndex = 1;
+        UserGroup memory group = UserGroup({
+            name: "Owner",
+            groupType: "ERC20",
+            status: GroupStatus.ACTIVE,
+            groupAddr: _ERC20
+        });
+        save(_self, group);
     }
 
     function save(List storage _self, UserGroup memory _group) internal returns (uint id) {
@@ -414,12 +421,12 @@ contract VoterBase is VoterInterface {
         questions.init();
         groups.init();
         votings.init();
-        userGroups.init();
     }
 
     // METHODS
     function setERC20(address _address) public returns (address erc20) {
         ERC20 = IERC20(_address);
+        userGroups.init(_address);
     }
 
     /*
