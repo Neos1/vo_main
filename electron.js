@@ -4,7 +4,6 @@ const electronLocalshortcut = require('electron-localshortcut');
 
 const path = require('path');
 const url = require('url');
-const solc = require('solc');
 
 let mainWindow;
 
@@ -16,8 +15,12 @@ function createWindow() {
     width: 960,
     height: 560
   });
+  if (process.platform == 'darwin') {
+    process.env.PORTABLE_EXECUTABLE_DIR = path.join(__dirname, '/src');
+  }
   mainWindow.loadURL(`file://${path.join(__dirname, './build/ballot/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
+  mainWindow.webContents.toggleDevTools()
   electronLocalshortcut.register(mainWindow, 'F12', () => {
     mainWindow.webContents.toggleDevTools()
   });

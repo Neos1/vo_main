@@ -1,6 +1,6 @@
 .vscode
 node_modules/
-
+.DS_Store
 src/node_modules
 dist/
 build/

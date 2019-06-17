@@ -25,6 +25,9 @@
   "build": {
     "files": [
       "build/ballot/**/*",
+      "src/contracts/**/*",
+      "src/wallets/**/*",
+      "src/config.json",
       "electron.js"
     ],
     "win": {
