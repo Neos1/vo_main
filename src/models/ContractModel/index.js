@@ -97,7 +97,7 @@ class ContractModel {
     
     if (localStorage.getItem(`votings[${this.contract._address}]`)) {
       votings = JSON.parse(localStorage.getItem(`votings[${this.contract._address}]`));
-      this.votings = votings.reverse();
+      this.votings = votings;
     }
 
     let i = this.votings.length !== 0 ? this.votings.length+1 : 1;
@@ -111,10 +111,10 @@ class ContractModel {
     this.votings.map((voting, index)=> {
       voting.id = index+1;
     })
-    this.votings = this.votings.reverse()
-    this.bufferVotings = this.votings;
+    console.log(this.votings);
+    this.bufferVotings = this.votings.length == length-1 ? this.votings : '';
 
-    localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings));
+    localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings.reverse()));
     return this.bufferVotings;
   }
 
@@ -318,15 +318,16 @@ class ContractModel {
   @action async refreshLastVoting() {
     const {contract} = this;
     const address = web3.eth.accounts.wallet[0].address;
-
     let votingsCount = await contract.methods.getVotingsCount().call({from: address});
     let index = votingsCount - 1;
     let voting = await contract.methods.voting(index).call({from: address});
-    console.log(voting);
-    let savedVotings = this.votings.reverse();
-    savedVotings[index-1] = voting;
-    console.log(savedVotings);
-    this.votings = savedVotings;
+    voting.id = index;
+    console.log(this.votings);
+    this.votings[index-1] = voting;
+    this.bufferVotings = this.votings.reverse();
+    console.log(this.bufferVotings);
+
+    localStorage.setItem(`votings[${contract._address}]`, JSON.stringify(this.votings));
   }
 }
 

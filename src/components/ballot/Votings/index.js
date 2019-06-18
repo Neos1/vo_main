@@ -53,9 +53,6 @@ class Votings extends Component {
 
     this.getData();
   }
-  componentWillReceiveProps() {
-    this.filterVotings();
-  }
 
   async getData() {
     
@@ -69,7 +66,13 @@ class Votings extends Component {
 
     await contractModel.getQuestions('system');
     await contractModel.getVotings();
-    console.log(contractModel.votings);
+
+    /*setInterval(async ()=> {
+      await contractModel.refreshLastVoting();
+      this.filterVotings();
+      this.forceUpdate();
+    }, 5*1000);
+    */
 
     this.setState({
       loading: false
@@ -78,6 +81,10 @@ class Votings extends Component {
     if(contractModel.bufferVotings[0].status == 0) {
       this.setState({
         createVotingStep: 5
+      })
+    } else {
+      this.setState({
+        createVotingStep: 1
       })
     }
   }
