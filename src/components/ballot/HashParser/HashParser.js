@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 // COMPONENTS
 import HashChange from '../../common/HashChange/HashChange';
-import translationStore from '../../../models/Translation/TranslationInstance';
+//import translationStore from '../../../models/Translation/TranslationInstance';
 
 /*-------------------------------------------------------*/
 // Declarations
@@ -21,7 +21,7 @@ class HashTreeNode {
 	}
 }
 
-class Locale extends HashTreeNode {
+/*class Locale extends HashTreeNode {
 	static appropriteLanguages = translationStore.appropriteLanguages;
 	constructor(lng) {
 		assert(Locale.appropriteLanguages);
@@ -31,6 +31,7 @@ class Locale extends HashTreeNode {
 		}
 	}
 }
+*/
 
 class Meta extends HashTreeNode {
 	constructor(_re, str) {
@@ -112,7 +113,7 @@ class HashTree {
 		this._rest = components; // no Locale, no Meta
 		return;
 	}
-
+/*
 	localeUpdate(locale = '') {
 		let theLocale = this._locale;
 		if (theLocale.toString() !== locale)
@@ -128,7 +129,7 @@ class HashTree {
 		assert(locale instanceof Locale, `${locale} must be instance of Locale`);
 		this._locale = locale;
 	}
-
+*/
 	deleteMeta() {
 		this._meta = null;
 	}
@@ -147,7 +148,7 @@ class HashTree {
 // Exports
 
 export default class HashParser extends React.Component {
-	_translationStoreReference = translationStore;
+	//_translationStoreReference = translationStore;
 
 	constructor() {
 		super();
@@ -162,34 +163,34 @@ export default class HashParser extends React.Component {
 		let hashUpdate = _.clone(hash);
 		let originalTree = new HashTree(hash);
 		let tree = _.clone(originalTree);
-		let locale = tree.getLocale();
+		//let locale = tree.getLocale();
 		let meta = tree.getMeta();
-		if (!locale) {
+		/*if (!locale) {
 			const defaultLanguage = this.translationStoreReference.defaultLanguage;
 			assert(defaultLanguage, `Default language = ${defaultLanguage}`)
 			let locale = new Locale(defaultLanguage);
 			assert(locale._data, `Locale data is ${locale._data}`);
 			tree.setLocale(locale);
-		}
+		}*/
 		if (meta) {			
 			tree.deleteMeta();
 		}
-		let currentLng = this.translationStoreReference.lng;
-		let lngUpdate = tree.localeUpdate(currentLng);
+	//	let currentLng = this.translationStoreReference.lng;
+	//	let lngUpdate = tree.localeUpdate(currentLng);
 		let treeUpdate = `${tree}` !== `${originalTree}`;
-		if (lngUpdate) {
+	/*	if (lngUpdate) {
 			// this.updateBrowserURL(`${tree}`);
 			this.translationStoreReference.changeLanguage(lngUpdate);
-		}
+		}*/
 		if (treeUpdate) {
 			this.updateBrowserURL(`${tree}`);
 		}
 	}
 
-	get translationStoreReference() {
+	/*get translationStoreReference() {
 		assert(this._translationStoreReference);
 		return this._translationStoreReference;
-	}
+	}*/
 
 	updateBrowserURL(hashUpdate) {
 		window.location.hash = hashUpdate;

@@ -23,19 +23,31 @@
     "electron-builder": "^20.38.3"
   },
   "build": {
-    "files":["build/ballot/**/*", "electron.js"],
+    "files": [
+      "build/ballot/**/*",
+      "electron.js"
+    ],
     "win": {
-        "target": [
-            "portable"
-        ]
+      "target": [
+        "portable"
+      ]
+    },
+    "linux": {
+      "target": "deb"
+    },
+    "mac": {
+      "target": "dmg"
     },
     "nsis": {
-        "warningsAsErrors": false
+      "warningsAsErrors": false
     },
     "portable": {
-        "artifactName": "voter_portable--win.exe"
+      "artifactName": "voter_portable--win.exe"
     },
     "compression": "store",
     "asar": false
+  },
+  "dependencies": {
+    "electron-localshortcut": "^3.1.0"
   }
 }

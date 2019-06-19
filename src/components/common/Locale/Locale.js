@@ -4,7 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { sprintf } from 'sprintf-js';
 
 // component
-@inject('translationStore') @observer
+@inject(/*'translationStore'*/) @observer
 class Locale extends Component {
     static propTypes = {
         children: PropTypes.string.isRequired,
@@ -19,10 +19,10 @@ class Locale extends Component {
         const {
             children,
             format,
-            translationStore,
+            //translationStore,
         } = this.props;
         const key = children.trim();
-        const text = translationStore.languages[key] || key;
+        //const text = translationStore.languages[key] || key;
         let target;
         if (format.length) {
             target = sprintf(text, ...format);

@@ -1,6 +1,5 @@
 {
     "extends": "airbnb",
-    "plugins": ["jest"],
     "rules": {
         "indent": ["error", 4, {"SwitchCase": 1}],
         "no-underscore-dangle": 0,
@@ -22,10 +21,5 @@
             "controlComponents": ["Input", "SimpleInput", "TextArea"],
             "depth": 3
         }]
-    },
-    "parser": "babel-eslint",
-    "env": {
-        "browser": true,
-        "jest/globals": true
     }
 }

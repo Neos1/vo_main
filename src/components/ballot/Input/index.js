@@ -33,7 +33,7 @@ export default observer(({ field, type = 'text', placeholder = null, showLabel =
     );
 });
 
-const SimpleInput = observer(({ id, label,index, maxLength, name, type = 'text', placeholder = null, showLabel = false, onChange, required = false, ...rest }) => {
+const SimpleInput = observer(({ id, label,index, maxLength, name, type = 'text', placeholder = null, showLabel = false, onChange, onFocus, onBlur, required = false, ...rest }) => {
     return (
         <div 
             className={
@@ -56,6 +56,8 @@ const SimpleInput = observer(({ id, label,index, maxLength, name, type = 'text',
                 onChange={onChange}
                 type={type}
                 required={required}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 placeholder={placeholder}
                 name={name}
                 maxLength={maxLength}

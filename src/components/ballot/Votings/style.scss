@@ -1,0 +1,391 @@
+@import '../../../styles/ballot/variables';
+@import '../../../styles/ballot/select';
+.wrapper {
+  margin-top: 50px;
+  height: calc(100vh - 50px);
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+.section {
+  display: inline-block;
+  &-parameters{
+    width: 35%;
+    height: 100%;
+    padding: 20px 30px;
+    background: #F1F4F5;
+    display: flex;
+    overflow-y: auto;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+    &>div {
+      position: relative;
+      width: 85%;
+      height: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      #loader-text{
+        position: absolute;
+        top: 53%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+    &__content {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: space-between;
+      &-heading {
+        margin: 0;
+        font-weight: 400;
+        font-size: 24px;
+      }
+      &-subheading {
+        font-size: 14px;
+        color: rgba($color: #5B778D, $alpha: 0.6);
+      }
+      .Select {
+        display: inline-block;
+        width: 100%;
+        height:48px !important;
+        margin-bottom: 0;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 3px;
+        &*{
+          border: none;
+        }
+
+        &.is-focused,
+        &.is-open,
+        &-multi-value-wrapper, 
+        &-arrow-zone,
+        &-input,
+        &-control {
+          height:48px !important;
+        }
+        &.is-focused,
+        &.is-open {
+          .Select-control {
+            &>* {
+              height:48px !important;
+            }
+          }
+        }
+        &-control {
+          transition: .2s linear;
+          border: 1px solid #D9DFE3;
+          border-radius: 3px;
+        }
+        &-placeholder {
+          color: #5B778D;
+          line-height: 48px;
+        }
+        &.is-open {
+          .Select-control {
+            border: 1px solid #4288F3;
+          }
+          .Select-arrow {
+            border: none !important;
+            transform: rotate(180deg);
+          }
+        }
+        &-arrow {
+          width: 25px;
+          height: 25px;
+          border: none !important;
+          background-image: url($image_path +'select-arrow.svg');
+          background-position: center center;
+          background-repeat: no-repeat;
+        }
+        &-arrow-zone {
+          border: none;
+        }
+        &-menu-outer{
+          top: 51px;
+        }
+        &-value > span {
+          line-height: 33px !important; 
+        }
+      }
+    }
+    &__buttons {
+      width: auto;
+      text-align: left;
+      margin-top: 165px;
+      padding-bottom: 20px;
+      label {
+        &>span {
+          display: block;
+          margin-bottom: 5px;
+          color: #5B778D;
+          font-weight: 400;
+          text-align: left;
+        }
+        &:last-child{
+          &>span {
+            text-align: left;
+          }
+        }
+      }
+      &>form button {
+        width: 100%;
+      }
+      .votings-additionals {
+        margin: 30px 0;
+        & > div {
+          margin-bottom:20px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+          align-items: center;
+          .field {
+            display: inline-block;
+            width: 40%;
+          }
+          select {
+            width: 30%;
+          }
+          span {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    &__active {
+      text-align: center;
+      width: 261px;
+    }
+  }
+  &-votings {
+    position: relative;
+    width: 65%;
+    height: 100%;
+    padding: 20px 25px;
+    box-sizing: border-box;
+    background-color: #E6E8ED;
+    overflow-y: auto;
+    &__filters {
+      display: table;
+      margin-bottom: 20px;
+      &-numbers {
+        display: inline-block;
+        .Select {
+          display: inline-block;
+          width: 80px;
+          height: 20px !important;
+          margin-bottom: 0;
+          box-sizing: border-box;
+          border: none;
+          &*{
+            border: none;
+          }
+
+          &.is-focused,
+          &.is-open,
+          &-multi-value-wrapper, 
+          &-arrow-zone,
+          &-input,
+          &-control {
+            background: transparent !important;
+            height: 20px !important;
+            border: none !important;
+          }
+          &.is-focused,
+          &.is-open {
+            .Select-control {
+              background: transparent;
+              &>* {
+                height: 20px !important;
+              }
+            }
+          }
+          &-control {
+            transition: .2s linear;
+            border: none;
+            background: transparent;
+          }
+          &-placeholder {
+            color: #5B778D;
+            line-height: 20px;
+          }
+          &-value {
+            padding: 0 !important;
+          }
+          &.is-open {
+            .Select-control {
+              border: none;
+              background: transparent;
+            }
+            .Select-arrow {
+              border: none !important;
+              transform: rotate(180deg);
+            }
+          }
+          &-arrow {
+            right: 10px;
+            top: -3px;
+            width: 15px;
+            height: 15px;
+            border: none !important;
+            background-image: url($image_path +'select-arrow_grey.svg');
+            background-position: center center;
+            background-repeat: no-repeat;
+          }
+          &-arrow-zone {
+            
+            border: none;
+          }
+          &-menu-outer{
+            top: 22px;
+          }
+          &-value > span {
+            line-height: 20px !important; 
+          }
+        }
+
+        &--questions {
+          .Select {
+            width: 200px !important;
+          }
+        }
+        &--descision {
+          .Select {
+            width: 120px !important;
+          }
+        }
+        &--id {
+          .Select {
+            width: 120px !important;
+          }
+        }
+
+        &>*{
+          vertical-align: middle;
+        }
+        &>span {
+          display: inline-block;
+          margin-right: 10px;
+          font-size: 12px;
+          color: #A6B4BF;
+        }
+      }
+      &-groups {
+        display: block;
+        margin: 20px 0;
+        &>*{
+          vertical-align: middle;
+        }
+        &>span {
+          display: inline-block;
+          margin-right: 10px;
+          font-size: 14px;
+          line-height: 15px;
+          color: #37474F;
+        }
+        
+      }
+    }
+  }
+}
+
+$loader-size: 100px;
+$loader-dot-size: ($loader-size / 5);
+$loader-height: ($loader-dot-size * 2);
+$loader-dot-color: #447ACC;
+
+// HTML
+#loader-walk {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: $loader-size;
+  height: $loader-height;
+  margin: 40px auto 0;
+  > div {
+    content: "";
+    width: $loader-dot-size;
+    height: $loader-dot-size;
+    background: $loader-dot-color;
+    border-radius: 100%;
+    position: absolute;
+    animation: animate 2s linear infinite;
+    &:nth-of-type(1) { animation-delay: -.4s; }
+    &:nth-of-type(2) { animation-delay: -.8s; }
+    &:nth-of-type(3) { animation-delay: -1.2s; }
+    &:nth-of-type(4) { animation-delay: -1.6s; }
+  }
+}
+@keyframes animate {
+  0% { 
+    left: $loader-size; 
+    top:0
+  }
+  80% { 
+    left: 0; 
+    top:0;
+  }
+  85% { 
+    left: 0; 
+    top: -$loader-dot-size; 
+    width: $loader-dot-size; 
+    height: $loader-dot-size;
+  }
+  90% { 
+    width: ($loader-dot-size * 2); 
+    height: ($loader-dot-size - 5px); 
+  }
+  95% { 
+    left: $loader-size; 
+    top: -$loader-dot-size; 
+    width: $loader-dot-size; 
+    height: $loader-dot-size;
+  }
+  100% { 
+    left: $loader-size; top:0; 
+  }
+}
+.InputFromTo {
+  display: inline-block;
+}
+
+.InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
+  background-color: #f0f8ff !important;
+  color: #4a90e2;
+}
+.InputFromTo .DayPicker-Day {
+  border-radius: 0 !important;
+}
+.InputFromTo .DayPicker-Day--start {
+  border-top-left-radius: 50% !important;
+  border-bottom-left-radius: 50% !important;
+}
+.InputFromTo .DayPicker-Day--end {
+  border-top-right-radius: 50% !important;
+  border-bottom-right-radius: 50% !important;
+}
+.InputFromTo .DayPickerInput {
+ 
+  &-Overlay {
+    position: absolute;
+    margin-left: -160px;
+    width: 550px;
+  }
+  input {
+    width: 100px;
+  }
+}
+.InputFromTo-to .DayPickerInput {
+  &-Overlay {
+    margin-left: -345px;
+  }
+  input {
+    width: 100px;
+  }
+}

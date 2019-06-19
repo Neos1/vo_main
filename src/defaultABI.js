@@ -212,7 +212,7 @@ module.exports = [
       },
       {
         "name": "_decimalUnits",
-        "type": "uint8"
+        "type": "uint256"
       },
       {
         "name": "_tokenSymbol",

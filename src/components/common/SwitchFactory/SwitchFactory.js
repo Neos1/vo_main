@@ -20,7 +20,7 @@ class SwitchFactory extends React.Component {
     render() {
         const { generateRouting } = this;
         const { routes, redirects } = this.props;
-        this.lng = getDefaultLanguange();
+        //this.lng = getDefaultLanguange();
         this.routePrefix = getRoutePrefix();
         return (
             <RouterDOM.Switch>
