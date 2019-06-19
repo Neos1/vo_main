@@ -10,6 +10,7 @@ import groupIcon from '../../../img/addGroup_Icon.svg'
 import questionIcon from '../../../img/addQuestion_Icon.svg'
 import Question from '../Question/Question';
 import { Redirect } from 'react-router';
+import Loader from '../../common/Loader';
 
 @inject('accountStore', 'contractModel') @observer
 class Questions extends Component {
@@ -49,13 +50,7 @@ class Questions extends Component {
 
   getLoader() {
     return (
-      <div id="loader-walk" className={this.step == 40? 'hidden' : ''}>
-        <div className="dot"></div>
-        <div className="dot"></div>
-        <div className="dot"></div>
-        <div className="dot"></div>
-        <div className="dot"></div>
-      </div>  
+      <Loader/>
     )
   }
 

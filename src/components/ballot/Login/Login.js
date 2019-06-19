@@ -111,21 +111,23 @@ class Login extends React.Component {
             <div className={styles.login}>
                 <Container>
                     <div className={styles.login__container}>
+                        <button className={`
+                            ${styles.login__back} 
+                            ${((this.step == 0)
+                                ||(this.step == 3)
+                                ||(this.step == 12)
+                                ||(this.step == 21)
+                                ||(this.step == 24)
+                                ||(this.step == 11)
+                                ||(this.step == 33)
+                                ||(this.step == 37)
+                                ||(this.step == 8)
+                                ||(this.step == 51)
+                                ||(this.step == 40)) 
+                                ? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
                         <div className={styles.login__welcome}>
 
-                            <button 
-                                className={`
-                                ${styles.login__back} 
-                                ${((this.step == 0)
-                                    ||(this.step == 21)
-                                    ||(this.step == 24)
-                                    ||(this.step == 11)
-                                    ||(this.step == 33)
-                                    ||(this.step == 37)
-                                    ||(this.step == 8)
-                                    ||(this.step == 51)
-                                    ||(this.step == 40)) 
-                                    ? styles.hidden : ''} btn btn--white`} onClick={this.goBack}> Вернуться </button>
+                            
                             {/* Окно логина */}
                             <div className={`${styles.login__form} ${this.step !== 0 ? styles.hidden : ''}`}>
                                 <h3>Вход в систему</h3>
@@ -256,7 +258,10 @@ class Login extends React.Component {
                             {/** Окно выбора проекта */}
                             <div className={`${styles.seed__form} ${this.step !== 3 ? styles.hidden : ''}`}>
                                 <h3>Выбор проекта</h3>
-                                <div className={styles.login__select}> 
+                                <div className={styles.login__select} style={{
+                                        "overflow-y": "auto",
+                                        "max-height": "35%"  
+                                }}> 
                                     <ul className={styles.login__projects}>
                                         {projects}
                                     </ul>
@@ -413,16 +418,16 @@ class Login extends React.Component {
                                 
                                 <form name="deploy_project" onSubmit={this.createTokenContract}>
                                     <div className={styles.login__select}> 
-                                        <h3>Создание нового проекта</h3>
+                                        <h3>Создание контракта токенов</h3>
                                         <div className={styles.deploy__input}>
                                             <label>
-                                            <SimpleInput required placeholder="Укажите название токена"  onChange={this.getTokenName}/>
+                                            <SimpleInput required placeholder="Укажите название токена" name='token'  onChange={this.getTokenName}/>
                                             </label>
                                             <label> 
-                                            <SimpleInput required placeholder="Укажите символ токена" onChange={this.getTokenChar}/>
+                                            <SimpleInput required placeholder="Укажите символ токена" name='tokenSymbol' onChange={this.getTokenChar}/>
                                             </label>
                                             <label>
-                                            <SimpleInput required placeholder="Укажите общее количество токенов" onChange={this.getTokenCount}/>
+                                            <SimpleInput required placeholder="Укажите общее количество токенов" name='count' onChange={this.getTokenCount}/>
                                             </label>
                                             <label>
                                             <SimpleInput name="password" type='password' required placeholder="Введите пароль ключа" onChange={this.getPasswordCheck}/>
@@ -573,8 +578,9 @@ class Login extends React.Component {
                             <div className={`${styles.content} ${this.step !== 0 ? 'hidden': '' }`} style={{'maxWidth':"350px"}}>
                                 <img src={`${PATH_TO_IMG}rocket.png`}></img>
                                 <div className={styles.content__description}>
-                                    <p>Задача организации, в особенности же укрепление и развитие структуры позволяет выполнять важные задания по разработке систем массового участия.</p>
-                                    <p>Не следует, однако забывать, что рамки и место обучения кадров позволяет оценить значение направлений прогрессивного развития.</p>
+                                    <p> An open source voting system V4Vote will allow you to connect to decision-making those whose help you need. </p>
+                                    <p>Connect the project owners, company employees, management, holders of tokens purchased on ICO. </p> 
+                                    <p>Use the opportunities of decentralized transparent voting for the growth of the project by taking into account the views of stakeholders.</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 1) && (this.step !== 23 ) ? 'hidden': '' }`}>
@@ -904,12 +910,25 @@ class Login extends React.Component {
     createTokenContract = (e) =>{
         e.preventDefault();
         if (e.target.password.value == this.account.password){
-            if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (this.ERC20.totalSupply !="")){
-                this.step = 51;
-                this.deployToken("token");
-            }else{
-                alert("Введите все данные")
+            if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (!isNaN(Number(this.ERC20.totalSupply)))){
+                if (this.account.balances/1.0e18 > 0.001) {
+                    this.step = 51;
+                    this.deployToken("token");
+                } else alert("Недостаточно средств на кошельке, пополните баланс")
+            } else {
+                if (this.ERC20.name == "") {
+                    document.deploy_project.token.classList.add('field__input--error')
+                }
+                if (this.ERC20.symbol == "") {
+                    document.deploy_project.tokenSymbol.classList.add('field__input--error')
+                }
+                if (isNaN(Number(this.ERC20.totalSupply))) {
+                    document.deploy_project.count.classList.add('field__input--error')
+                }
+                alert("Введите корректные данные")
             }
+        } else {
+            document.deploy_project.password.classList.add('field__input--error')
         }
     }
 
@@ -963,9 +982,17 @@ class Login extends React.Component {
     }
     @action deploySolidity = (e) =>{
         e.preventDefault();
-        this.step = 40
-        this.substep = 1;
-        this.deployToken('contract')
+        const {password, passwordCheck} = this.account;
+        
+        if (password === passwordCheck) {
+            if (this.account.balances/1.0e18 > 0.001) {
+                this.step = 40
+                this.substep = 1;
+                this.deployToken('contract')
+            } else alert("Недостаточно средств на кошельке, пополните баланс")
+        } else {
+            document.deploy_step_2.querySelectorAll('input')[1].classList.add('field__input--error');
+        }
     }
     @action
     sendTx = (transaction, type, key, abi) => {
@@ -1167,6 +1194,7 @@ class Login extends React.Component {
             e.target.password.classList.remove('field__input--error')
             e.target.password_confirm.classList.remove('field__input--error')
             this.step = 11;
+            document.forms.password_input.reset();
             this.createWallet();
         } else {
             e.target.password.classList.add('field__input--error')
@@ -1188,6 +1216,7 @@ class Login extends React.Component {
     checkCreatedSeed = (e) =>{
         e.preventDefault();
        this.previousStep.push(this.step)
+       document.forms.seed.reset()
         this.step = 21;
         let seed = this.seed.join(' ');
         if ( bip39.validateMnemonic(seed) ) {
@@ -1226,8 +1255,17 @@ class Login extends React.Component {
     handleSaveKey = (e) => {
         e.preventDefault();
        this.previousStep.push(this.step)
-        this.step = 24;
-        this.recoverWallet('create');
+       let regex = new RegExp(/^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9])(?=.*[!&$%&? "]).{6,}$/g)
+       if (regex.test(e.target.password.value) && (e.target.password.value == e.target.password_confirm.value)){
+            e.target.password.classList.remove('field__input--error')
+            e.target.password_confirm.classList.remove('field__input--error')
+            document.forms.password_input.reset();
+            this.step = 24;
+            this.recoverWallet('create');
+        } else {
+            e.target.password.classList.add('field__input--error')
+            e.target.password_confirm.classList.add('field__input--error')
+        }
     }
     @action
     recoverFromSeed =(e) => {
@@ -1235,6 +1273,7 @@ class Login extends React.Component {
        this.previousStep.push(this.step)
         let seed = this.seed.join(' ');
         if(bip39.validateMnemonic(seed)){
+            document.forms.seed.reset()
             this.step = 21;
             this.recoverWallet('recover');
         } else alert("Проверьте правильность ввода")
@@ -1315,26 +1354,32 @@ class Login extends React.Component {
     @action
     checkExistingERC = (e)=>{
         e.preventDefault();
-       this.previousStep.push(this.step)
-        this.step = 37;
-        console.info('Ты не тут')
+        if ( this.ERC20.hash.match(/(?=0x[a-zA-Z0-9]{40})\w+/g) !== null ) {
+            this.previousStep.push(this.step)
+            this.step = 37;
+            let address = web3.eth.getCode(this.ERC20.hash).then(data=>{
+                data !== '0x'? this.step = 38 : alert('Адрес не валидный');
+            })
+            let defaultABI = window.__ENV === 'development'
+                ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"), "utf8"))
+                : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), "utf8"))
+            
+            let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
 
-        let address = web3.eth.getCode(this.ERC20.hash).then(data=>{
-            data !== '0x'? this.step = 38 : alert('Адрес не валидный');
-        })
-        
-        let defaultABI = window.__ENV === 'development'
-            ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"), "utf8"))
-            : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), "utf8"))
-        
-        let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
-        contract.methods.totalSupply().call({from: this.account.addresses}).then(result=>{
-            this.ERC20.totalSupply = result
-        })
-        contract.methods.symbol().call({from: this.account.addresses}).then(result=>{
-            this.ERC20.symbol = result
-        })
+            contract.methods.totalSupply().call({from: this.account.addresses}).then(result=>{
+                this.ERC20.totalSupply = result
+            })
+            contract.methods.symbol().call({from: this.account.addresses}).then(result=>{
+                this.ERC20.symbol = result
+            })
 
+            if ((this.ERC20.totalSupply == "") && (this.ERC20.symbol == "")) {
+                this.step = 36;
+                document.checkERC.querySelector('input').classList.add('field__input--error');
+            }
+        } else {    
+            document.checkERC.querySelector('input').classList.add('field__input--error');
+        }
     }
     @action
     continueDeploy = ()=>{

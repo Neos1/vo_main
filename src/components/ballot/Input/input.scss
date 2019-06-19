@@ -37,7 +37,7 @@
 		padding: 15.5px 24px;
 		font-weight: 400;
 		&:hover, &:focus{
-			padding: 14.5px 22px;
+			padding: 14.5px 23px;
 			border: 1px solid #434BDF;
 		}
 		&[type='password']{
@@ -51,9 +51,10 @@
 			color: #A6B4BF;
 		}
 		&--error {
+			padding: 14.5px 23px;
 			border: 1px solid #CF142B;
 			@include placeholder {
-				font-size: 12px;
+				font-size: 14px;
 				color: #CF142B;
 			}
 		}

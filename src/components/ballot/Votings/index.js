@@ -18,6 +18,7 @@ import StartVotingmodal from '../Modals/StartVoting';
 import SetVoteModal from '../Modals/SetVoteModal';
 import AlertModal from '../Modals/AlertModal';
 import contractModel from '../../../models/ContractModel';
+import Loader from '../../common/Loader'
 
 import VotingActive from '../../../img/voting_active.svg'
 
@@ -96,13 +97,7 @@ class Votings extends Component {
     const {createVotingStep} = this.state;
     return (
       <div>
-        <div id="loader-walk" className={this.step == 40? 'hidden' : ''}>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-        </div>   
+        <Loader/>
         <p id="loader-text">
           {
             createVotingStep == 2 

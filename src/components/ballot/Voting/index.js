@@ -283,7 +283,7 @@ class Voting extends Component {
   }
   getHideGroupsBtn() {
     return(
-      <div style={{'textAlign': 'center'}}>
+      <div style={{'textAlign': 'center', 'padding': '20px'}}>
         <span className={`${styles['label']}`} onClick={this.toggleGraphs.bind(this)}>скрыть группы</span> 
       </div>
     )
