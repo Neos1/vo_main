@@ -409,5 +409,10 @@ contract VoterBase is VoterInterface {
             groupAddr: _address
         });
         userGroups.save(userGroup);
+    }
+
+    function setCustomGroupAdmin(address group, address admin) returns (bool) {    
+        require(group.call( bytes4( keccak256("setAdmin(address)")), admin));
+        return true;
     } 
 }

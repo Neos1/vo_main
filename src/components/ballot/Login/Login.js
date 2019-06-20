@@ -761,7 +761,6 @@ class Login extends React.Component {
     }
     @action
     getPasswordCheck = (e) => {
-        
         this.account.passwordCheck = e.target.value;
         e.target.classList.remove('field__input--error');
     }
@@ -883,27 +882,32 @@ class Login extends React.Component {
     }
     @action
     getProjectName = (e) => {
+        e.target.classList.remove('field__input--error')
         this.contract.name = e.target.value
     }
     @action
     getProjectHash = (e) => {
+        e.target.classList.remove('field__input--error')
         this.contract.hash = e.target.value
     }
     @action 
     getERC20Hash = (e)=>{
+        e.target.classList.remove('field__input--error')
         this.ERC20.hash = e.target.value
     }
 
     @action
-    getTokenName = (e)=>{
+    getTokenName = (e) => {
         this.ERC20.name = e.target.value
     }
     @action
-    getTokenChar = (e)=>{
+    getTokenChar = (e) => {
+        e.target.classList.remove('field__input--error')
         this.ERC20.symbol = e.target.value
     }
     @action
-    getTokenCount = (e)=>{
+    getTokenCount = (e) => {
+        e.target.classList.remove('field__input--error')
         this.ERC20.totalSupply = e.target.value
     }
     @action 
@@ -1220,6 +1224,10 @@ class Login extends React.Component {
         this.step = 21;
         let seed = this.seed.join(' ');
         if ( bip39.validateMnemonic(seed) ) {
+            let inputs = document.forms.seed.querySelectorAll('input');
+            inputs.forEach(input=> {
+                input.classList.remove('active');
+            })
             let privKey = web3.eth.accounts.wallet[0].privateKey
             this.newAddresses(this.account.addresses, privKey);
             setTimeout(()=>{
@@ -1273,7 +1281,11 @@ class Login extends React.Component {
        this.previousStep.push(this.step)
         let seed = this.seed.join(' ');
         if(bip39.validateMnemonic(seed)){
-            document.forms.seed.reset()
+            document.forms.seed.reset();
+            let inputs = document.forms.seed.querySelectorAll('input');
+            inputs.forEach(input=> {
+                input.classList.remove('active');
+            })
             this.step = 21;
             this.recoverWallet('recover');
         } else alert("Проверьте правильность ввода")

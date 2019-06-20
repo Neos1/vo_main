@@ -43,6 +43,10 @@ contract MERC20 {
     return balance;
   }
 
+  function setAdmin(address _newAdmin) {
+    admin = _newAdmin;
+  }
+
   function _addUser(address user, uint256 balance) public returns(uint256) {
     balances[user].prevBalance = balance;
     balances[user].currBalance = balance;

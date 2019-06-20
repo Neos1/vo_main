@@ -32,7 +32,8 @@
       padding: 0;
       width: calc(25% - 1px);
       & > div {
-        width: 133px;
+        width: 145px;
+        text-align: right;
       }
       p { 
         margin-top: 0;
@@ -71,6 +72,15 @@
           width: 133px;
           height: 10px;
           border : 1px solid #D9DFE3;
+        }
+      }
+      &-last {
+        span {
+          display: inline-block;
+          width: 75%;
+        }
+        img {
+          vertical-align: unset;
         }
       }
     }

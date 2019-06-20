@@ -294,7 +294,7 @@ class Votings extends Component {
     })
 
     parametersTypes = parametersTypes.filter(e=>e);
-
+    console.log(parametersTypes)
     if (selected == 0) {
       parametersTypes = ['uint[]','uint8','string','string','address','bytes4','uint[]','bytes32[]']
       let id = await contract.methods.getCount().call({from: web3.eth.accounts.wallet[0].address})
