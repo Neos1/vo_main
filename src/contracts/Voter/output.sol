@@ -53,9 +53,9 @@ library QuestionGroups {
 library UserGroups {
 
     enum GroupStatus {
-        // deleted or inactive group
+        // deleted or inactive question
         INACTIVE,
-        // active group
+        // active question
         ACTIVE
     }
 
@@ -69,6 +69,7 @@ library UserGroups {
     struct List {
         uint groupIdIndex;
         mapping (bytes32 => uint) uniqNames;
+        mapping (uint => string) names;
         mapping (uint => UserGroup) group;
     }
 
@@ -84,11 +85,13 @@ library UserGroups {
     }
 
     function save(List storage _self, UserGroup memory _group) internal returns (uint id) {
-        bytes32 name = keccak256(abi.encodePacked(_group.name));
+        bytes32 key = keccak256(abi.encodePacked(_group.name));
+        string memory name = _group.name;
         uint groupId = _self.groupIdIndex;
-        require(!exists(_self, name), "provided group already exists");
+        require(!exists(_self, key), "provided group already exists");
+        _self.names[groupId] = name;
         _self.group[groupId] = _group;
-        _self.uniqNames[name] = groupId;
+        _self.uniqNames[key] = groupId;
         _self.groupIdIndex++;
         return groupId;
     }
@@ -803,6 +806,11 @@ contract VoterBase is VoterInterface {
             groupAddr: _address
         });
         userGroups.save(userGroup);
+    }
+
+    function setCustomGroupAdmin(address group, address admin) returns (bool) {    
+        require(group.call( bytes4( keccak256("setAdmin(address)")), admin));
+        return true;
     } 
 }
 

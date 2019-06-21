@@ -35,7 +35,7 @@
     "name": "Установить администратора группы",
     "caption": "Установка администратора в группе кастомных токенов",
     "time": 10,
-    "method": "0x704b6c02",
+    "method": "0x3cc0a953",
     "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
     "parameters": ["Group","address", "Admin address","address"]
   }

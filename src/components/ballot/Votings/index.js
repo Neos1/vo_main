@@ -277,10 +277,10 @@ class Votings extends Component {
     let mainInputs = target.querySelectorAll('form[name="votingData"] > label input ');
     let additionalInputs = target.querySelectorAll('.votings-additionals input')
     let additionalSelects = target.querySelectorAll('.votings-additionals select')
-    console.log(mainInputs, additionalInputs, additionalSelects);
 
     let methodSelector = questions.system[selected].methodSelector;
     let questionParameters = questions.system[selected]._parameters;
+
     let values = [];
 
     hexString += questions.system[selected].methodSelector
@@ -292,9 +292,9 @@ class Votings extends Component {
       }
       return type != "" ? type : '' ;
     })
-
     parametersTypes = parametersTypes.filter(e=>e);
-    console.log(parametersTypes)
+
+
     if (selected == 0) {
       parametersTypes = ['uint[]','uint8','string','string','address','bytes4','uint[]','bytes32[]']
       let id = await contract.methods.getCount().call({from: web3.eth.accounts.wallet[0].address})
@@ -318,7 +318,6 @@ class Votings extends Component {
       
     }
 
-    console.log(values);
     let hexString = (web3.eth.abi.encodeParameters(parametersTypes, values));
 
     hexString = hexString.replace('0x', methodSelector);

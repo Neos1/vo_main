@@ -135,6 +135,30 @@
 	},
 	{
 		"constant": false,
+		"inputs": [
+			{
+				"name": "group",
+				"type": "address"
+			},
+			{
+				"name": "admin",
+				"type": "address"
+			}
+		],
+		"name": "setCustomGroupAdmin",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x3cc0a953"
+	},
+	{
+		"constant": false,
 		"inputs": [],
 		"name": "getUserWeight",
 		"outputs": [
