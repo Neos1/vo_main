@@ -1078,19 +1078,20 @@ class Login extends React.Component {
         }); 
     }
     @action prepareFormula(formula) {
-        const FORMULA_REGEXP = new RegExp(/(group)|((?:0x*[a-zA-Z0-9]{40}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
+        const FORMULA_REGEXP = new RegExp(/(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
         let matched = formula.match(FORMULA_REGEXP);
         console.log(matched)
         
         let convertedFormula = [];
         
         matched[0] == 'group'? convertedFormula.push(0) : convertedFormula.push(1)
-        matched[2] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
-        matched[3] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
-        convertedFormula.push(Number(matched[4].replace('%', '')))
+        matched[1] == 'Owners'? convertedFormula.push(1) : convertedFormula.push(2)
+        matched[3] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
+        matched[4] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
+        convertedFormula.push(Number(matched[5].replace('%', '')))
 
-        if (matched.length == 6) {
-           matched[5] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
+        if (matched.length == 8) {
+           matched[7] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
         }
         console.log(convertedFormula);
         return convertedFormula;

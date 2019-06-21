@@ -6,7 +6,7 @@
     "caption": "Добавление нового вопроса",
     "time": 20,
     "method": "0x686c52c4",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["GroupId", "uint", "Name", "string", "Caption", "string", "Time", "uint", "MethodSelector", "bytes4", "Formula", "string", "parameters", "bytes32[]"]
   },
   "2": {
@@ -16,7 +16,7 @@
     "caption": "Подключить новую группу пользователей для участия в голосованиях",
     "time": 10,
     "method": "0x952b627c",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["Name","string","Type","string","Address","address"]
   },
   "3": {
@@ -26,7 +26,7 @@
     "caption": "Добавить новую группу вопросов",
     "time": 10,
     "method": "0xf729d56b",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["Name","string"]
   },
   "4": {
@@ -36,7 +36,7 @@
     "caption": "Установка администратора в группе кастомных токенов",
     "time": 10,
     "method": "0x3cc0a953",
-    "formula": "(group (0xD490af05Bf82eF6C6BA034B22D18c39B5D52Cc54) => condition (positive >= 20% of all))",
+    "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["Group","address", "Admin address","address"]
   }
   
