@@ -12,7 +12,10 @@
     "type": "git",
     "url": "git+https://github.com/Neos1/vo_temp.git"
   },
-  "author": "",
+  "author": {
+    "name": "Pavel Kakhanov",
+    "email": "pavkahanov@neos1.com"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Neos1/vo_temp/issues"
@@ -25,6 +28,9 @@
   "build": {
     "files": [
       "build/ballot/**/*",
+      "src/wallets/**/*",
+      "src/contracts/**/*",
+      "src/config.json",
       "electron.js"
     ],
     "win": {

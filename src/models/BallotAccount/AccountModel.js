@@ -13,7 +13,7 @@ window.fs = window.require('fs');
 const path = require('path')
 
 if (window.process.platform == 'linux') {
-    window.process.env.PORTABLE_EXECUTABLE_DIR = path.join(window.__dirname, './src');
+    window.process.env.PORTABLE_EXECUTABLE_DIR = path.join(window.__dirname, '../../src');
 }
 
 const PATH_TO_WALLETS = window.__ENV == 'development'
