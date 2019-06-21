@@ -6,8 +6,8 @@ import Select from 'react-select';
 import '../../../styles/ballot/basic.scss';
 import styles from './style.scss';
 import lists from '../../../img/lists.png';
-import groupIcon from '../../../img/addGroup_Icon.svg'
-import questionIcon from '../../../img/addQuestion_Icon.svg'
+import groupIcon from '../../../img/addGroup_icon.svg'
+import questionIcon from '../../../img/addQuestion_icon.svg'
 import Question from '../Question/Question';
 import { Redirect } from 'react-router';
 import Loader from '../../common/Loader';

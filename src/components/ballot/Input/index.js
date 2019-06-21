@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import styles from './Input.scss';
+import styles from './input.scss';
 
 export default observer(({ field, type = 'text', placeholder = null, showLabel = false, ...rest }) => {
     return (
