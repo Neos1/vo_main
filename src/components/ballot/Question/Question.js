@@ -33,7 +33,7 @@ class Question extends Component {
     let r = [];
     let ready = '( )'
     f[0] === 0 ? r.push('group( ') : r.push('user(0x298e231fcf67b4aa9f41f902a5c5e05983e1d5f8) => condition( ');
-    f[1] === 0 ? r.push('Owner) => condition(') : r.push('Custom) => condition(');
+    f[1] === 1 ? r.push('Owner) => condition(') : r.push('Custom) => condition(');
     f[2] === 0 ? r.push('quorum') : r.push('positive');
     f[3] === 0 ? r.push(' <= ') : r.push(' >= ');
     f.length == 6 ? r.push(`${f[4]} %`) : r.push(`${f[4]} % )`)

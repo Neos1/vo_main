@@ -1088,10 +1088,10 @@ class Login extends React.Component {
         matched[1] == 'Owners'? convertedFormula.push(1) : convertedFormula.push(2)
         matched[3] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
         matched[4] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
-        convertedFormula.push(Number(matched[5].replace('%', '')))
+        convertedFormula.push(Number(matched[5]))
 
-        if (matched.length == 8) {
-           matched[7] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
+        if (matched.length == 9) {
+           matched[8] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
         }
         console.log(convertedFormula);
         return convertedFormula;
