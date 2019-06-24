@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styles from './style.scss';
 import { inject, observer } from 'mobx-react';
 import accountStore from '../../../models/BallotAccount/AccountModel';
-
 import arrow from '../../../img/arrow_send.svg';
 
 @inject('contractModel', 'accountStore')@observer
@@ -21,18 +20,42 @@ class UserGroup extends Component {
 
   async componentWillMount() {
     const { accountStore } = this.props;
-    await this.getERCInfo();
+    await this.getInfo();
   }
 
-  async getERCInfo() {
+  async getInfo() {
     const { contractModel } = this.props;
-    const { contract } = contractModel;
     const { userAddress } = this.state;
-    let symbol = await contract.methods.getERCSymbol().call({from: userAddress})
-    let totalSupply = await contract.methods.getERCTotal().call({from: userAddress})
-    let address = await contract.methods.getERCAddress().call({from: userAddress})
-    let userBalance = await contract.methods.getUserBalance().call({from: userAddress})
-    await this.setState({symbol, totalSupply, address, userBalance})
+    const { groupAddress, groupType } = this.props.data;
+
+    groupType == 'ERC20'? await this.getERCinfo(groupAddress) : await this.getCustomInfo(groupAddress);
+    
+  }
+
+  async getERCinfo(address) {
+    const { userAddress } = this.state;
+    console.log(address);
+    const abi = window.__ENV == 'development'
+      ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/ERC20.abi'), 'utf8'))    
+      : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/ERC20.abi'), 'utf8'))
+    const contract = await new web3.eth.Contract(abi, address);
+    let symbol = await contract.methods.symbol().call({from: userAddress})
+    let totalSupply = await contract.methods.totalSupply().call({from: userAddress})
+    let userBalance = await contract.methods.balanceOf(userAddress).call({from: userAddress})
+    await this.setState({symbol, totalSupply, userBalance})
+  }
+
+  async getCustomInfo(address) { 
+    const { userAddress } = this.state;
+    console.log(address);
+    const abi = window.__ENV == 'development'
+      ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
+    const contract = await new web3.eth.Contract(abi, address);
+    let symbol = await contract.methods.symbol().call({from: userAddress})
+    let totalSupply = await contract.methods.totalSupply().call({from: userAddress})
+    let userBalance = await contract.methods.balanceOf(userAddress).call({from: userAddress})
+    await this.setState({symbol, totalSupply, userBalance})
   }
 
   expandCard() {
@@ -46,19 +69,24 @@ class UserGroup extends Component {
   render() { 
     const { onTransfer } = this.props;
     const {totalSupply, symbol, address, userBalance, userAddress, expanded} = this.state;
+    const { data } = this.props;
 
     return ( 
 
       <div className='group'>
         <div className='group-head'>
           <div className='group-head__about'>
-            <h1 onClick={this.expandCard.bind(this)}>Admins</h1>
-            <p>Неограниченные права</p>
-            <p><strong>{address}</strong></p>
+            <h1 onClick={this.expandCard.bind(this)}> {data.name} </h1>
+            <p>
+              {
+                data.name == 'Owner' ? "Неограниченные права" : "Могут голосовать по определенным вопросам" 
+              }
+            </p>
+            <p><strong>{data.groupAddress}</strong></p>
           </div>
           <div className='group-head__additional'>
             <p><strong>{totalSupply}</strong> {symbol}</p>
-            <p>ERC20</p>
+            <p>{data.groupType}</p>
           </div>
         </div>
         <hr/>

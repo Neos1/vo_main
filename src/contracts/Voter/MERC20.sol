@@ -1,24 +1,25 @@
 pragma solidity 0.5;
 
-import "./IERC20.sol";
+import "../IERC20.sol";
+import "./MERCInterface.sol";
 
-contract MERC20 {
-  string private name;
-  string private symbol;
-  uint256 private decimals;
+contract MERC20 is MERCInterface {
+  string private _name;
+  string private _symbol;
+  uint256 private _decimals;
   address public admin;
   IERC20 private parentERC;
 
   mapping (address => userBalance) balances;
   address[] users;
 
-  constructor (string _name, string _symbol, address _parentAddr ) public {
-    name = _name;
-    symbol = _symbol;
+  constructor (string name, string symbol, address _parentAddr ) public {
+    _name = name;
+    _symbol = symbol;
     parentERC = IERC20(_parentAddr);
-    decimals = parentERC.totalSupply();
+    _decimals = parentERC.totalSupply();
     admin = msg.sender;
-    balances[msg.sender].currBalance = decimals;
+    balances[msg.sender].currBalance = _decimals;
   }
 
   struct userBalance{
@@ -28,14 +29,14 @@ contract MERC20 {
   }
 
 
-  function _symbol() public view returns(string) {
-    return symbol;
+  function symbol() public view returns(string) {
+    return _symbol;
   }
-  function _name() public view returns(string) {
-    return name;
+  function name() public view returns(string) {
+    return _name;
   }
-  function _decimals() public view returns(uint256) {
-    return decimals;
+  function totalSupply() public view returns(uint256) {
+    return _decimals;
   }
 
   function balanceOfERC(address owner) public returns (uint256) {
@@ -43,8 +44,8 @@ contract MERC20 {
     return balance;
   }
 
-  function setAdmin(address _newAdmin) {
-    admin = _newAdmin;
+  function balanceOf(address who) returns (uint256) {
+    
   }
 
   function _addUser(address user, uint256 balance) public returns(uint256) {
@@ -64,5 +65,8 @@ contract MERC20 {
     balances[_to].currBalance = balances[_to].currBalance + value;
   }
 
+  function setAdmin(address _newAdmin) {
+    admin = _newAdmin;
+  }
 
 }
