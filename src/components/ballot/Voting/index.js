@@ -10,6 +10,7 @@ import voteNegative from '../../../img/vote_negative.svg';
 import voteNone from '../../../img/vote_none.svg';
 import positive from '../../../img/set_positive.svg';
 import negative from '../../../img/set_negative.svg';
+import awaitLastVote from '../../../img/voting_lastVote.svg';
 
 
 @inject('contractModel')@observer
@@ -49,17 +50,35 @@ class Voting extends Component {
         percent: 100
       })
     }
-    
+    const voteNotEnded = ()=> {
+      return (
+        <p className={styles['voting-about__progress']}>
+          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining < 0 ? 0 : remaining} минут</span>
+          <span className={styles['voting-about__progress-bar']} style={{'width': percent+"%"}}></span>
+        </p>
+      )
+    }
+    const voteEnded = ()=> {
+      return (
+        <p className={styles['voting-about__progress']}>
+          <p className={styles['voting-about__progress-last']}>
+            <span>Ожидание последнего голоса</span>
+            <img src={awaitLastVote}/>
+          </p>
+        </p>
+      )
+    }
+    let result = percent < 100 ? voteNotEnded() : voteEnded()
+
     return (
       <div className={styles['voting-about__flow-active']}>
         <p>
           <span>Идет голосование</span>
           <img src={voteActive}/>
         </p>
-        <p className={styles['voting-about__progress']}>
-          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining < 0 ? 0 : remaining} минут</span>
-          <span className={styles['voting-about__progress-bar']} style={{'width': percent+"%"}}></span>
-        </p>
+          {
+            result
+          }
       </div>
     )
   }
@@ -68,7 +87,7 @@ class Voting extends Component {
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
     contract.methods.getVotingDescision(1).call({from: address})
-      .then(async (result)=>{ 
+      .then(async (result) =>{ 
         await this.setState({descision: result})
       })
 
@@ -134,12 +153,12 @@ class Voting extends Component {
     const {contractModel, index} = this.props;
     const { questions, bufferVotings } = contractModel;
     let id = bufferVotings[index-1][0] - 1;
-
+    console.log(id);
     let votingData = bufferVotings[index-1].data;
     let methodSelector = questions.system[id].methodSelector;
     let questionParams = questions.system[id]._parameters;
     let finalData = [];
-
+    console.log(methodSelector);
     let parametersTypes = questionParams.map((param, index)=>{
       let type = '';
       let parameter = web3.utils.hexToUtf8(param);
@@ -149,23 +168,30 @@ class Voting extends Component {
       return type != "" ? type : '' ;
     })
     parametersTypes = parametersTypes.filter(e=>e);
+    console.log(parametersTypes)
 
     if (id == 0) {
-      questionParams = ['ID', 'uint', 'Status','uint8','Name','string','Text','string','Target','address','MethodSelector','bytes4','Formula','uint[]','parameters','bytes32[]']
+      questionParams = ['ID', 'uint', 'Status','uint8','Name','string','Text','string','Target','address','MethodSelector','bytes4','Formula','uint[]','parameters','bytes32[]'].map(param => web3.utils.utf8ToHex(param))
       parametersTypes = ['uint[]','uint8','string','string','address','bytes4','uint[]','bytes32[]'];
     } 
+    
     votingData = votingData.replace(methodSelector, '0x');
-
+    console.log(questionParams)
     let data = web3.eth.abi.decodeParameters(parametersTypes, votingData);
         data = Object.values(data);
-
+        console.log(data);
     for(let i = 0; i < data.length - 1; i++) {
       if (i == 0) {
-        finalData.push([questionParams[i*2], data[i][0]])
+        if (typeof data[i] == 'object') {
+          finalData.push([questionParams[i*2], data[i][0]])
+        } else {
+          finalData.push([questionParams[i*2], data[i]])
+        }
       } else {
         finalData.push([questionParams[i*2], data[i]])
       }
     }
+    console.log(finalData)
     return finalData;
   }
   
@@ -182,17 +208,17 @@ class Voting extends Component {
     let f = formula.map(text=> Number(text));
     let r = [];
     let ready = '( )'
-    f[0] === 0 ? r.push('group(ERC20) => condition( ') : r.push('user(0x298e231fcf67b4aa9f41f902a5c5e05983e1d5f8) => condition( ') ;
-    f[1] === 0 ? r.push('quorum') : r.push('positive') ;
-    f[2] === 0 ? r.push(' <= ') : r.push(' >= ') ;
-    f.length == 5 ? r.push(`${f[3]} %`) : r.push(`${f[3]} % )`)
-    if (f.length == 5) {
-      f[4] === 0 ? r.push(' of quorum)') : r.push(' of all)') ;
+    f[0] === 0 ? r.push('group(') : r.push('user(') ;
+    f[1] === 1 ? r.push('Owners) => condition( ') : r.push('Custom) => condition( ') ;
+    f[2] === 0 ? r.push('quorum') : r.push('positive') ;
+    f[3] === 0 ? r.push(' <= ') : r.push(' >= ') ;
+    f.length == 6 ? r.push(`${f[4]} %`) : r.push(`${f[4]} % )`)
+    if (f.length == 6) {
+      f[5] === 0 ? r.push(' of quorum)') : r.push(' of all)') ;
     }
 
     formula = r.join('');
     ready = ready.replace(' ', formula);
-
 
     return ready;
   }
@@ -281,9 +307,10 @@ class Voting extends Component {
       graphics: !this.state.graphics 
     })
   }
+
   getHideGroupsBtn() {
     return(
-      <div style={{'textAlign': 'center'}}>
+      <div style={{'textAlign': 'center', 'padding': '20px'}}>
         <span className={`${styles['label']}`} onClick={this.toggleGraphs.bind(this)}>скрыть группы</span> 
       </div>
     )
@@ -304,6 +331,7 @@ class Voting extends Component {
     let formula = this.getFormula();
 
     let votingParameters = votingParams.map(( param, index ) => {
+      console.log(param)
       let value;
       if ((index == votingParams.length - 1 ) && (typeof(param[1]) == 'object')) {
         value = param[1].map((subParam, index) => {

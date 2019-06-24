@@ -18,6 +18,7 @@ import StartVotingmodal from '../Modals/StartVoting';
 import SetVoteModal from '../Modals/SetVoteModal';
 import AlertModal from '../Modals/AlertModal';
 import contractModel from '../../../models/ContractModel';
+import Loader from '../../common/Loader'
 
 import VotingActive from '../../../img/voting_active.svg'
 
@@ -96,13 +97,7 @@ class Votings extends Component {
     const {createVotingStep} = this.state;
     return (
       <div>
-        <div id="loader-walk" className={this.step == 40? 'hidden' : ''}>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-        </div>   
+        <Loader/>
         <p id="loader-text">
           {
             createVotingStep == 2 
@@ -282,10 +277,10 @@ class Votings extends Component {
     let mainInputs = target.querySelectorAll('form[name="votingData"] > label input ');
     let additionalInputs = target.querySelectorAll('.votings-additionals input')
     let additionalSelects = target.querySelectorAll('.votings-additionals select')
-    console.log(mainInputs, additionalInputs, additionalSelects);
 
     let methodSelector = questions.system[selected].methodSelector;
     let questionParameters = questions.system[selected]._parameters;
+
     let values = [];
 
     hexString += questions.system[selected].methodSelector
@@ -297,8 +292,8 @@ class Votings extends Component {
       }
       return type != "" ? type : '' ;
     })
-
     parametersTypes = parametersTypes.filter(e=>e);
+
 
     if (selected == 0) {
       parametersTypes = ['uint[]','uint8','string','string','address','bytes4','uint[]','bytes32[]']
@@ -323,7 +318,6 @@ class Votings extends Component {
       
     }
 
-    console.log(values);
     let hexString = (web3.eth.abi.encodeParameters(parametersTypes, values));
 
     hexString = hexString.replace('0x', methodSelector);

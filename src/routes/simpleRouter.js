@@ -4,6 +4,7 @@ import Login from '../components/ballot/Login/Login';
 import Main from "../components/ballot/Main/Main";
 import VotingWrapper from '../components/ballot/VotingWrapper';
 import Users from '../components/ballot/Users';
+import Settings from '../components/ballot/Settings';
 
 class SimpleRouter extends Component {
   render() {
@@ -14,6 +15,7 @@ class SimpleRouter extends Component {
           <Route path='/questions' exact component={withRouter(Main)}/>
           <Route path='/votings' exact component={withRouter(VotingWrapper)}/>
           <Route path='/users' exact component={withRouter(Users)}/>
+          <Route path='/settings' exact component={withRouter(Settings)}/>
         </Switch>
       </MemoryRouter>
      );

@@ -20,7 +20,7 @@ function createWindow() {
   }
   mainWindow.loadURL(`file://${path.join(__dirname, './build/ballot/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
-  mainWindow.webContents.toggleDevTools()
+  //mainWindow.webContents.toggleDevTools()
   electronLocalshortcut.register(mainWindow, 'F12', () => {
     mainWindow.webContents.toggleDevTools()
   });

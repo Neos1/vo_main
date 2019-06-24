@@ -11,9 +11,15 @@ import eventEmitter from "../../utils/event-emitter";
 window.fs = window.require('fs');
 
 const path = require('path')
+
+if (window.process.platform == 'linux') {
+    window.process.env.PORTABLE_EXECUTABLE_DIR = path.join(window.__dirname, '../../src');
+}
+
 const PATH_TO_WALLETS = window.__ENV == 'development'
     ? path.join(window.process.env.INIT_CWD, "./wallets/")
     : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './wallets/')
+    
 
 
 
