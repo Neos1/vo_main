@@ -2,12 +2,16 @@
 	"host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
 	"projects": [
 		{
-			"name": "123",
-			"address": "0xc751C4d736025CB18a50189Fc19c0A6fD7022514"
+			"name": "test",
+			"address": "0x53DaE0cE0bDBC4dbE2B35171b0d46aBb75074a34"
 		},
 		{
-			"name": "testette",
-			"address": "0x06F3B141b53D9bDcB1b11b181Eb2aEe3C1407a9a"
+			"name": "qwerty",
+			"address": "0x7f58ABab12003C8bb5e671FfcFb46B6444100699"
+		},
+		{
+			"name": "QWAQ",
+			"address": "0x83169004d24Fc89b4fEA0697275bbed05d99e252"
 		}
 	]
 }

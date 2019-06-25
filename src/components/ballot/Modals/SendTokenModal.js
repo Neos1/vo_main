@@ -35,11 +35,13 @@ class SendTokenModal extends Component {
   }
 
   getModalBody() {
+    const { address } = this.props; 
     return (
      <div>
       <div className={styles['modal-body__form']}>
         <h2></h2>
         <form name='sendToken' onSubmit={this.sendToken.bind(this)}>
+          <p>{address}</p>
           <label>
             <p>Куда перевести</p>
             <SimpleInput type='text' onChange={this.inputAddress.bind(this)}/>
@@ -74,15 +76,28 @@ class SendTokenModal extends Component {
 
   sendToken(e) {
     e.preventDefault();
-    const { contractModel } = this.props;
+    const { contractModel, address: fromAddress, type } = this.props;
     const {addressWho, count} = this.state;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address
     this.setState({step: 1})
-    contract.methods.transferERC20(addressWho, count).send({from: address, gas: 100000})
-      .on('receipt', async receipt =>{
-        await this.setState({step: 2});
-      })
+    if (type !== 'Custom') {
+      contract.methods.transferERC20(addressWho, count).send({from: address, gas: 100000})
+        .on('receipt', async receipt =>{
+          await this.setState({step: 2});
+        })
+    } else { 
+      const contractAddress = '0x'
+      const abi = window.__ENV == 'development'
+        ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
+        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
+      const customContract = await new web3.eth.Contract(abi, contractAddress);
+      customContract.methods.transferFrom(fromAddress, addressWho, count).send({from: address, gas: 100000})
+        .on('receipt', async receipt =>{
+          await this.setState({step: 2});
+        })
+    }
+    
   }
 
   render() { 

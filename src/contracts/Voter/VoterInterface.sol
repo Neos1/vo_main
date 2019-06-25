@@ -111,5 +111,5 @@ interface VoterInterface {
         uint endTime,
         bytes data
     );
-    function getVotingsCount() external returns (uint length);
+    function getVotingsCount() external view returns (uint length);
 }

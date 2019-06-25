@@ -11,9 +11,11 @@ class UserGroup extends Component {
     this.state = {
       expanded: false,
       totalSupply: 0,
+      groupType: '',
       symbol: '',
       address: '',
       userBalance: '',
+      users: [],
       userAddress: web3.eth.accounts.wallet[0].address
     }
   }
@@ -27,14 +29,13 @@ class UserGroup extends Component {
     const { contractModel } = this.props;
     const { userAddress } = this.state;
     const { groupAddress, groupType } = this.props.data;
-
+    await this.setState({groupType});
     groupType == 'ERC20'? await this.getERCinfo(groupAddress) : await this.getCustomInfo(groupAddress);
     
   }
 
   async getERCinfo(address) {
     const { userAddress } = this.state;
-    console.log(address);
     const abi = window.__ENV == 'development'
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/ERC20.abi'), 'utf8'))    
       : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/ERC20.abi'), 'utf8'))
@@ -47,7 +48,6 @@ class UserGroup extends Component {
 
   async getCustomInfo(address) { 
     const { userAddress } = this.state;
-    console.log(address);
     const abi = window.__ENV == 'development'
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
       : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
@@ -55,7 +55,15 @@ class UserGroup extends Component {
     let symbol = await contract.methods.symbol().call({from: userAddress})
     let totalSupply = await contract.methods.totalSupply().call({from: userAddress})
     let userBalance = await contract.methods.balanceOf(userAddress).call({from: userAddress})
-    await this.setState({symbol, totalSupply, userBalance})
+    let users = await contract.methods.getUsers().call({from: userAddress})
+    console.log(users);
+    await this.setState({symbol, totalSupply, userBalance, users});
+  }
+
+  async getCustomUsers (contract) {
+    const { userAddress, users } = this.state;
+    
+
   }
 
   expandCard() {
@@ -64,10 +72,15 @@ class UserGroup extends Component {
     })
   }
 
+  openModal(type, address) {
+    const { onTransfer } = this.props;
+    onTransfer(type, address)
+  }
+
 
 
   render() { 
-    const { onTransfer } = this.props;
+
     const {totalSupply, symbol, address, userBalance, userAddress, expanded} = this.state;
     const { data } = this.props;
 
@@ -101,7 +114,7 @@ class UserGroup extends Component {
             <span className='group-users__user-balance--percent'>
               <strong>{((userBalance/totalSupply)*100).toFixed(0)} %</strong> 
             </span>
-            <button className="btn btn--blue" onClick={onTransfer}><img src={arrow}/></button>
+            <button className="btn btn--blue" onClick={this.openModal.bind(this, data.groupType, userAddress)}><img src={arrow}/></button>
           </p>
           <hr/>
         </div>

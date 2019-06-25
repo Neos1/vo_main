@@ -937,7 +937,7 @@ class Login extends React.Component {
     }
 
     @action deployToken = (type)=> {
-        
+
         type !== 'token' ? unite() : '';
         let ERC20 = window.__ENV === 'production' 
         ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), "utf8")
@@ -1126,7 +1126,7 @@ class Login extends React.Component {
                         let rawTx = {
                             to: contractAddress,
                             data: dataTx,
-                            gasPrice: web3.utils.toHex(1000000000),
+                            gasPrice: web3.utils.toHex(10000000000),
                             gasLimit: web3.utils.toHex(6000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
