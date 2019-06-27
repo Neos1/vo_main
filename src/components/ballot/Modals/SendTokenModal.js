@@ -76,7 +76,7 @@ class SendTokenModal extends Component {
 
   sendToken(e) {
     e.preventDefault();
-    const { contractModel, address: fromAddress, type } = this.props;
+    const { contractModel, address: fromAddress, type, contractAddress } = this.props;
     const {addressWho, count} = this.state;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address
@@ -87,11 +87,10 @@ class SendTokenModal extends Component {
           await this.setState({step: 2});
         })
     } else { 
-      const contractAddress = '0x'
       const abi = window.__ENV == 'development'
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
         : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
-      const customContract = await new web3.eth.Contract(abi, contractAddress);
+      const customContract = new web3.eth.Contract(abi, contractAddress);
       customContract.methods.transferFrom(fromAddress, addressWho, count).send({from: address, gas: 100000})
         .on('receipt', async receipt =>{
           await this.setState({step: 2});

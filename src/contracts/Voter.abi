@@ -555,6 +555,26 @@
 		"constant": false,
 		"inputs": [
 			{
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "findUserGroup",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xf0c4c3e6"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"name": "_groupType",
 				"type": "uint8"
 			},

@@ -223,6 +223,13 @@ interface IERC20 {
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function name() external view returns (string);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
     function symbol() external view returns (string);
 
     /**
@@ -262,7 +269,7 @@ interface IERC20 {
      *
      * Emits an `Approval` event.
      */
-    function approve(address owner, address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
 
     /**
      * @dev Moves `amount` tokens from `sender` to `recipient` using the
@@ -731,26 +738,45 @@ contract VoterBase is VoterInterface {
         return true;
     }
 
+
+    function findUserGroup(address user) external returns (uint) { 
+		uint length = userGroups.groupIdIndex;
+		uint votingIndex = votings.votingIdIndex - 1;
+		uint questionId =  votings.voting[votingIndex].questionId;
+		uint groupId = questions.question[questionId].groupId;
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+		uint256 balance = group.balanceOf(user);
+		uint index = 0;
+		if (balance != 0 ) {
+			index = groupId;
+		}
+		return index;
+    }
+
+
     function sendVote(uint _choice) external returns (uint result, uint256 votePos, uint256 voteNeg) {
         uint _voteId = votings.votingIdIndex - 1;
         uint timestamp = votings.voting[_voteId].endTime;
-        uint256 balance = ERC20.balanceOf(msg.sender);
         uint questionId = votings.voting[_voteId].questionId;
         uint groupId = questions.question[questionId].groupId;
         string memory groupName = userGroups.names[groupId];
+
+		uint index = this.findUserGroup(msg.sender);
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+		uint256 balance = group.balanceOf(msg.sender);
+
         if (block.timestamp < timestamp ) {
-            if (votings.voting[_voteId].votes[address(ERC20)][msg.sender] == 0) {
-                ERC20.approve(msg.sender, address(this), balance);
+            if (votings.voting[_voteId].votes[address(group)][msg.sender] == 0) {
                 ERC20.transferFrom(msg.sender, address(this), balance);
-                votings.voting[_voteId].votes[address(ERC20)][msg.sender] = _choice;
-                votings.voting[_voteId].voteWeigths[address(ERC20)][msg.sender] = balance;
+                votings.voting[_voteId].votes[address(group)][msg.sender] = _choice;
+                votings.voting[_voteId].voteWeigths[address(group)][msg.sender] = balance;
                 votings.voting[_voteId].descisionWeights[_choice][groupName] += balance;
             }
         } else {
             this.closeVoting();
         }
         return (
-            votings.voting[_voteId].votes[address(ERC20)][msg.sender] = _choice,
+            votings.voting[_voteId].votes[address(group)][msg.sender] = _choice,
             votings.voting[_voteId].descisionWeights[1][groupName],
             votings.voting[_voteId].descisionWeights[2][groupName]
         );

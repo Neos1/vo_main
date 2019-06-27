@@ -14,6 +14,7 @@ class UserGroup extends Component {
       groupType: '',
       symbol: '',
       address: '',
+      balances: [],
       userBalance: '',
       users: [],
       userAddress: web3.eth.accounts.wallet[0].address
@@ -48,22 +49,32 @@ class UserGroup extends Component {
 
   async getCustomInfo(address) { 
     const { userAddress } = this.state;
-    const abi = window.__ENV == 'development'
+    let abi = window.__ENV == 'development'
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
       : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
-    const contract = await new web3.eth.Contract(abi, address);
+    let contract = await new web3.eth.Contract(abi, address);
     let symbol = await contract.methods.symbol().call({from: userAddress})
     let totalSupply = await contract.methods.totalSupply().call({from: userAddress})
     let userBalance = await contract.methods.balanceOf(userAddress).call({from: userAddress})
-    let users = await contract.methods.getUsers().call({from: userAddress})
-    console.log(users);
-    await this.setState({symbol, totalSupply, userBalance, users});
+    let users = await contract.methods.getUsers().call({from: userAddress}) 
+    let balances = await this.getCustomUsersBalances(address, users);
+    console.log(JSON.stringify(balances))
+    await this.setState({symbol, totalSupply, userBalance, users, balances});
   }
 
-  async getCustomUsers (contract) {
-    const { userAddress, users } = this.state;
-    
-
+  async getCustomUsersBalances (address, users) {
+    const {userAddress} = this.state;
+    let abi = window.__ENV == 'development'
+      ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
+    const customContract = new web3.eth.Contract(abi, address);
+    let balances = []; 
+    await users.map(async user => {
+      await customContract.methods.balanceOf(user).call({from: userAddress}).then(balance=>{
+        balances.push(balance)
+      })
+    })
+    return balances;
   }
 
   expandCard() {
@@ -72,20 +83,17 @@ class UserGroup extends Component {
     })
   }
 
-  openModal(type, address) {
+  openModal(type, groupAddress, userAddress) {
     const { onTransfer } = this.props;
-    onTransfer(type, address)
+    onTransfer(type, groupAddress, userAddress)
   }
-
 
 
   render() { 
 
-    const {totalSupply, symbol, address, userBalance, userAddress, expanded} = this.state;
+    const {totalSupply, symbol, address, userBalance, userAddress, expanded, balances, users} = this.state;
     const { data } = this.props;
-
     return ( 
-
       <div className='group'>
         <div className='group-head'>
           <div className='group-head__about'>
@@ -104,18 +112,22 @@ class UserGroup extends Component {
         </div>
         <hr/>
         <div className={`group-users ${expanded? '' : 'hidden'}`}>
-          <p className='group-users__user'>
-            <span className='group-users__user-address'>
-              <strong>{userAddress}</strong>
-            </span>
-            <span className='group-users__user-balance'>
-              <strong>{userBalance} </strong> {symbol}
-            </span>
-            <span className='group-users__user-balance--percent'>
-              <strong>{((userBalance/totalSupply)*100).toFixed(0)} %</strong> 
-            </span>
-            <button className="btn btn--blue" onClick={this.openModal.bind(this, data.groupType, userAddress)}><img src={arrow}/></button>
-          </p>
+          { data.groupType == 'ERC20'
+              ? <User
+                  address={userAddress}
+                  balance={userBalance}
+                  totalSupply={totalSupply}
+                  symbol={symbol}
+                  onclick ={this.openModal.bind(this, data.groupType, data.groupAddress, userAddress)}
+                />
+              : balances.map((balance, index) => <User 
+                  address={users[index]}
+                  balance={balance}
+                  totalSupply={totalSupply}
+                  symbol={symbol}
+                  onclick ={this.openModal.bind(this, data.groupType, data.groupAddress, users[index])}
+                  />)
+          }
           <hr/>
         </div>
         <div className='group-description'>
@@ -126,6 +138,23 @@ class UserGroup extends Component {
 
      );
   }
+}
+
+const User = ({address, symbol, balance, totalSupply, onclick}) => {
+  return(
+    <p className='group-users__user'>
+        <span className='group-users__user-address'>
+          <strong>{address}</strong>
+        </span>
+        <span className='group-users__user-balance'>
+          <strong>{balance} </strong> {symbol}
+        </span>
+        <span className='group-users__user-balance--percent'>
+          <strong>{((balance/totalSupply)*100).toFixed(0)} %</strong> 
+        </span>
+        <button className="btn btn--blue" onClick={onclick}><img src={arrow}/></button>
+      </p>
+  )
 }
  
 export default UserGroup;

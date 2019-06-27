@@ -1,4 +1,4 @@
-pragma solidity ^0.5;
+pragma solidity 0.5;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -9,6 +9,13 @@ interface IERC20 {
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function name() external view returns (string);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
     function symbol() external view returns (string);
 
     /**
@@ -48,7 +55,7 @@ interface IERC20 {
      *
      * Emits an `Approval` event.
      */
-    function approve(address owner, address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
 
     /**
      * @dev Moves `amount` tokens from `sender` to `recipient` using the

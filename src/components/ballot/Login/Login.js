@@ -938,10 +938,10 @@ class Login extends React.Component {
 
     @action deployToken = (type)=> {
 
-        type !== 'token' ? unite() : '';
+        unite(type);
         let ERC20 = window.__ENV === 'production' 
-        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), "utf8")
-        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/ERC20.sol"), "utf8");
+        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/output.sol'), "utf8")
+        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/output.sol"), "utf8");
         
         let questions = window.__ENV === 'production' 
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/sysQuestions.json'), "utf8"))
@@ -1067,7 +1067,7 @@ class Login extends React.Component {
                                     }
                                 }) 
                             } else {
-                                this.contract.hash = data.contractAddress;
+                                this.ERC20.hash = data.contractAddress;
                                 this.step = 52;
                             }
 

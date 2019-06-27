@@ -16,7 +16,8 @@ class UserGroups extends Component {
       modalVisible: false,
       redirect: false,
       type: '',
-      address:'',
+      userAddress:'',
+      groupAddress: ''
      }
   }
   componentWillMount() {
@@ -24,12 +25,13 @@ class UserGroups extends Component {
     contractModel.getUserGroups();
     console.log(this.props);
   }
-  toggleModal(type, address) {
-    console.log(type, address);
+  toggleModal(type, groupAddress, userAddress) {
+    console.log(type, groupAddress, userAddress);
     this.setState({
       modalVisible: !this.state.modalVisible,
       type,
-      address
+      userAddress,
+      groupAddress
     })
   }
   
@@ -68,7 +70,7 @@ class UserGroups extends Component {
           { userGroups.map(group => <UserGroup data={group} onTransfer={this.toggleModal.bind(this)}/>)}
         </section>
         {
-          modalVisible ? <SendTokenModal type={this.state.type} address={this.state.address}  onclose={this.toggleModal.bind(this)}/>: ""
+          modalVisible ? <SendTokenModal type={this.state.type} contractAddress={this.state.groupAddress} address={this.state.userAddress}  onclose={this.toggleModal.bind(this)}/>: ""
         }
       </div>
      );

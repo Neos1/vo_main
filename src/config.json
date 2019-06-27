@@ -3,15 +3,11 @@
 	"projects": [
 		{
 			"name": "test",
-			"address": "0x53DaE0cE0bDBC4dbE2B35171b0d46aBb75074a34"
+			"address": "0xF4D2FE4510d65AaC32bD1C3200cA2a3Cb744e28D"
 		},
 		{
-			"name": "qwerty",
-			"address": "0x7f58ABab12003C8bb5e671FfcFb46B6444100699"
-		},
-		{
-			"name": "QWAQ",
-			"address": "0x83169004d24Fc89b4fEA0697275bbed05d99e252"
+			"name": "QEWRQYQ",
+			"address": "0x6C297FCB0326cE7E31F537260Dbc9eca56d5aE0A"
 		}
 	]
 }
