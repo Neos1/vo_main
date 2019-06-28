@@ -740,7 +740,6 @@ contract VoterBase is VoterInterface {
 
 
     function findUserGroup(address user) external returns (uint) { 
-		uint length = userGroups.groupIdIndex;
 		uint votingIndex = votings.votingIdIndex - 1;
 		uint questionId =  votings.voting[votingIndex].questionId;
 		uint groupId = questions.question[questionId].groupId;
@@ -760,9 +759,8 @@ contract VoterBase is VoterInterface {
         uint questionId = votings.voting[_voteId].questionId;
         uint groupId = questions.question[questionId].groupId;
         string memory groupName = userGroups.names[groupId];
-
 		uint index = this.findUserGroup(msg.sender);
-		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+		IERC20 group = IERC20(userGroups.group[index].groupAddr);
 		uint256 balance = group.balanceOf(msg.sender);
 
         if (block.timestamp < timestamp ) {

@@ -153,12 +153,11 @@ class Voting extends Component {
     const {contractModel, index} = this.props;
     const { questions, bufferVotings } = contractModel;
     let id = bufferVotings[index-1][0] - 1;
-    console.log(id);
     let votingData = bufferVotings[index-1].data;
     let methodSelector = questions.system[id].methodSelector;
     let questionParams = questions.system[id]._parameters;
     let finalData = [];
-    console.log(methodSelector);
+
     let parametersTypes = questionParams.map((param, index)=>{
       let type = '';
       let parameter = web3.utils.hexToUtf8(param);
@@ -168,7 +167,7 @@ class Voting extends Component {
       return type != "" ? type : '' ;
     })
     parametersTypes = parametersTypes.filter(e=>e);
-    console.log(parametersTypes)
+
 
     if (id == 0) {
       questionParams = ['ID', 'uint', 'Status','uint8','Name','string','Text','string','Target','address','MethodSelector','bytes4','Formula','uint[]','parameters','bytes32[]'].map(param => web3.utils.utf8ToHex(param))
@@ -176,10 +175,9 @@ class Voting extends Component {
     } 
     
     votingData = votingData.replace(methodSelector, '0x');
-    console.log(questionParams)
     let data = web3.eth.abi.decodeParameters(parametersTypes, votingData);
         data = Object.values(data);
-        console.log(data);
+
     for(let i = 0; i < data.length - 1; i++) {
       if (i == 0) {
         if (typeof data[i] == 'object') {
@@ -191,7 +189,6 @@ class Voting extends Component {
         finalData.push([questionParams[i*2], data[i]])
       }
     }
-    console.log(finalData)
     return finalData;
   }
   
@@ -331,7 +328,6 @@ class Voting extends Component {
     let formula = this.getFormula();
 
     let votingParameters = votingParams.map(( param, index ) => {
-      console.log(param)
       let value;
       if ((index == votingParams.length - 1 ) && (typeof(param[1]) == 'object')) {
         value = param[1].map((subParam, index) => {
