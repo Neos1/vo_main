@@ -270,33 +270,33 @@ contract VoterBase is VoterInterface {
         return votings.descision[_id];
     }   
 
-        function closeVoting() external {
+	function closeVoting() external {
         uint votingId = votings.votingIdIndex - 1;
         uint questionId = votings.voting[votingId].questionId;
         uint[] storage formula = questions.question[questionId].formula;
         uint groupId = formula[1];
-        uint parity = formula[2];
-        uint percent = formula[3];
+        uint parity = formula[3];
+        uint percent = formula[4];
         uint quorumPercent;
         uint condition;
         string memory groupName = userGroups.names[groupId];
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
         uint256 positiveVotes = votings.voting[votingId].descisionWeights[1][groupName];
         uint256 negativeVotes = votings.voting[votingId].descisionWeights[2][groupName];
-        uint256 totalSupply = ERC20.totalSupply();
-        uint256 quorum = positiveVotes + negativeVotes;
+        uint256 totalSupply = group.totalSupply();
 
         if (parity == 1) {
-            if (formula[4] != 0) {
-                condition = formula[4];
+            if (formula[5] != 0) {
+                condition = formula[5];
             } else {
                 condition = 0;
             }
         }
         if (parity == 0) {
-            quorumPercent = (quorum/totalSupply) * 100;
+            quorumPercent = ((positiveVotes + negativeVotes)/totalSupply) * 100;
         } else if (parity == 1) {
             if (condition == 0) {
-                quorumPercent = (positiveVotes/quorum)*100;
+                quorumPercent = (positiveVotes/(positiveVotes + negativeVotes))*100;
             } else if (condition == 1) {
                 quorumPercent = (positiveVotes/totalSupply)*100;
             }
@@ -329,8 +329,11 @@ contract VoterBase is VoterInterface {
 
     function returnTokens() public returns (bool status){
         uint votingId = votings.votingIdIndex - 1;
-        uint256 weight = votings.voting[votingId].voteWeigths[address(ERC20)][msg.sender];
-        ERC20.transferFrom(address(this), msg.sender, weight);
+		uint questionId =  votings.voting[votingId].questionId;
+		uint groupId = questions.question[questionId].groupId;
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+        uint256 weight = votings.voting[votingId].voteWeigths[address(group)][msg.sender];
+        group.transferFrom(address(group), msg.sender, weight);
         return true;
     }
 
@@ -360,12 +363,14 @@ contract VoterBase is VoterInterface {
 		uint256 balance = group.balanceOf(msg.sender);
 
         if (block.timestamp < timestamp ) {
-            if (votings.voting[_voteId].votes[address(group)][msg.sender] == 0) {
-                ERC20.transferFrom(msg.sender, address(this), balance);
-                votings.voting[_voteId].votes[address(group)][msg.sender] = _choice;
-                votings.voting[_voteId].voteWeigths[address(group)][msg.sender] = balance;
-                votings.voting[_voteId].descisionWeights[_choice][groupName] += balance;
-            }
+			if ( balance != 0) {
+				if (votings.voting[_voteId].votes[address(group)][msg.sender] == 0) {
+					ERC20.transferFrom(msg.sender, address(this), balance);
+					votings.voting[_voteId].votes[address(group)][msg.sender] = _choice;
+					votings.voting[_voteId].voteWeigths[address(group)][msg.sender] = balance;
+					votings.voting[_voteId].descisionWeights[_choice][groupName] += balance;
+				}
+			}
         } else {
             this.closeVoting();
         }

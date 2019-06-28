@@ -121,6 +121,7 @@ class UserGroup extends Component {
                   onclick ={this.openModal.bind(this, data.groupType, data.groupAddress, userAddress)}
                 />
               : balances.map((balance, index) => <User 
+                  key={index}
                   address={users[index]}
                   balance={balance}
                   totalSupply={totalSupply}

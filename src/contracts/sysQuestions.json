@@ -1,43 +1,43 @@
 {
   "1": {
     "id": 1,
-    "group": 0,
+    "group": 1,
     "name": "Добавить Вопрос",
     "caption": "Добавление нового вопроса",
-    "time": 20,
+    "time": 5,
     "method": "0x686c52c4",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["GroupId", "uint", "Name", "string", "Caption", "string", "Time", "uint", "MethodSelector", "bytes4", "Formula", "string", "parameters", "bytes32[]"]
   },
   "2": {
     "id": 2,
-    "group": 0,
+    "group": 1,
     "name": "Подключить группу пользователей",
     "caption": "Подключить новую группу пользователей для участия в голосованиях",
-    "time": 10,
+    "time": 5,
     "method": "0x952b627c",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Name","string","Type","string","Address","address"]
+    "parameters": ["Name", "string", "Address", "address", "Type", "string"]
   },
   "3": {
     "id": 3,
-    "group": 0,
+    "group": 1,
     "name": "Добавить группу вопросов",
     "caption": "Добавить новую группу вопросов",
-    "time": 10,
+    "time": 5,
     "method": "0xf729d56b",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Name","string"]
+    "parameters": ["Name", "string"]
   },
   "4": {
     "id": 4,
-    "group": 0,
+    "group": 1,
     "name": "Установить администратора группы",
     "caption": "Установка администратора в группе кастомных токенов",
-    "time": 10,
+    "time": 5,
     "method": "0x3cc0a953",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Group","address", "Admin address","address"]
+    "parameters": ["Group", "address", "Admin address", "address"]
   }
-  
+
 }

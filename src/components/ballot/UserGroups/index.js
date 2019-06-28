@@ -67,7 +67,7 @@ class UserGroups extends Component {
         </section>
 
         <section className={`${styles.section} ${styles['section-groups']}`}>
-          { userGroups.map(group => <UserGroup data={group} onTransfer={this.toggleModal.bind(this)}/>)}
+          { userGroups.map((group, index) => <UserGroup key={index} data={group} onTransfer={this.toggleModal.bind(this)}/>)}
         </section>
         {
           modalVisible ? <SendTokenModal type={this.state.type} contractAddress={this.state.groupAddress} address={this.state.userAddress}  onclose={this.toggleModal.bind(this)}/>: ""

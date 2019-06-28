@@ -128,9 +128,9 @@ class ContractModel {
       voting.id = index + 1;
     })
     console.log(this.votings);
-    this.bufferVotings = this.votings.length == length - 1 ? this.votings : '';
+    this.bufferVotings = this.votings.length == length - 1 ? this.votings.reverse() : '';
 
-    localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings.reverse()));
+    localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings));
     return this.bufferVotings;
   }
 
@@ -380,6 +380,7 @@ class ContractModel {
       from: address
     });
     console.log(index);
+    console.log(userGroups[index - 1], userGroups[index]);
     const { groupAddress, groupType } = userGroups[index - 1];
 
     let userContract = new web3.eth.Contract(ercABI, groupAddress);
@@ -387,10 +388,10 @@ class ContractModel {
     if (groupType == 'ERC20') {
       let userBalance = await userContract.methods.balanceOf(address).call({from: address});
       console.log(index);
-      await userContract.methods.approve(contract._address, userBalance).send({from: address, gas: 10000000});
+      await userContract.methods.approve(contract._address, userBalance).send({from: address, gas: 1000000});
     }
 
-    /*this.contract.methods.sendVote(descision).send({
+    this.contract.methods.sendVote(descision).send({
       from: address,
       gas: web3.utils.toHex(6000000),
       gasPrice: web3.utils.toHex(10000000000)
@@ -405,7 +406,7 @@ class ContractModel {
     .on('receipt', (receipt) => {
       this.userVote.status = 1;
       this.refreshLastVoting();
-    })*/
+    })
   }
 
   @action async refreshLastVoting() {

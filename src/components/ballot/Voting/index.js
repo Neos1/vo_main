@@ -189,6 +189,7 @@ class Voting extends Component {
         finalData.push([questionParams[i*2], data[i]])
       }
     }
+
     return finalData;
   }
   
