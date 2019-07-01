@@ -189,7 +189,7 @@ library Votings {
   struct List {
     uint votingIdIndex;
     mapping (uint => Voting) voting;
-    mapping (uint=> uint) descision;
+    mapping (uint => uint) descision;
   }
 
   function init(List storage _self) internal {
@@ -678,13 +678,16 @@ contract VoterBase is VoterInterface {
         uint votingId = votings.votingIdIndex - 1;
         uint questionId = votings.voting[votingId].questionId;
         uint[] storage formula = questions.question[questionId].formula;
+        
         uint groupId = formula[1];
         uint parity = formula[3];
         uint percent = formula[4];
         uint quorumPercent;
         uint condition;
+
         string memory groupName = userGroups.names[groupId];
 		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+
         uint256 positiveVotes = votings.voting[votingId].descisionWeights[1][groupName];
         uint256 negativeVotes = votings.voting[votingId].descisionWeights[2][groupName];
         uint256 totalSupply = group.totalSupply();
@@ -696,13 +699,14 @@ contract VoterBase is VoterInterface {
                 condition = 0;
             }
         }
+        
         if (parity == 0) {
-            quorumPercent = ((positiveVotes + negativeVotes)/totalSupply) * 100;
+            quorumPercent = ( (positiveVotes + negativeVotes) /totalSupply) * 100;
         } else if (parity == 1) {
             if (condition == 0) {
-                quorumPercent = (positiveVotes/(positiveVotes + negativeVotes))*100;
+                quorumPercent = (positiveVotes / (positiveVotes + negativeVotes) ) * 100;
             } else if (condition == 1) {
-                quorumPercent = (positiveVotes/totalSupply)*100;
+                quorumPercent = ( positiveVotes / totalSupply ) * 100;
             }
         }
 
@@ -710,12 +714,13 @@ contract VoterBase is VoterInterface {
             if (positiveVotes > negativeVotes) {
                 votings.descision[votingId] = 1;
                 address(this).call(votings.voting[votingId].data);
-            } else if (positiveVotes > negativeVotes) {
+            } else if (positiveVotes < negativeVotes) {
                 votings.descision[votingId] = 2;
             } else if (positiveVotes == negativeVotes) {
                 votings.descision[votingId] = 0;
             }
         }
+
         votings.voting[votingId].status = Votings.Status.ENDED;
     }
 
@@ -724,10 +729,11 @@ contract VoterBase is VoterInterface {
         uint questionId = votings.voting[_votingId].questionId;
         uint groupId = questions.question[questionId].groupId;
         string memory groupName = userGroups.names[groupId];
+        IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
         uint256[3] memory votes;
         votes[0] = votings.voting[_votingId].descisionWeights[1][groupName];
         votes[1] = votings.voting[_votingId].descisionWeights[2][groupName];
-        votes[2] = ERC20.totalSupply();
+        votes[2] = group.totalSupply();
         return votes;
     }
 

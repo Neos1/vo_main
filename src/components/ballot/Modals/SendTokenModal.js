@@ -78,11 +78,14 @@ class SendTokenModal extends Component {
     e.preventDefault();
     const { contractModel, address: fromAddress, type, contractAddress } = this.props;
     const {addressWho, count} = this.state;
-    const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address
     this.setState({step: 1})
     if (type !== 'Custom') {
-      contract.methods.transferERC20(addressWho, count).send({from: address, gas: 100000})
+      const abi = window.__ENV == 'development'
+        ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/ERC20.abi'), 'utf8'))
+        : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/ERC20.abi'), 'utf8'));
+      const customContract = new web3.eth.Contract(abi, contractAddress);
+      customContract.methods.transfer(addressWho, count).send({from: address, gas: 100000})
         .on('receipt', async receipt =>{
           await this.setState({step: 2});
         })
@@ -115,8 +118,8 @@ class SendTokenModal extends Component {
         <div className={'modal-content'}>
           <div className={styles['modal-head']}>
             <p>{`Перевод токенов`}</p>
-            <div className={styles['modal-head__close']} onClick={onclose}>
-              <img src={close}/>
+            <div className={`${styles['modal-head__close']} ${step == 1 ? 'hidden': ''}` } onClick={onclose}>
+              <img src={close}/> 
             </div>
           </div>
           <div className={styles['modal-body']}>

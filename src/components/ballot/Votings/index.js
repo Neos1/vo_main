@@ -49,7 +49,7 @@ class Votings extends Component {
   componentWillMount() {
     const { contractModel } = this.props;
     this.setState({
-      selected: contractModel.votingTemplate.questionId
+      selected: contractModel.votingTemplate.questionId - 1
     })
 
     this.getData();
@@ -67,13 +67,13 @@ class Votings extends Component {
 
     await contractModel.getQuestions('system');
     await contractModel.getVotings();
+    await contractModel.getUserGroups();
 
-    /*setInterval(async ()=> {
+    setInterval(async ()=> {
       await contractModel.refreshLastVoting();
       this.filterVotings();
       this.forceUpdate();
-    }, 5*1000);
-    */
+    }, 60*1000);
 
     this.setState({
       loading: false

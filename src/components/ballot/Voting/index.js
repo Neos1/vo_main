@@ -86,7 +86,7 @@ class Voting extends Component {
     const {contractModel, index} = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
-    contract.methods.getVotingDescision(1).call({from: address})
+    contract.methods.getVotingDescision(index).call({from: address})
       .then(async (result) =>{ 
         await this.setState({descision: result})
       })
@@ -95,8 +95,6 @@ class Voting extends Component {
 
   getDescision(){
     const { descision } = this.state;
-
-
     let descisions = {
       0:{ 
         text: "НЕ ПРИНЯТО",
@@ -226,10 +224,12 @@ class Voting extends Component {
     const address = web3.eth.accounts.wallet[0].address;
 
     contract.methods.getVotes(index).call({from: address}).then(data => {
-
-      if ((Number(data[0])>Number(data[1])) && ((Number(data[0])>Number(data[2])))) this.setState({preDescision: 'ЗА'})
-      if ((Number(data[1])>Number(data[0])) && ((Number(data[1])>Number(data[2])))) this.setState({preDescision: 'ПРОТИВ'})
-      if ((Number(data[2])>Number(data[0])) && ((Number(data[2])>Number(data[1])))) this.setState({preDescision: 'НЕ ГОЛОСОВАЛО'})
+      const positive = Number(data[0]);
+      const negative = Number(data[1]);
+      const abstained = Number(data[2]) - (positive+ negative);
+      if ((positive > negative) && (positive > abstained)) this.setState({preDescision: 'ЗА'})
+      if ((negative > positive) && (negative > abstained)) this.setState({preDescision: 'ПРОТИВ'})
+      if ((abstained > positive) && (abstained > negative)) this.setState({preDescision: 'НЕ ГОЛОСОВАЛО'})
 
       this.setState({
         votingPercents : {

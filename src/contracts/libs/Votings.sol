@@ -28,7 +28,7 @@ library Votings {
   struct List {
     uint votingIdIndex;
     mapping (uint => Voting) voting;
-    mapping (uint=> uint) descision;
+    mapping (uint => uint) descision;
   }
 
   function init(List storage _self) internal {

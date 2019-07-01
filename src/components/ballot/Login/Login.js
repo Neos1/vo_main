@@ -966,7 +966,7 @@ class Login extends React.Component {
                 let compiler = c;   
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                window.result = compiler.compile(contract, true);
+                window.result = compiler.compile(contract, 1);
                 console.log(result);
                 result ? this.substep = 2:'';
                 if (result.contracts[contractID].interface !== ""){
@@ -1080,7 +1080,6 @@ class Login extends React.Component {
     @action prepareFormula(formula) {
         const FORMULA_REGEXP = new RegExp(/(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
         let matched = formula.match(FORMULA_REGEXP);
-        console.log(matched)
         
         let convertedFormula = [];
         
@@ -1093,7 +1092,6 @@ class Login extends React.Component {
         if (matched.length == 9) {
            matched[8] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
         }
-        console.log(convertedFormula);
         return convertedFormula;
     }
 
@@ -1482,7 +1480,6 @@ class Login extends React.Component {
         const abi = await window.__ENV === 'production' 
             ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
             : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
-        console.log(abi)
         const address = project.address
         let contract = new web3.eth.Contract(abi, address);
         this.checkQuestions(contract, address, this.selected)

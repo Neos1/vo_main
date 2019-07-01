@@ -220,7 +220,6 @@ class ContractModel {
       userGroups.push(group);
     }
     localStorage.setItem(`userGroups${contractAddress}`, JSON.stringify(userGroups));
-    console.log(userGroups);
   }
   //* users groups end
 
@@ -254,7 +253,6 @@ class ContractModel {
       questionGroups.push(group);
     }
 
-    console.log(questionGroups);
   }
   //* question groups end
 
@@ -379,15 +377,12 @@ class ContractModel {
     let index = await this.contract.methods.findUserGroup(address).call({
       from: address
     });
-    console.log(index);
-    console.log(userGroups[index - 1], userGroups[index]);
     const { groupAddress, groupType } = userGroups[index - 1];
 
     let userContract = new web3.eth.Contract(ercABI, groupAddress);
 
     if (groupType == 'ERC20') {
       let userBalance = await userContract.methods.balanceOf(address).call({from: address});
-      console.log(index);
       await userContract.methods.approve(contract._address, userBalance).send({from: address, gas: 1000000});
     }
 
@@ -422,11 +417,8 @@ class ContractModel {
       from: address
     });
     voting.id = index;
-    console.log(this.votings);
     this.votings[index - 1] = voting;
     this.bufferVotings = this.votings.reverse();
-    console.log(this.bufferVotings);
-
     localStorage.setItem(`votings[${contract._address}]`, JSON.stringify(this.votings));
   }
 }
