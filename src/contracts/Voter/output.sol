@@ -678,48 +678,67 @@ contract VoterBase is VoterInterface {
         uint votingId = votings.votingIdIndex - 1;
         uint questionId = votings.voting[votingId].questionId;
         uint[] storage formula = questions.question[questionId].formula;
-        
-        uint groupId = formula[1];
-        uint parity = formula[3];
+
+        uint votingCondition = formula[2]; // 1 - positive, 0 - quorum
+        uint sign = formula[3]; // 1 - >=, 2 - <=
         uint percent = formula[4];
         uint quorumPercent;
-        uint condition;
+        uint modificator; // modificator of votingCondition: 1 - of all, 0 - of quorum
 
-        string memory groupName = userGroups.names[groupId];
-		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
-
+        string memory groupName = userGroups.names[formula[1]];
+		IERC20 group = IERC20(userGroups.group[formula[1]].groupAddr);
         uint256 positiveVotes = votings.voting[votingId].descisionWeights[1][groupName];
         uint256 negativeVotes = votings.voting[votingId].descisionWeights[2][groupName];
         uint256 totalSupply = group.totalSupply();
-
-        if (parity == 1) {
-            if (formula[5] != 0) {
-                condition = formula[5];
-            } else {
-                condition = 0;
-            }
-        }
         
-        if (parity == 0) {
-            quorumPercent = ( (positiveVotes + negativeVotes) /totalSupply) * 100;
-        } else if (parity == 1) {
-            if (condition == 0) {
+        if (formula[5] != 0) { // if modificator exists in question
+            modificator = formula[5];
+        } else {
+            modificator = 0;
+        }
+
+
+        if (votingCondition == 0) { 
+            // if condition == quorum
+            quorumPercent = ((positiveVotes + negativeVotes) / totalSupply) * 100;
+        } else if (votingCondition == 1) { 
+            // else if condition == positive
+            if (modificator == 0) { 
+                // of quorum
                 quorumPercent = (positiveVotes / (positiveVotes + negativeVotes) ) * 100;
-            } else if (condition == 1) {
+            } else if (modificator == 1) { 
+                // of all
                 quorumPercent = ( positiveVotes / totalSupply ) * 100;
             }
         }
 
-        if (quorumPercent >= percent) {
-            if (positiveVotes > negativeVotes) {
-                votings.descision[votingId] = 1;
-                address(this).call(votings.voting[votingId].data);
-            } else if (positiveVotes < negativeVotes) {
-                votings.descision[votingId] = 2;
-            } else if (positiveVotes == negativeVotes) {
-                votings.descision[votingId] = 0;
+
+        if (sign == 1) {
+            // if >=
+            if (quorumPercent >= percent) {
+                if (positiveVotes > negativeVotes) {
+                    votings.descision[votingId] = 1;
+                    address(this).call(votings.voting[votingId].data);
+                } else if (positiveVotes < negativeVotes) {
+                    votings.descision[votingId] = 2;
+                } else if (positiveVotes == negativeVotes) {
+                    votings.descision[votingId] = 0;
+                }
             }
+        } else if (sign == 0) {
+            //if <=
+            if (quorumPercent <= percent) {
+                if (positiveVotes > negativeVotes) {
+                    votings.descision[votingId] = 1;
+                    address(this).call(votings.voting[votingId].data);
+                } else if (positiveVotes < negativeVotes) {
+                    votings.descision[votingId] = 2;
+                } else if (positiveVotes == negativeVotes) {
+                    votings.descision[votingId] = 0;
+                }
+            }       
         }
+        
 
         votings.voting[votingId].status = Votings.Status.ENDED;
     }
