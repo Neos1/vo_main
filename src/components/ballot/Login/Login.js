@@ -259,8 +259,8 @@ class Login extends React.Component {
                             <div className={`${styles.seed__form} ${this.step !== 3 ? styles.hidden : ''}`}>
                                 <h3>Выбор проекта</h3>
                                 <div className={styles.login__select} style={{
-                                        "overflow-y": "auto",
-                                        "max-height": "35%"  
+                                        "overflowY": "auto",
+                                        "maxHeight": "35%"  
                                 }}> 
                                     <ul className={styles.login__projects}>
                                         {projects}

@@ -46,7 +46,7 @@ class Votings extends Component {
 
   @observable questions = []
 
-  componentWillMount() {
+  componentDidMount() {
     const { contractModel } = this.props;
     this.setState({
       selected: contractModel.votingTemplate.questionId - 1

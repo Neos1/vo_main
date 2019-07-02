@@ -128,7 +128,7 @@ class ContractModel {
       voting.id = index + 1;
     })
     console.log(this.votings);
-    this.bufferVotings = this.votings.length == length - 1 ? this.votings.slice().reverse() : '';
+    this.bufferVotings = this.votings.length == length - 1 ? this.votings.slice().sort((a,b) =>  (a.id < b.id) ? 1 : -1 ) : '';
 
     localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings));
     return this.bufferVotings;
@@ -151,7 +151,7 @@ class ContractModel {
       this.votings.filter(voting => {
         return (voting[0] == questionId);
       }) :
-      this.votings;
+      this.votings.slice().sort((a,b) =>  (a.id < b.id) ? 1 : -1 );
   }
   @action filterByPage(page) {
     if (page != null) {
@@ -418,7 +418,7 @@ class ContractModel {
     });
     voting.id = index;
     this.votings[index - 1] = voting;
-    this.bufferVotings = this.votings.slice().reverse();
+    this.bufferVotings = this.votings.slice().sort((a,b) =>  (a.id < b.id) ? 1 : -1 );
     localStorage.setItem(`votings[${contract._address}]`, JSON.stringify(this.votings));
   }
 }

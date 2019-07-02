@@ -33,7 +33,7 @@ class Voting extends Component {
       graphics: false,
     }
   }
-  async componentWillMount() {
+  async componentDidMount() {
     this.getTime();
     this.getVotesPercents();
     this.getVotingDescision();
@@ -83,10 +83,10 @@ class Voting extends Component {
     )
   }
   getVotingDescision(){
-    const {contractModel, index} = this.props;
+    const {contractModel, index, data} = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
-    contract.methods.getVotingDescision(index).call({from: address})
+    contract.methods.getVotingDescision(data.id).call({from: address})
       .then(async (result) =>{ 
         await this.setState({descision: result})
       })
@@ -219,11 +219,12 @@ class Voting extends Component {
     return ready;
   }
   getVotesPercents() {
-    const {contractModel, index} = this.props;
+
+    const {contractModel, index, data} = this.props;
     const { contract} = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
 
-    contract.methods.getVotes(index).call({from: address}).then(data => {
+    contract.methods.getVotes(data.id).call({from: address}).then(data => {
       const positive = Number(data[0]);
       const negative = Number(data[1]);
       const abstained = Number(data[2]) - (positive+ negative);
