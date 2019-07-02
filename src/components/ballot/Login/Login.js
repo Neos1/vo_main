@@ -966,7 +966,7 @@ class Login extends React.Component {
                 let compiler = c;   
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                window.result = compiler.compile(contract, 1);
+                window.result = compiler.compile(contract);
                 console.log(result);
                 result ? this.substep = 2:'';
                 if (result.contracts[contractID].interface !== ""){

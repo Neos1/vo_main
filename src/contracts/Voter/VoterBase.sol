@@ -296,18 +296,17 @@ contract VoterBase is VoterInterface {
 
         if (votingCondition == 0) { 
             // if condition == quorum
-            quorumPercent = ((positiveVotes + negativeVotes) / totalSupply) * 100;
+            quorumPercent = (positiveVotes + negativeVotes) * 100 / totalSupply;
         } else if (votingCondition == 1) { 
             // else if condition == positive
             if (modificator == 0) { 
                 // of quorum
-                quorumPercent = (positiveVotes / (positiveVotes + negativeVotes) ) * 100;
+                quorumPercent = (positiveVotes * 100 / (positiveVotes + negativeVotes) );
             } else if (modificator == 1) { 
                 // of all
-                quorumPercent = ( positiveVotes / totalSupply ) * 100;
+                quorumPercent = ( positiveVotes * 100 / totalSupply );
             }
         }
-
 
         if (sign == 1) {
             // if >=

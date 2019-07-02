@@ -128,7 +128,7 @@ class ContractModel {
       voting.id = index + 1;
     })
     console.log(this.votings);
-    this.bufferVotings = this.votings.length == length - 1 ? this.votings.reverse() : '';
+    this.bufferVotings = this.votings.length == length - 1 ? this.votings.slice().reverse() : '';
 
     localStorage.setItem(`votings[${this.contract._address}]`, JSON.stringify(this.votings));
     return this.bufferVotings;
@@ -418,7 +418,7 @@ class ContractModel {
     });
     voting.id = index;
     this.votings[index - 1] = voting;
-    this.bufferVotings = this.votings.reverse();
+    this.bufferVotings = this.votings.slice().reverse();
     localStorage.setItem(`votings[${contract._address}]`, JSON.stringify(this.votings));
   }
 }
