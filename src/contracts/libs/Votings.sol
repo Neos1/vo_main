@@ -21,14 +21,14 @@ library Votings {
 
     // contains total weights for voting variants
     mapping (address=> mapping(address => uint256)) voteWeigths;
-    mapping (uint=> mapping(address => uint256)) descisionWeights;
+    mapping (uint=> mapping(string => uint256)) descisionWeights;
     bytes data;
   }
 
   struct List {
     uint votingIdIndex;
     mapping (uint => Voting) voting;
-    mapping (uint=> uint) descision;
+    mapping (uint => uint) descision;
   }
 
   function init(List storage _self) internal {

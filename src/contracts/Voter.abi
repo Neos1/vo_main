@@ -1,6 +1,6 @@
 [
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
 				"name": "_id",
@@ -15,7 +15,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x0d24ef38"
 	},
@@ -158,7 +158,7 @@
 		"signature": "0x3cc0a953"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getUserWeight",
 		"outputs": [
@@ -168,12 +168,12 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x42429139"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getUserVote",
 		"outputs": [
@@ -183,12 +183,12 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x4f301d47"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getERCTotal",
 		"outputs": [
@@ -198,7 +198,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x5b1bb4a2"
 	},
@@ -266,7 +266,7 @@
 		"signature": "0x686c52c4"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getERCSymbol",
 		"outputs": [
@@ -276,7 +276,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x7264420a"
 	},
@@ -358,7 +358,7 @@
 		"signature": "0xa87d942c"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getUserBalance",
 		"outputs": [
@@ -368,7 +368,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xb7013dc1"
 	},
@@ -381,12 +381,7 @@
 			}
 		],
 		"name": "setERC20",
-		"outputs": [
-			{
-				"name": "erc20",
-				"type": "address"
-			}
-		],
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function",
@@ -478,7 +473,7 @@
 		"signature": "0xcc4aa204"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getERCAddress",
 		"outputs": [
@@ -488,7 +483,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xd094b706"
 	},
@@ -508,7 +503,7 @@
 		"signature": "0xd7843f54"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "addresses",
 		"outputs": [
@@ -522,12 +517,12 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xda0321cd"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [],
 		"name": "getVotingsCount",
 		"outputs": [
@@ -537,7 +532,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xdae7c92c"
 	},
@@ -555,6 +550,26 @@
 		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xec4d819c"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "findUserGroup",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xf0c4c3e6"
 	},
 	{
 		"constant": false,
@@ -664,7 +679,7 @@
 		"signature": "0xfd4a77f1"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
 				"name": "_votingId",
@@ -679,7 +694,7 @@
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function",
 		"signature": "0xff981099"
 	},

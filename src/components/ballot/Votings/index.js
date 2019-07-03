@@ -46,10 +46,10 @@ class Votings extends Component {
 
   @observable questions = []
 
-  componentWillMount() {
+  componentDidMount() {
     const { contractModel } = this.props;
     this.setState({
-      selected: contractModel.votingTemplate.questionId
+      selected: contractModel.votingTemplate.questionId - 1
     })
 
     this.getData();
@@ -67,13 +67,13 @@ class Votings extends Component {
 
     await contractModel.getQuestions('system');
     await contractModel.getVotings();
+    await contractModel.getUserGroups();
 
-    /*setInterval(async ()=> {
+    setInterval(async ()=> {
       await contractModel.refreshLastVoting();
       this.filterVotings();
       this.forceUpdate();
-    }, 5*1000);
-    */
+    }, 60*1000);
 
     this.setState({
       loading: false
@@ -117,7 +117,6 @@ class Votings extends Component {
     const {additionalInputs} = this.state;
     const getInputBlock = ()=>{
       let idx = additionalInputs.length
-      console.log(`idx = ${idx}`)
       return (
         <div>
           <SimpleInput/>
@@ -140,13 +139,9 @@ class Votings extends Component {
 
   async removeEl(index) {
     const{additionalInputs} = this.state;
-    console.log(`index = ${index}`);
-    console.log(`additionalInputs[${index}] = ${additionalInputs[index]}`);
-
     let inputs = additionalInputs;
 
     inputs.splice(index, 1);
-    console.log(inputs)
     await this.setState({
       additionalInputs: inputs
     })
@@ -237,7 +232,6 @@ class Votings extends Component {
 
   handleSelect(selected){
     const { contractModel } = this.props;
-    console.log(selected.value);
     contractModel.prepareVoting(Number(selected.value));
     this.setState({
       selected: selected.value - 1
@@ -245,22 +239,21 @@ class Votings extends Component {
   }
 
   prepareFormula(formula) {
-        const FORMULA_REGEXP = new RegExp(/(group)|((?:0x*[a-zA-Z0-9]{40}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
-        let matched = formula.match(FORMULA_REGEXP);
-        console.log(matched)
-        
-        let convertedFormula = [];
-        
-        matched[0] == 'group'? convertedFormula.push(0) : convertedFormula.push(1)
-        matched[2] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
-        matched[3] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
-        convertedFormula.push(Number(matched[4].replace('%', '')))
+      const FORMULA_REGEXP = new RegExp(/(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
+      let matched = formula.match(FORMULA_REGEXP);
 
-        if (matched.length == 6) {
-           matched[5] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
-        }
-        console.log(convertedFormula);
-        return convertedFormula;
+      let convertedFormula = [];
+      
+      matched[0] == 'group'? convertedFormula.push(0) : convertedFormula.push(1)
+      matched[1] == 'Owners'? convertedFormula.push(1) : convertedFormula.push(2)
+      matched[3] == 'quorum'? convertedFormula.push(0) : convertedFormula.push(1)
+      matched[4] == '<='? convertedFormula.push(0) : convertedFormula.push(1)
+      convertedFormula.push(Number(matched[5]))
+
+      if (matched.length == 9) {
+        matched[8] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
+      }
+      return convertedFormula;
     }
 
 
@@ -332,7 +325,6 @@ class Votings extends Component {
 
     let privateKey = web3.eth.accounts.wallet[0].privateKey
     let votingData = await this.createVotingData(document.forms.votingData);
-    console.log(votingData);
 
     let data = contract.methods.startNewVoting(questionId, 0, 0, votingData).encodeABI();
     let options = {
@@ -355,7 +347,6 @@ class Votings extends Component {
             })
         })
         .on('receipt', (data)=> {
-            console.log(data)
             this.setState({
               startVoting: false,
               createVotingStep: 5

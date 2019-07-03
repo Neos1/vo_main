@@ -35,7 +35,7 @@ class SetVoteModal extends Component {
     let votingParameters = userVote.parameters.map(( param, index ) => {
       return (
         <p key={index}>
-          <span>{param[0]}</span>
+          <span>{web3.utils.hexToUtf8(param[0])}</span>
           <span> - </span>
           <span>{param[1]}</span>
         </p>

@@ -15,14 +15,23 @@ class UserGroups extends Component {
     this.state = { 
       modalVisible: false,
       redirect: false,
+      type: '',
+      userAddress:'',
+      groupAddress: ''
      }
   }
   componentWillMount() {
+    const { contractModel } = this.props;
+    contractModel.getUserGroups();
     console.log(this.props);
   }
-  toggleModal() {
+  toggleModal(type, groupAddress, userAddress) {
+    console.log(type, groupAddress, userAddress);
     this.setState({
-      modalVisible: !this.state.modalVisible
+      modalVisible: !this.state.modalVisible,
+      type,
+      userAddress,
+      groupAddress
     })
   }
   
@@ -35,8 +44,11 @@ class UserGroups extends Component {
   }
 
   render() { 
+    const { contractModel } = this.props;
+    const { userGroups } = contractModel;
     const { modalVisible, redirect } = this.state;
 
+    console.log(userGroups);
     if (redirect) return <Redirect to='/votings'/>
     return ( 
       <div className={styles.wrapper}>
@@ -55,10 +67,10 @@ class UserGroups extends Component {
         </section>
 
         <section className={`${styles.section} ${styles['section-groups']}`}>
-          <UserGroup onTransfer={this.toggleModal.bind(this)}/>
+          { userGroups.map((group, index) => <UserGroup key={index} data={group} onTransfer={this.toggleModal.bind(this)}/>)}
         </section>
         {
-          modalVisible ? <SendTokenModal  onclose={this.toggleModal.bind(this)}/>: ""
+          modalVisible ? <SendTokenModal type={this.state.type} contractAddress={this.state.groupAddress} address={this.state.userAddress}  onclose={this.toggleModal.bind(this)}/>: ""
         }
       </div>
      );

@@ -33,7 +33,7 @@ class Voting extends Component {
       graphics: false,
     }
   }
-  async componentWillMount() {
+  async componentDidMount() {
     this.getTime();
     this.getVotesPercents();
     this.getVotingDescision();
@@ -83,10 +83,10 @@ class Voting extends Component {
     )
   }
   getVotingDescision(){
-    const {contractModel, index} = this.props;
+    const {contractModel, index, data} = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
-    contract.methods.getVotingDescision(1).call({from: address})
+    contract.methods.getVotingDescision(data.id).call({from: address})
       .then(async (result) =>{ 
         await this.setState({descision: result})
       })
@@ -95,8 +95,6 @@ class Voting extends Component {
 
   getDescision(){
     const { descision } = this.state;
-
-
     let descisions = {
       0:{ 
         text: "НЕ ПРИНЯТО",
@@ -153,12 +151,11 @@ class Voting extends Component {
     const {contractModel, index} = this.props;
     const { questions, bufferVotings } = contractModel;
     let id = bufferVotings[index-1][0] - 1;
-    console.log(id);
     let votingData = bufferVotings[index-1].data;
     let methodSelector = questions.system[id].methodSelector;
     let questionParams = questions.system[id]._parameters;
     let finalData = [];
-    console.log(methodSelector);
+
     let parametersTypes = questionParams.map((param, index)=>{
       let type = '';
       let parameter = web3.utils.hexToUtf8(param);
@@ -168,7 +165,7 @@ class Voting extends Component {
       return type != "" ? type : '' ;
     })
     parametersTypes = parametersTypes.filter(e=>e);
-    console.log(parametersTypes)
+
 
     if (id == 0) {
       questionParams = ['ID', 'uint', 'Status','uint8','Name','string','Text','string','Target','address','MethodSelector','bytes4','Formula','uint[]','parameters','bytes32[]'].map(param => web3.utils.utf8ToHex(param))
@@ -176,10 +173,9 @@ class Voting extends Component {
     } 
     
     votingData = votingData.replace(methodSelector, '0x');
-    console.log(questionParams)
     let data = web3.eth.abi.decodeParameters(parametersTypes, votingData);
         data = Object.values(data);
-        console.log(data);
+
     for(let i = 0; i < data.length - 1; i++) {
       if (i == 0) {
         if (typeof data[i] == 'object') {
@@ -191,7 +187,7 @@ class Voting extends Component {
         finalData.push([questionParams[i*2], data[i]])
       }
     }
-    console.log(finalData)
+
     return finalData;
   }
   
@@ -223,15 +219,18 @@ class Voting extends Component {
     return ready;
   }
   getVotesPercents() {
-    const {contractModel, index} = this.props;
+
+    const {contractModel, index, data} = this.props;
     const { contract} = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
 
-    contract.methods.getVotes(index).call({from: address}).then(data => {
-
-      if ((Number(data[0])>Number(data[1])) && ((Number(data[0])>Number(data[2])))) this.setState({preDescision: 'ЗА'})
-      if ((Number(data[1])>Number(data[0])) && ((Number(data[1])>Number(data[2])))) this.setState({preDescision: 'ПРОТИВ'})
-      if ((Number(data[2])>Number(data[0])) && ((Number(data[2])>Number(data[1])))) this.setState({preDescision: 'НЕ ГОЛОСОВАЛО'})
+    contract.methods.getVotes(data.id).call({from: address}).then(data => {
+      const positive = Number(data[0]);
+      const negative = Number(data[1]);
+      const abstained = Number(data[2]) - (positive+ negative);
+      if ((positive > negative) && (positive > abstained)) this.setState({preDescision: 'ЗА'})
+      if ((negative > positive) && (negative > abstained)) this.setState({preDescision: 'ПРОТИВ'})
+      if ((abstained > positive) && (abstained > negative)) this.setState({preDescision: 'НЕ ГОЛОСОВАЛО'})
 
       this.setState({
         votingPercents : {
@@ -331,7 +330,6 @@ class Voting extends Component {
     let formula = this.getFormula();
 
     let votingParameters = votingParams.map(( param, index ) => {
-      console.log(param)
       let value;
       if ((index == votingParams.length - 1 ) && (typeof(param[1]) == 'object')) {
         value = param[1].map((subParam, index) => {

@@ -96,9 +96,6 @@ class AlertModal extends Component {
       <div>
           <div className={styles['modal-head']}>
             <p>Голосовать {text}</p>
-            <div className={styles['modal-head__close']} onClick={this.closeWindow.bind(this)}>
-              <img src={close}/>
-            </div>
           </div>
           <div className={styles['modal-body']}>
             <Loader/>

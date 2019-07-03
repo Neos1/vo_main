@@ -259,8 +259,8 @@ class Login extends React.Component {
                             <div className={`${styles.seed__form} ${this.step !== 3 ? styles.hidden : ''}`}>
                                 <h3>Выбор проекта</h3>
                                 <div className={styles.login__select} style={{
-                                        "overflow-y": "auto",
-                                        "max-height": "35%"  
+                                        "overflowY": "auto",
+                                        "maxHeight": "35%"  
                                 }}> 
                                     <ul className={styles.login__projects}>
                                         {projects}
@@ -937,11 +937,11 @@ class Login extends React.Component {
     }
 
     @action deployToken = (type)=> {
-        
-        type !== 'token' ? unite() : '';
+
+        unite(type);
         let ERC20 = window.__ENV === 'production' 
-        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.sol'), "utf8")
-        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/ERC20.sol"), "utf8");
+        ? fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/output.sol'), "utf8")
+        : fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/output.sol"), "utf8");
         
         let questions = window.__ENV === 'production' 
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/sysQuestions.json'), "utf8"))
@@ -966,7 +966,7 @@ class Login extends React.Component {
                 let compiler = c;   
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
-                window.result = compiler.compile(contract, true);
+                window.result = compiler.compile(contract);
                 console.log(result);
                 result ? this.substep = 2:'';
                 if (result.contracts[contractID].interface !== ""){
@@ -1067,7 +1067,7 @@ class Login extends React.Component {
                                     }
                                 }) 
                             } else {
-                                this.contract.hash = data.contractAddress;
+                                this.ERC20.hash = data.contractAddress;
                                 this.step = 52;
                             }
 
@@ -1080,7 +1080,6 @@ class Login extends React.Component {
     @action prepareFormula(formula) {
         const FORMULA_REGEXP = new RegExp(/(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g);
         let matched = formula.match(FORMULA_REGEXP);
-        console.log(matched)
         
         let convertedFormula = [];
         
@@ -1093,7 +1092,6 @@ class Login extends React.Component {
         if (matched.length == 9) {
            matched[8] == 'quorum' ? convertedFormula.push(0) : convertedFormula.push(1)
         }
-        console.log(convertedFormula);
         return convertedFormula;
     }
 
@@ -1126,7 +1124,7 @@ class Login extends React.Component {
                         let rawTx = {
                             to: contractAddress,
                             data: dataTx,
-                            gasPrice: web3.utils.toHex(1000000000),
+                            gasPrice: web3.utils.toHex(10000000000),
                             gasLimit: web3.utils.toHex(6000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
@@ -1482,7 +1480,6 @@ class Login extends React.Component {
         const abi = await window.__ENV === 'production' 
             ? JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './contracts/Voter.abi'), "utf8"))
             : JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "./contracts/Voter.abi"), "utf8"))
-        console.log(abi)
         const address = project.address
         let contract = new web3.eth.Contract(abi, address);
         this.checkQuestions(contract, address, this.selected)
