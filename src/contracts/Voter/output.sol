@@ -29,6 +29,16 @@ library QuestionGroups {
 
     function init(List storage _self) internal {
         _self.groupIdIndex = 1;
+         Group memory systemGroup = Group({
+            name: 'Системные',
+            groupType: GroupType.SYSTEM
+        });
+        save(_self, systemGroup);
+         Group memory otherGroup = Group({
+            name: "Другие",
+            groupType: GroupType.CUSTOM
+        });
+        save(_self, otherGroup);
     }
 
     function save(List storage _self, Group memory _group) internal returns (uint id) {
@@ -360,12 +370,10 @@ interface VoterInterface {
 
     /**
      * @notice adds new question to question library
-     * @param _groupType question group type
      * @param _name question group name
      * @return new question id
      */
     function saveNewGroup(
-        QuestionGroups.GroupType _groupType,
         string _name
     ) external returns (uint id);
 
@@ -503,13 +511,6 @@ contract VoterBase is VoterInterface {
         bytes32[] _parameters
 
     ) external returns (bool _saved){
-        /*Questions.Status status = _status; 
-        string memory caption = _caption; 
-        string memory text = _text; 
-        address target = _target; 
-        bytes4 methodSelector = _methodSelector; 
-        string memory formula = _formula; 
-        bytes32[] memory parameters = _parameters;*/ 
         Questions.Question memory question = createNewQuestion( 
             _idsAndTime, 
             _status, 
@@ -526,16 +527,18 @@ contract VoterBase is VoterInterface {
 
     /**
      * @notice adds new question to question library
-     * @param _groupType question group type
      * @param _name question group name
      * @return new question id
      */
     function saveNewGroup(
-        QuestionGroups.GroupType _groupType,
         string _name
     ) external returns (uint id) {
-        // validate params
-        // call groups.save()
+        QuestionGroups.Group memory group = QuestionGroups.Group({
+            name: _name,
+            groupType: QuestionGroups.GroupType.CUSTOM
+        });
+        id = groups.save(group);
+        return id;
     }
     
     function getCount() external returns (uint length) {
@@ -827,12 +830,12 @@ contract VoterBase is VoterInterface {
     }
 
     function getUserVote() external view returns (uint vote) {
-        uint _voteId = votings.votingIdIndex;
+        uint _voteId = votings.votingIdIndex - 1;
         return votings.voting[_voteId].votes[address(ERC20)][msg.sender];
     }
 
     function getUserWeight() external view returns (uint256 weight) {
-        uint _voteId = votings.votingIdIndex;
+        uint _voteId = votings.votingIdIndex - 1;
         return votings.voting[_voteId].voteWeigths[address(ERC20)][msg.sender];
     }
 

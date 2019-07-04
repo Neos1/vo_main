@@ -152,8 +152,8 @@ class Voting extends Component {
     const { questions, bufferVotings } = contractModel;
     let id = bufferVotings[index-1][0] - 1;
     let votingData = bufferVotings[index-1].data;
-    let methodSelector = questions.system[id].methodSelector;
-    let questionParams = questions.system[id]._parameters;
+    let methodSelector = questions[id].methodSelector;
+    let questionParams = questions[id]._parameters;
     let finalData = [];
 
     let parametersTypes = questionParams.map((param, index)=>{
@@ -199,7 +199,7 @@ class Voting extends Component {
   getFormula() {
     const {data, contractModel} = this.props;
     let questionId = data[0];
-    let formula = contractModel.questions.system[questionId-1]._formula; 
+    let formula = contractModel.questions[questionId-1]._formula; 
 
     let f = formula.map(text=> Number(text));
     let r = [];
@@ -218,6 +218,7 @@ class Voting extends Component {
 
     return ready;
   }
+
   getVotesPercents() {
 
     const {contractModel, index, data} = this.props;

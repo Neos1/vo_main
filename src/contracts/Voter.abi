@@ -537,6 +537,26 @@
 		"signature": "0xdae7c92c"
 	},
 	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "saveNewGroup",
+		"outputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0xdf831328"
+	},
+	{
 		"constant": true,
 		"inputs": [],
 		"name": "getUserGroupsLength",
@@ -570,30 +590,6 @@
 		"stateMutability": "nonpayable",
 		"type": "function",
 		"signature": "0xf0c4c3e6"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_groupType",
-				"type": "uint8"
-			},
-			{
-				"name": "_name",
-				"type": "string"
-			}
-		],
-		"name": "saveNewGroup",
-		"outputs": [
-			{
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function",
-		"signature": "0xf729d56b"
 	},
 	{
 		"constant": false,

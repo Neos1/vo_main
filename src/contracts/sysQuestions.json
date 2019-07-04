@@ -7,7 +7,22 @@
     "time": 5,
     "method": "0x686c52c4",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["GroupId", "uint", "Name", "string", "Caption", "string", "Time", "uint", "MethodSelector", "bytes4", "Formula", "string", "parameters", "bytes32[]"]
+    "parameters": [
+      "GroupId",
+      "uint",
+      "Name",
+      "string",
+      "Caption",
+      "string",
+      "Time",
+      "uint",
+      "MethodSelector",
+      "bytes4",
+      "Formula",
+      "string",
+      "parameters",
+      "bytes32[]"
+    ]
   },
   "2": {
     "id": 2,
@@ -25,7 +40,7 @@
     "name": "Добавить группу вопросов",
     "caption": "Добавить новую группу вопросов",
     "time": 5,
-    "method": "0xf729d56b",
+    "method": "0xdf831328",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["Name", "string"]
   },
@@ -39,5 +54,4 @@
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": ["Group", "address", "Admin address", "address"]
   }
-
 }
