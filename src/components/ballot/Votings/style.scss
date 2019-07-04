@@ -1,5 +1,5 @@
-@import '../../../styles/ballot/variables';
-@import '../../../styles/ballot/select';
+@import "../../../styles/ballot/variables";
+@import "../../../styles/ballot/select";
 
 .wrapper {
   margin-top: 50px;
@@ -16,14 +16,14 @@
     width: 35%;
     height: 100%;
     padding: 20px 30px;
-    background: #F1F4F5;
+    background: #f1f4f5;
     display: flex;
     overflow-y: auto;
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: center;
 
-    &>div {
+    & > div {
       position: relative;
       width: 85%;
       height: 100%;
@@ -55,7 +55,7 @@
 
       &-subheading {
         font-size: 14px;
-        color: rgba($color: #5B778D, $alpha: 0.6);
+        color: rgba($color: #5b778d, $alpha: 0.6);
       }
 
       .Select {
@@ -83,26 +83,26 @@
         &.is-focused,
         &.is-open {
           .Select-control {
-            &>* {
+            & > * {
               height: 48px !important;
             }
           }
         }
 
         &-control {
-          transition: .2s linear;
-          border: 1px solid #D9DFE3;
+          transition: 0.2s linear;
+          border: 1px solid #d9dfe3;
           border-radius: 3px;
         }
 
         &-placeholder {
-          color: #5B778D;
+          color: #5b778d;
           line-height: 48px;
         }
 
         &.is-open {
           .Select-control {
-            border: 1px solid #4288F3;
+            border: 1px solid #4288f3;
           }
 
           .Select-arrow {
@@ -115,7 +115,7 @@
           width: 25px;
           height: 25px;
           border: none !important;
-          background-image: url($image_path +'select-arrow.svg');
+          background-image: url($image_path+"select-arrow.svg");
           background-position: center center;
           background-repeat: no-repeat;
         }
@@ -128,7 +128,7 @@
           top: 51px;
         }
 
-        &-value>span {
+        &-value > span {
           line-height: 33px !important;
         }
       }
@@ -141,29 +141,29 @@
       padding-bottom: 20px;
 
       label {
-        &>span {
-          display: block;
+        & > span {
+          display: inline-block;
           margin-bottom: 5px;
-          color: #5B778D;
+          color: #5b778d;
           font-weight: 400;
           text-align: left;
         }
 
         &:last-child {
-          &>span {
+          & > span {
             text-align: left;
           }
         }
       }
 
-      &>form button {
+      & > form button {
         width: 100%;
       }
 
       .votings-additionals {
         margin: 30px 0;
 
-        &>div {
+        & > div {
           margin-bottom: 20px;
           display: flex;
           flex-flow: row nowrap;
@@ -198,7 +198,7 @@
     height: 100%;
     padding: 20px 25px;
     box-sizing: border-box;
-    background-color: #E6E8ED;
+    background-color: #e6e8ed;
     overflow-y: auto;
 
     &__filters {
@@ -236,20 +236,20 @@
             .Select-control {
               background: transparent;
 
-              &>* {
+              & > * {
                 height: 20px !important;
               }
             }
           }
 
           &-control {
-            transition: .2s linear;
+            transition: 0.2s linear;
             border: none;
             background: transparent;
           }
 
           &-placeholder {
-            color: #5B778D;
+            color: #5b778d;
             line-height: 20px;
           }
 
@@ -275,13 +275,12 @@
             width: 15px;
             height: 15px;
             border: none !important;
-            background-image: url($image_path +'select-arrow_grey.svg');
+            background-image: url($image_path+"select-arrow_grey.svg");
             background-position: center center;
             background-repeat: no-repeat;
           }
 
           &-arrow-zone {
-
             border: none;
           }
 
@@ -289,7 +288,7 @@
             top: 22px;
           }
 
-          &-value>span {
+          &-value > span {
             line-height: 20px !important;
           }
         }
@@ -312,15 +311,15 @@
           }
         }
 
-        &>* {
+        & > * {
           vertical-align: middle;
         }
 
-        &>span {
+        & > span {
           display: inline-block;
           margin-right: 10px;
           font-size: 12px;
-          color: #A6B4BF;
+          color: #a6b4bf;
         }
       }
 
@@ -328,18 +327,17 @@
         display: block;
         margin: 20px 0;
 
-        &>* {
+        & > * {
           vertical-align: middle;
         }
 
-        &>span {
+        & > span {
           display: inline-block;
           margin-right: 10px;
           font-size: 14px;
           line-height: 15px;
-          color: #37474F;
+          color: #37474f;
         }
-
       }
     }
   }
@@ -348,7 +346,7 @@
 $loader-size: 100px;
 $loader-dot-size: ($loader-size / 5);
 $loader-height: ($loader-dot-size * 2);
-$loader-dot-color: #447ACC;
+$loader-dot-color: #447acc;
 
 // HTML
 #loader-walk {
@@ -360,7 +358,7 @@ $loader-dot-color: #447ACC;
   height: $loader-height;
   margin: 40px auto 0;
 
-  >div {
+  > div {
     content: "";
     width: $loader-dot-size;
     height: $loader-dot-size;
@@ -370,11 +368,11 @@ $loader-dot-color: #447ACC;
     animation: animate 2s linear infinite;
 
     &:nth-of-type(1) {
-      animation-delay: -.4s;
+      animation-delay: -0.4s;
     }
 
     &:nth-of-type(2) {
-      animation-delay: -.8s;
+      animation-delay: -0.8s;
     }
 
     &:nth-of-type(3) {
@@ -390,7 +388,7 @@ $loader-dot-color: #447ACC;
 @keyframes animate {
   0% {
     left: $loader-size;
-    top: 0
+    top: 0;
   }
 
   80% {
@@ -427,7 +425,8 @@ $loader-dot-color: #447ACC;
   display: inline-block;
 }
 
-.InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
+.InputFromTo
+  .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
   background-color: #f0f8ff !important;
   color: #4a90e2;
 }
@@ -447,7 +446,6 @@ $loader-dot-color: #447ACC;
 }
 
 .InputFromTo .DayPickerInput {
-
   &-Overlay {
     position: absolute;
     margin-left: -160px;

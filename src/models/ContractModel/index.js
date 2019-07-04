@@ -46,6 +46,26 @@ class ContractModel {
   //* questions
   @action async getQuestions() {
     let questions;
+    let deployedQuestions =
+      window.__ENV == "development"
+        ? JSON.parse(
+            fs.readFileSync(
+              path.join(
+                window.process.env.INIT_CWD,
+                "./contracts/sysQuestions.json"
+              ),
+              "utf8"
+            )
+          )
+        : JSON.parse(
+            fs.readFileSync(
+              path.join(
+                window.process.env.PORTABLE_EXECUTABLE_DIR,
+                "./contracts/sysQuestions.json"
+              ),
+              "utf8"
+            )
+          );
 
     if (localStorage.getItem(`questions[${this.contract._address}]`)) {
       questions = JSON.parse(
@@ -65,6 +85,7 @@ class ContractModel {
       let question = await this.contract.methods.question(i).call({
         from: address
       });
+      question.hints = deployedQuestions[i].hints;
       this.questions.push(question);
     }
     this.bufferQuestions = this.questions;
@@ -356,7 +377,7 @@ class ContractModel {
 
   @action prepareVoting(id) {
     const { questions } = this;
-    let parameters = questions.system[id - 1]._parameters;
+    let parameters = questions[id - 1]._parameters;
     let params = [];
 
     for (let i = 0; i < parameters.length; i += 2) {
