@@ -163,7 +163,7 @@ class Votings extends Component {
     let inputs = contractModel.votingTemplate.params.map((param, index) => {
       let returnField = () => {
         return (
-          <label>
+          <label key={index}>
             <span>{param[0]}</span>
             <Hint data={hints[selected][index]} />
             <SimpleInput
@@ -393,7 +393,7 @@ class Votings extends Component {
     let options = {
       data,
       to: contract._address,
-      gasPrice: web3.utils.toHex(10000000000),
+      gasPrice: web3.utils.toHex(40000000000),
       gasLimit: web3.utils.toHex(8000000),
       value: "0x0"
     };

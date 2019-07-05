@@ -50,7 +50,7 @@ class Voting extends Component {
     this.setState({
       expanded: false
     })
-    contract.methods.closeVoting().send({ from: address, gas: 8000000 })
+    contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
       .on('transactionHash', txhash => {
         setStep(4)
       })

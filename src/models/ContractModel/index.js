@@ -154,10 +154,11 @@ class ContractModel {
       let userVote = await this.contract.methods.getUserVote(i).call({
         from: address
       });
-
+      console.log(userVote);
       voting['userVote'] = userVote;
 
       this.votings.push(voting);
+      this.votings[i - 1].userVote = userVote;
     }
     this.votings.map((voting, index) => {
       voting.id = index + 1;
@@ -462,7 +463,7 @@ class ContractModel {
       .send({
         from: address,
         gas: web3.utils.toHex(8000000),
-        gasPrice: web3.utils.toHex(10000000000)
+        gasPrice: web3.utils.toHex(40000000000)
       })
       .on("error", error => {
         this.userVote.status = 2;

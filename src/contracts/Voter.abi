@@ -175,21 +175,6 @@
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "getUserVote",
-		"outputs": [
-			{
-				"name": "vote",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function",
-		"signature": "0x4f301d47"
-	},
-	{
-		"constant": true,
-		"inputs": [],
 		"name": "getERCTotal",
 		"outputs": [
 			{
@@ -318,6 +303,26 @@
 		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x7fd60dfd"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_voteId",
+				"type": "uint256"
+			}
+		],
+		"name": "getUserVote",
+		"outputs": [
+			{
+				"name": "vote",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0x86194c19"
 	},
 	{
 		"constant": false,
