@@ -151,7 +151,7 @@ class ContractModel {
       let voting = await this.contract.methods.voting(i).call({
         from: address
       });
-      let userVote = await this.contract.methods.getUserVote().call({
+      let userVote = await this.contract.methods.getUserVote(i).call({
         from: address
       });
 
