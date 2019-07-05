@@ -4,6 +4,7 @@ import { Redirect } from "react-router";
 class ContractModel {
   @observable contract;
   @observable questions = [];
+  @observable hints = [];
   @observable votings = [];
   @observable userGroups = [];
   @observable questionGroups = [];
@@ -49,29 +50,33 @@ class ContractModel {
     let deployedQuestions =
       window.__ENV == "development"
         ? JSON.parse(
-            fs.readFileSync(
-              path.join(
-                window.process.env.INIT_CWD,
-                "./contracts/sysQuestions.json"
-              ),
-              "utf8"
-            )
+          fs.readFileSync(
+            path.join(
+              window.process.env.INIT_CWD,
+              "./contracts/sysQuestions.json"
+            ),
+            "utf8"
           )
+        )
         : JSON.parse(
-            fs.readFileSync(
-              path.join(
-                window.process.env.PORTABLE_EXECUTABLE_DIR,
-                "./contracts/sysQuestions.json"
-              ),
-              "utf8"
-            )
-          );
+          fs.readFileSync(
+            path.join(
+              window.process.env.PORTABLE_EXECUTABLE_DIR,
+              "./contracts/sysQuestions.json"
+            ),
+            "utf8"
+          )
+        );
 
     if (localStorage.getItem(`questions[${this.contract._address}]`)) {
       questions = JSON.parse(
         localStorage.getItem(`questions[${this.contract._address}]`)
       );
-      //this.questions[type] = questions.reverse();
+    }
+    if (localStorage.getItem(`hints[${this.contract._address}]`)) {
+      this.hints = JSON.parse(
+        localStorage.getItem(`hints[${this.contract._address}]`)
+      );
     }
 
     let i = this.questions.length ? this.questions.length + 1 : 1;
@@ -85,13 +90,17 @@ class ContractModel {
       let question = await this.contract.methods.question(i).call({
         from: address
       });
-      question.hints = deployedQuestions[i].hints;
+      this.hints.push(deployedQuestions[i].hints);
       this.questions.push(question);
     }
     this.bufferQuestions = this.questions;
     localStorage.setItem(
       `questions[${this.contract._address}]`,
       JSON.stringify(this.questions)
+    );
+    localStorage.setItem(
+      `hints[${this.contract._address}]`,
+      JSON.stringify(this.hints)
     );
     return this.bufferQuestions;
   }
@@ -142,6 +151,12 @@ class ContractModel {
       let voting = await this.contract.methods.voting(i).call({
         from: address
       });
+      let userVote = await this.contract.methods.getUserVote().call({
+        from: address
+      });
+
+      voting['userVote'] = userVote;
+
       this.votings.push(voting);
     }
     this.votings.map((voting, index) => {
@@ -171,8 +186,8 @@ class ContractModel {
     this.bufferVotings =
       questionId !== 0
         ? this.votings.filter(voting => {
-            return voting[0] == questionId;
-          })
+          return voting[0] == questionId;
+        })
         : this.votings.slice().sort((a, b) => (a.id < b.id ? 1 : -1));
   }
   @action filterByPage(page) {
@@ -365,10 +380,10 @@ class ContractModel {
       }
     ];
 
-    this.questionGroups.map(group => {
+    this.questionGroups.map((group, index) => {
       options.push({
         value: group.groupType,
-        label: group.name
+        label: `${index + 1} ${group.name}`
       });
     });
 
@@ -411,20 +426,20 @@ class ContractModel {
     const ercABI =
       window.__ENV === "development"
         ? JSON.parse(
-            fs.readFileSync(
-              path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"),
-              "utf8"
-            )
+          fs.readFileSync(
+            path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"),
+            "utf8"
           )
+        )
         : JSON.parse(
-            fs.readFileSync(
-              path.join(
-                window.process.env.PORTABLE_EXECUTABLE_DIR,
-                "contracts/ERC20.abi"
-              ),
-              "utf8"
-            )
-          );
+          fs.readFileSync(
+            path.join(
+              window.process.env.PORTABLE_EXECUTABLE_DIR,
+              "contracts/ERC20.abi"
+            ),
+            "utf8"
+          )
+        );
 
     let index = await this.contract.methods.findUserGroup(address).call({
       from: address
@@ -446,7 +461,7 @@ class ContractModel {
       .sendVote(descision)
       .send({
         from: address,
-        gas: web3.utils.toHex(6000000),
+        gas: web3.utils.toHex(8000000),
         gasPrice: web3.utils.toHex(10000000000)
       })
       .on("error", error => {

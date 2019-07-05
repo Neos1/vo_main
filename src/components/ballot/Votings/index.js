@@ -48,28 +48,25 @@ class Votings extends Component {
 
   @observable questions = [];
 
-  async componentDidMount() {
+  async componentWillMount() {
     const { contractModel } = this.props;
-    await this.setState({
-      selected: contractModel.votingTemplate.questionId - 1
-    });
+    const { votingTemplate, hints: Hints } = contractModel;
+    const { questionId } = votingTemplate;
 
-    this.getData();
+    await this.setState({
+      selected: questionId - 1,
+      hints: questionId - 1 >= 0 ? Hints[questionId] : []
+    });
+    await this.getData();
   }
 
   async getData() {
-    console.log(this.state.selected);
-
     const { contractModel, accountStore } = this.props;
     const { address } = accountStore;
     const { contract } = contractModel;
 
-    this.setState({
-      loading: true,
-      hints:
-        this.state.selected >= 0
-          ? contractModel.questions[this.state.selected].hints
-          : []
+    await this.setState({
+      loading: true
     });
     await contractModel.getQuestions();
     await contractModel.getVotings();
@@ -108,10 +105,10 @@ class Votings extends Component {
           {createVotingStep == 2
             ? "Отправка транзакции"
             : createVotingStep == 3
-            ? "Получение хэша"
-            : createVotingStep == 4
-            ? "Ожидание чека"
-            : ""}
+              ? "Получение хэша"
+              : createVotingStep == 4
+                ? "Ожидание чека"
+                : ""}
         </p>
       </div>
     );
@@ -152,11 +149,10 @@ class Votings extends Component {
       additionalInputs: inputs
     });
   }
-
   getPreparingPanel() {
     const { contractModel } = this.props;
-    const { startVoting } = this.state;
-    const { votingTemplate } = contractModel;
+    const { startVoting, selected } = this.state;
+    const { votingTemplate, hints } = contractModel;
 
     let types = {
       int: "Число",
@@ -169,7 +165,7 @@ class Votings extends Component {
         return (
           <label>
             <span>{param[0]}</span>
-            <Hint data={this.state.hints[index]} />
+            <Hint data={hints[selected][index]} />
             <SimpleInput
               type="text"
               placeholder={types[param[1]]}
@@ -263,13 +259,11 @@ class Votings extends Component {
 
   handleSelect(selected) {
     const { contractModel } = this.props;
-    console.log(selected.value - 1);
     contractModel.prepareVoting(Number(selected.value));
     this.setState({
       selected: selected.value - 1,
-      hints: contractModel.questions[selected.value - 1].hints
+      hints: contractModel.hints[selected.value - 1]
     });
-    console.log(contractModel.questions[selected.value - 1].hints);
   }
 
   prepareFormula(formula) {
@@ -318,12 +312,12 @@ class Votings extends Component {
       ".votings-additionals select"
     );
 
-    let methodSelector = questions.system[selected].methodSelector;
-    let questionParameters = questions.system[selected]._parameters;
+    let methodSelector = questions[selected].methodSelector;
+    let questionParameters = questions[selected]._parameters;
 
     let values = [];
 
-    hexString += questions.system[selected].methodSelector;
+    hexString += questions[selected].methodSelector;
 
     let parametersTypes = questionParameters.map((param, index) => {
       let type = "";
@@ -400,7 +394,7 @@ class Votings extends Component {
       data,
       to: contract._address,
       gasPrice: web3.utils.toHex(10000000000),
-      gasLimit: web3.utils.toHex(6000000),
+      gasLimit: web3.utils.toHex(8000000),
       value: "0x0"
     };
 
@@ -516,6 +510,12 @@ class Votings extends Component {
     }
   }
 
+  setVotingStep(num) {
+    this.setState({
+      createVotingStep: num
+    })
+  }
+
   hideModal() {
     const { contractModel } = this.props;
     const { votingTemplate } = contractModel;
@@ -529,7 +529,7 @@ class Votings extends Component {
     const modifiers = { start: from, end: to };
 
     let renderVotings = bufferVotings.map((voting, index) => (
-      <Voting key={index + 1} data={voting} index={index + 1} />
+      <Voting key={index + 1} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
     ));
 
     let loader = this.getLoader();
@@ -537,8 +537,8 @@ class Votings extends Component {
       createVotingStep == 1
         ? this.getPreparingPanel()
         : createVotingStep == 5
-        ? this.getActiveVotingPanel()
-        : this.getLoader();
+          ? this.getActiveVotingPanel()
+          : this.getLoader();
 
     return (
       <div className={styles.wrapper}>
@@ -553,10 +553,10 @@ class Votings extends Component {
             <label
               className={`${styles["section-votings__filters-numbers"]} 
                                ${
-                                 styles[
-                                   "section-votings__filters-numbers--questions"
-                                 ]
-                               }`}
+                styles[
+                "section-votings__filters-numbers--questions"
+                ]
+                }`}
             >
               <span> Вопрос </span>
               <Select
@@ -573,8 +573,8 @@ class Votings extends Component {
             <label
               className={`${styles["section-votings__filters-numbers"]} 
                                ${
-                                 styles["section-votings__filters-numbers--id"]
-                               }`}
+                styles["section-votings__filters-numbers--id"]
+                }`}
             >
               <span> Номера </span>
               <Select
@@ -591,10 +591,10 @@ class Votings extends Component {
             <label
               className={`${styles["section-votings__filters-numbers"]} 
                                ${
-                                 styles[
-                                   "section-votings__filters-numbers--date"
-                                 ]
-                               }`}
+                styles[
+                "section-votings__filters-numbers--date"
+                ]
+                }`}
             >
               <span> Дата </span>
               <div className="InputFromTo">

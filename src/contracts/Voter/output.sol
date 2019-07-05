@@ -831,7 +831,10 @@ contract VoterBase is VoterInterface {
 
     function getUserVote() external view returns (uint vote) {
         uint _voteId = votings.votingIdIndex - 1;
-        return votings.voting[_voteId].votes[address(ERC20)][msg.sender];
+        uint questionId = votings.voting[_voteId].questionId;
+        uint groupId = questions.question[questionId].groupId;
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+        return votings.voting[_voteId].votes[address(group)][msg.sender];
     }
 
     function getUserWeight() external view returns (uint256 weight) {

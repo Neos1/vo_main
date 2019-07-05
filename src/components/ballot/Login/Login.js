@@ -64,7 +64,7 @@ class Login extends React.Component {
         randomSeed:"",
         balances:[],
         addresses:'',
-        keystore: {}
+        keystore: ''
     };
 
     
@@ -1004,7 +1004,7 @@ class Login extends React.Component {
         let options = {
             data: transaction.encodeABI(),
             gasPrice: web3.utils.toHex(10000000000),
-            gasLimit: web3.utils.toHex(6000000),
+            gasLimit: web3.utils.toHex(8000000),
             value: '0x0'
         };
 
@@ -1125,7 +1125,7 @@ class Login extends React.Component {
                             to: contractAddress,
                             data: dataTx,
                             gasPrice: web3.utils.toHex(10000000000),
-                            gasLimit: web3.utils.toHex(6000000),
+                            gasLimit: web3.utils.toHex(8000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
                         } 
@@ -1292,10 +1292,10 @@ class Login extends React.Component {
     @action
     handleSubmit = (e) => {
         e.preventDefault();
-        let loginWorker = new accountWorker();
-         this.previousStep.push(this.step);
-         this.step = 8;
-        if (e.target.password.value != ''){
+        if ((e.target.password.value != '') && (this.account.keystore != '')){
+            let loginWorker = new accountWorker();
+            this.previousStep.push(this.step);
+            this.step = 8;
             loginWorker.postMessage(JSON.stringify({
                     keystore: this.account.keystore, 
                     password: this.account.password
@@ -1318,6 +1318,9 @@ class Login extends React.Component {
                     loginWorker.terminate();
                 }
             }
+        } else {
+            document.forms.login_form.querySelector('.Select').classList.add('field__input--error');
+            document.forms.login_form.password.classList.add('field__input--error');
         }
     }
     @action
