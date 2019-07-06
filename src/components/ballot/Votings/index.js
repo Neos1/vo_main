@@ -69,8 +69,8 @@ class Votings extends Component {
       loading: true
     });
     await contractModel.getQuestions();
-    await contractModel.getVotings();
     await contractModel.getUserGroups();
+    await contractModel.getVotings();
 
     setInterval(async () => {
       await contractModel.refreshLastVoting();

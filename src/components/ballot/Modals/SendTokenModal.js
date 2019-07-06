@@ -85,7 +85,7 @@ class SendTokenModal extends Component {
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/ERC20.abi'), 'utf8'))
         : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/ERC20.abi'), 'utf8'));
       const customContract = new web3.eth.Contract(abi, contractAddress);
-      customContract.methods.transfer(addressWho, count).send({from: address, gas: 100000})
+      customContract.methods.transfer(addressWho, count).send({from: address, gas: 8000000})
         .on('receipt', async receipt =>{
           await this.setState({step: 2});
         })
@@ -94,7 +94,7 @@ class SendTokenModal extends Component {
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
         : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
       const customContract = new web3.eth.Contract(abi, contractAddress);
-      customContract.methods.transferFrom(fromAddress, addressWho, count).send({from: address, gas: 100000})
+      customContract.methods.transferFrom(fromAddress, addressWho, count).send({from: address, gas: 8000000})
         .on('receipt', async receipt =>{
           await this.setState({step: 2});
         })

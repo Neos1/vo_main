@@ -1218,11 +1218,11 @@ class Login extends React.Component {
     @action
     checkCreatedSeed = (e) => {
         e.preventDefault();
-        this.previousStep.push(this.step)
-        document.forms.seed.reset()
-        this.step = 21;
         let seed = this.seed.join(' ');
         if (bip39.validateMnemonic(seed)) {
+            this.previousStep.push(this.step)
+            document.forms.seed.reset()
+            this.step = 21;
             let inputs = document.forms.seed.querySelectorAll('input');
             inputs.forEach(input => {
                 input.classList.remove('active');

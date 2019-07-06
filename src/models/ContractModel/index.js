@@ -161,12 +161,12 @@ class ContractModel {
       this.votings[i - 1].userVote = userVote;
     }
     this.votings.map((voting, index) => {
-      voting.id = index + 1;
+      voting.votingId = index + 1;
     });
     console.log(this.votings);
     this.bufferVotings =
       this.votings.length == length - 1
-        ? this.votings.slice().sort((a, b) => (a.id < b.id ? 1 : -1))
+        ? this.votings.slice().sort((a, b) => (a.votingId < b.votingId ? 1 : -1))
         : "";
 
     localStorage.setItem(
@@ -189,7 +189,7 @@ class ContractModel {
         ? this.votings.filter(voting => {
           return voting[0] == questionId;
         })
-        : this.votings.slice().sort((a, b) => (a.id < b.id ? 1 : -1));
+        : this.votings.slice().sort((a, b) => (a.votingId < b.votingId ? 1 : -1));
   }
   @action filterByPage(page) {
     if (page != null) {
@@ -421,61 +421,70 @@ class ContractModel {
     let descision = this.userVote.descision == true ? 1 : 2;
     let address = web3.eth.accounts.wallet[0].address;
 
-    let privateKey = web3.eth.accounts.wallet[0].privateKey;
-    this.userVote.status = 3;
-
-    const ercABI =
-      window.__ENV === "development"
-        ? JSON.parse(
-          fs.readFileSync(
-            path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"),
-            "utf8"
-          )
-        )
-        : JSON.parse(
-          fs.readFileSync(
-            path.join(
-              window.process.env.PORTABLE_EXECUTABLE_DIR,
-              "contracts/ERC20.abi"
-            ),
-            "utf8"
-          )
-        );
-
-    let index = await this.contract.methods.findUserGroup(address).call({
+    let userVote = await this.contract.methods.getUserVote(voteId).call({
       from: address
     });
-    const { groupAddress, groupType } = userGroups[index - 1];
 
-    let userContract = new web3.eth.Contract(ercABI, groupAddress);
+    if( userVote == '0' ) {
+      let privateKey = web3.eth.accounts.wallet[0].privateKey;
+      this.userVote.status = 3;
+  
+      const ercABI =
+        window.__ENV === "development"
+          ? JSON.parse(
+            fs.readFileSync(
+              path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"),
+              "utf8"
+            )
+          )
+          : JSON.parse(
+            fs.readFileSync(
+              path.join(
+                window.process.env.PORTABLE_EXECUTABLE_DIR,
+                "contracts/ERC20.abi"
+              ),
+              "utf8"
+            )
+          );
+      let index = await this.contract.methods.findUserGroup(address).call({
+        from: address
+      });
+      const { groupAddress, groupType } = userGroups[index - 1];
+  
+      let userContract = new web3.eth.Contract(ercABI, groupAddress);
+  
+      if (groupType == "ERC20") {
+        let userBalance = await userContract.methods
+          .balanceOf(address)
+          .call({ from: address });
+        await userContract.methods
+          .approve(contract._address, userBalance)
+          .send({ from: address, gas: 1000000 });
+      }
+  
+      this.contract.methods
+        .sendVote(descision)
+        .send({
+          from: address,
+          gas: web3.utils.toHex(8000000),
+          gasPrice: web3.utils.toHex(40000000000)
+        })
+        .on("error", error => {
+          this.userVote.status = 2;
+          console.log(error);
+        })
+        .on("transactionHash", txHash => {
+          console.log(txHash);
+        })
+        .on("receipt", receipt => {
+          this.userVote.status = 1;
+          this.refreshLastVoting();
+        });
 
-    if (groupType == "ERC20") {
-      let userBalance = await userContract.methods
-        .balanceOf(address)
-        .call({ from: address });
-      await userContract.methods
-        .approve(contract._address, userBalance)
-        .send({ from: address, gas: 1000000 });
+    } else {
+      alert(`Вы уже проголосовали ${userVote == 1 ? "За": "Против"}`)
     }
 
-    this.contract.methods
-      .sendVote(descision)
-      .send({
-        from: address,
-        gas: web3.utils.toHex(8000000),
-        gasPrice: web3.utils.toHex(40000000000)
-      })
-      .on("error", error => {
-        this.userVote.status = 2;
-        console.log(error);
-      })
-      .on("transactionHash", txHash => {
-        console.log(txHash);
-      })
-      .on("receipt", receipt => {
-        this.userVote.status = 1;
-        this.refreshLastVoting();
-      });
   }
 
   @action async refreshLastVoting() {
@@ -488,11 +497,11 @@ class ContractModel {
     let voting = await contract.methods.voting(index).call({
       from: address
     });
-    voting.id = index;
+    voting.votingId = index;
     this.votings[index - 1] = voting;
     this.bufferVotings = this.votings
       .slice()
-      .sort((a, b) => (a.id < b.id ? 1 : -1));
+      .sort((a, b) => (a.votingId < b.votingId ? 1 : -1));
     localStorage.setItem(
       `votings[${contract._address}]`,
       JSON.stringify(this.votings)

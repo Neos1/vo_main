@@ -105,7 +105,7 @@ class Voting extends Component {
     const { contractModel, index, data } = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
-    contract.methods.getVotingDescision(data.id).call({ from: address })
+    contract.methods.getVotingDescision(data.votingId).call({ from: address })
       .then(async (result) => {
         await this.setState({ descision: result })
       })
@@ -244,7 +244,7 @@ class Voting extends Component {
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
 
-    contract.methods.getVotes(data.id).call({ from: address }).then(data => {
+    contract.methods.getVotes(data.votingId).call({ from: address }).then(data => {
       const positive = Number(data[0]);
       const negative = Number(data[1]);
       const abstained = Number(data[2]) - (positive + negative);
@@ -263,17 +263,25 @@ class Voting extends Component {
   }
 
   getGroupBlock() {
+    const { contractModel, data } = this.props;
+
     const { votingPercents } = this.state;
     const { positive, negative, totalTokens } = votingPercents;
 
     let positive_percent = positive == "0" ? 0 : (positive / totalTokens) * 100
     let negative_percent = negative == "0" ? 0 : (negative / totalTokens) * 100
     let abstained_percent = totalTokens == "0" ? 0 : ((totalTokens - (positive + negative)) / totalTokens) * 100
+
+    let questionId = data.id; 
+    let groupId = contractModel.questions[questionId - 1].groupId;
+
+    let groupName = contractModel.userGroups[groupId - 1].name;
+    let groupType = contractModel.userGroups[groupId - 1].groupType;
     return (
       <div className={styles['voting-group']}>
         <div className={styles['voting-group__heading']}>
-          <h2>Администраторы</h2>
-          <span>респонденты</span>
+          <h2>{groupName}</h2>
+          <span>{groupType}</span>
         </div>
         <div className={styles['voting-group__results']}>
           <label className={`${styles['voting-group__results-bar']} `}>
@@ -385,7 +393,7 @@ class Voting extends Component {
       <div className={styles.voting + ' ' + `${this.state.expanded ? "opened" : ''}`} >
         <div className={styles['voting-about']} onClick={this.toggleExpand.bind(this)} >
           <div className={styles['voting-about__info']} >
-            <span className={styles['voting-id']}>{data.id}</span>
+            <span className={styles['voting-id']}>{data.votingId}</span>
             <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>
             <p className={styles['voting-duration']}>Начало <strong>{timeStart}</strong> часа(ов)</p>
