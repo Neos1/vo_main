@@ -90,7 +90,10 @@ class ContractModel {
       let question = await this.contract.methods.question(i).call({
         from: address
       });
-      this.hints.push(deployedQuestions[i].hints);
+      console.log(i, deployedQuestions.hasOwnProperty(i))
+      if (deployedQuestions.hasOwnProperty(i)) {
+        this.hints.push(deployedQuestions[i].hints);
+      }
       this.questions.push(question);
     }
     this.bufferQuestions = this.questions;

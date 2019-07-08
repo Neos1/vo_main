@@ -1,4 +1,4 @@
-const {app, BrowserWindow, globalShortcut} = require('electron');
+const { app, BrowserWindow, globalShortcut } = require('electron');
 const electronLocalshortcut = require('electron-localshortcut');
 
 
@@ -9,11 +9,11 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    useContentSize:true,
-    minWidth:960,
-    minHeight:560,
-    width: 960,
-    height: 560
+    useContentSize: true,
+    minWidth: 1280,
+    minHeight: 720,
+    width: 1280,
+    height: 720
   });
   if (process.platform == 'darwin') {
     process.env.PORTABLE_EXECUTABLE_DIR = path.join(__dirname, '/src');
@@ -26,7 +26,7 @@ function createWindow() {
   });
 }
 
-app.on('ready',createWindow);
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

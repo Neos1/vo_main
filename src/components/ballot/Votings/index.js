@@ -167,7 +167,7 @@ class Votings extends Component {
         return (
           <label key={index}>
             <span>{param[0]}</span>
-            <Hint data={hints[selected][index]} />
+            {hints.hasOwnProperty(selected) ? <Hint data={hints[selected][index]} /> : ""}
             <SimpleInput
               type="text"
               placeholder={types[param[1]]}
