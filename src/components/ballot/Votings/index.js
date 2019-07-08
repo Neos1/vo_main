@@ -156,8 +156,10 @@ class Votings extends Component {
 
     let types = {
       int: "Число",
+      uint: "Число",
       string: "Текст",
-      address: "Адрес"
+      address: "Адрес",
+      bytes4: "Байтовая строка (0х + 8 символов)"
     };
 
     let inputs = contractModel.votingTemplate.params.map((param, index) => {
@@ -463,12 +465,20 @@ class Votings extends Component {
         case "int":
           valid = Boolean(Number(input.value));
           break;
+        case "uint":
+          valid = Boolean(Number(input.value));
+          break;
         case "string":
           valid = Boolean(String(input.value));
           break;
         case "address":
           valid = Boolean(
-            input.value.match(new RegExp(/(0x)+([0-9 a-z A-z]){40}/g))
+            input.value.match(new RegExp(/(0x)+([0-9 a-f A-F]){40}/g))
+          );
+          break;
+        case "bytes4":
+          valid = Boolean(
+            input.value.length == 10 && input.value.match(new RegExp(/(0x)+([0-9 a-f A-F]){8}/g))
           );
           break;
         default:
@@ -490,7 +500,7 @@ class Votings extends Component {
     let valids = this.validateInputs(document.forms.votingData);
 
     if (valids.length == 2) {
-      if (valids[0] == false || valids[0] == false) {
+      if (valids[0] == false || valids[1] == false) {
         return false;
       } else {
         votingTemplate.prepared = !votingTemplate.prepared;

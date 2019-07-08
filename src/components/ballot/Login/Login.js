@@ -330,11 +330,11 @@ class Login extends React.Component {
                                             Вы можете добавить проект, и принимать участие в голосованиях по нему
                                         </p>
                                         <label>
-                                            <SimpleInput maxLength="20" placeholder="Укажите название проекта" required onChange={this.getProjectName} />
+                                            <SimpleInput maxLength="20" name='name' placeholder="Укажите название проекта" required onChange={this.getProjectName} />
                                         </label>
 
                                         <label>
-                                            <SimpleInput required placeholder="Укажите адрес проекта" onChange={this.getProjectHash} />
+                                            <SimpleInput required name='address' placeholder="Укажите адрес проекта" onChange={this.getProjectHash} />
                                         </label>
 
                                         <div className={styles.login__submit}>
@@ -421,16 +421,16 @@ class Login extends React.Component {
                                         <h3>Создание контракта токенов</h3>
                                         <div className={styles.deploy__input}>
                                             <label>
-                                                <SimpleInput required placeholder="Укажите название токена" name='token' onChange={this.getTokenName} />
+                                                <SimpleInput placeholder="Укажите название токена" name='token' onChange={this.getTokenName} />
                                             </label>
                                             <label>
-                                                <SimpleInput required placeholder="Укажите символ токена" name='tokenSymbol' onChange={this.getTokenChar} />
+                                                <SimpleInput placeholder="Укажите символ токена" name='tokenSymbol' onChange={this.getTokenChar} />
                                             </label>
                                             <label>
-                                                <SimpleInput required placeholder="Укажите общее количество токенов" name='count' onChange={this.getTokenCount} />
+                                                <SimpleInput placeholder="Укажите общее количество токенов" name='count' onChange={this.getTokenCount} />
                                             </label>
                                             <label>
-                                                <SimpleInput name="password" type='password' required placeholder="Введите пароль ключа" onChange={this.getPasswordCheck} />
+                                                <SimpleInput name="password" type='password' placeholder="Введите пароль ключа" onChange={this.getPasswordCheck} />
                                             </label>
                                         </div>
                                     </div>
@@ -933,6 +933,15 @@ class Login extends React.Component {
             }
         } else {
             document.deploy_project.password.classList.add('field__input--error')
+            if (this.ERC20.name == "") {
+                document.deploy_project.token.classList.add('field__input--error')
+            }
+            if (this.ERC20.symbol == "") {
+                document.deploy_project.tokenSymbol.classList.add('field__input--error')
+            }
+            if (isNaN(Number(this.ERC20.totalSupply))) {
+                document.deploy_project.count.classList.add('field__input--error')
+            }
         }
     }
 
@@ -1412,11 +1421,22 @@ class Login extends React.Component {
     @action
     checkExistingAddress = (e) => {
         e.preventDefault();
-        this.previousStep.push(this.step)
-        this.step = 33;
-        let address = web3.eth.getCode(this.contract.hash).then(data => {
-            data !== '0x' ? writeToProjects() : alert('Адрес не валидный');
-        })
+        let address;
+
+        if (Boolean(this.contract.hash.match(new RegExp(/(0x)+([0-9 a-z A-Z]){40}/g)))) {
+            if (document.existing_project.name != '') {
+                this.previousStep.push(this.step)
+                this.step = 33;
+                address = web3.eth.getCode(this.contract.hash).then(data => {
+                    data !== '0x' ? writeToProjects() : alert('Адрес не валидный');
+                })
+            } else {
+                document.existing_project.name.classList.add('field__input--error');
+            }
+        } else {
+            document.existing_project.address.classList.add('field__input--error');
+        }
+
         let writeToProjects = () => {
             let project = {
                 name: this.contract.name,

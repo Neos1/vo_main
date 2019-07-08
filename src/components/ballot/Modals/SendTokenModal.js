@@ -44,15 +44,15 @@ class SendTokenModal extends Component {
           <p>{address}</p>
           <label>
             <p>Куда перевести</p>
-            <SimpleInput type='text' onChange={this.inputAddress.bind(this)}/>
+            <SimpleInput type='text'name='address'  onChange={this.inputAddress.bind(this)}/>
           </label>
           <label>
             <p>Количество</p>
-            <SimpleInput type='text' onChange={this.inputCount.bind(this)}/>
+            <SimpleInput type='text' name='count' onChange={this.inputCount.bind(this)}/>
           </label>
           <label>
             <p>Пароль</p>
-            <SimpleInput type='password' onChange={this.inputPassword.bind(this)}/>
+            <SimpleInput type='password' name='password' onChange={this.inputPassword.bind(this)}/>
           </label>
           <button className='btn btn--block btn--blue'> Перевести </button>
         </form>

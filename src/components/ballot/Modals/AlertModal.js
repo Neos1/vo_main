@@ -41,7 +41,7 @@ class AlertModal extends Component {
             </div>
           </div>
           <div className={styles['modal-footer']}>
-            <button className='btn btn--white'> Вернуться </button>
+            <button className='btn btn--white' onClick={this.closeWindow.bind(this)}> Вернуться </button>
             <button className='btn btn--blue' onClick={this.sendVote.bind(this)}> Продолжить </button>
           </div>
         </div>
