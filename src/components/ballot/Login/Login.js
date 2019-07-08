@@ -1232,7 +1232,7 @@ class Login extends React.Component {
             setTimeout(() => {
                 this.step = 0;
             }, 1500)
-        }
+        } else alert('Проверьте правильность ввода')
     }
     @action
     backToStart = () => {
@@ -1251,7 +1251,7 @@ class Login extends React.Component {
                 }
             }
         })
-        this.seed[index] = e.target.value;
+        this.seed[index] = e.target.value.replace(/\s+/g, '');
     }
     @action
     handleChangePassword = () => {

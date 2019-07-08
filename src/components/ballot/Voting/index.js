@@ -33,10 +33,11 @@ class Voting extends Component {
       graphics: false,
     }
   }
-  async componentDidMount() {
-    this.getTime();
-    this.getVotesPercents();
-    this.getVotingDescision();
+  async componentWillMount() {
+
+    await this.getTime();
+    await this.getVotingDescision();
+    await this.getVotesPercents();
   }
   toggleExpand() {
     this.setState({
@@ -272,7 +273,7 @@ class Voting extends Component {
     let negative_percent = negative == "0" ? 0 : (negative / totalTokens) * 100
     let abstained_percent = totalTokens == "0" ? 0 : ((totalTokens - (positive + negative)) / totalTokens) * 100
 
-    let questionId = data.id; 
+    let questionId = data.id;
     let groupId = contractModel.questions[questionId - 1].groupId;
 
     let groupName = contractModel.userGroups[groupId - 1].name;

@@ -48,11 +48,11 @@ class Votings extends Component {
 
   @observable questions = [];
 
-  async componentWillMount() {
-    const { contractModel } = this.props;
+  async componentDidMount() {
+    const { contractModel } = await this.props;
     const { votingTemplate, hints: Hints } = contractModel;
     const { questionId } = votingTemplate;
-
+    console.log(contractModel.userGroups);
     await this.setState({
       selected: questionId - 1,
       hints: questionId - 1 >= 0 ? Hints[questionId] : []
@@ -68,8 +68,8 @@ class Votings extends Component {
     await this.setState({
       loading: true
     });
-    await contractModel.getQuestions();
     await contractModel.getUserGroups();
+    await contractModel.getQuestions();
     await contractModel.getVotings();
 
     setInterval(async () => {

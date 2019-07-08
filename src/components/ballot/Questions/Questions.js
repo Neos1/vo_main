@@ -12,7 +12,7 @@ import Question from "../Question/Question";
 import { Redirect } from "react-router";
 import Loader from "../../common/Loader";
 
-@inject("accountStore", "contractModel")
+@inject("contractModel")
 @observer
 class Questions extends Component {
   constructor(props) {
@@ -26,8 +26,6 @@ class Questions extends Component {
     };
   }
 
-  @observable questions = [];
-
   componentWillMount() {
     this.getData();
   }
@@ -37,11 +35,8 @@ class Questions extends Component {
       loading: true
     });
 
-    const { contractModel, accountStore } = this.props;
-    const { address } = accountStore;
-    const { contract } = contractModel;
-
-    await contractModel.getQuestions("system");
+    let { contractModel } = this.props;
+    await contractModel.getQuestions();
     await contractModel.getQuestionGroups();
 
     this.setState({
@@ -87,7 +82,6 @@ class Questions extends Component {
       )
     );
     let loader = this.getLoader();
-
     if (redirect) return <Redirect to="/votings" />;
     return (
       <div className={styles.wrapper}>

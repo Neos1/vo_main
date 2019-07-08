@@ -163,7 +163,6 @@ class ContractModel {
     this.votings.map((voting, index) => {
       voting.votingId = index + 1;
     });
-    console.log(this.votings);
     this.bufferVotings =
       this.votings.length == length - 1
         ? this.votings.slice().sort((a, b) => (a.votingId < b.votingId ? 1 : -1))
@@ -229,18 +228,17 @@ class ContractModel {
   //* users groups
 
   @action async getUserGroups() {
-    const { contract, userGroups } = this;
+    const { contract } = this;
     const { _address: contractAddress } = contract;
     let savedUserGroups;
 
     if (localStorage.getItem(`userGroups[${contractAddress}]`)) {
-      savedUserGroups = JSON.parse(
+      this.userGroups = JSON.parse(
         localStorage.getItem(`userGroups[${contractAddress}]`)
       );
-      this.userGroups = savedUserGroups;
     }
 
-    let i = userGroups.length != 0 ? userGroups.length + 1 : 1;
+    let i = this.userGroups.length != 0 ? this.userGroups.length + 1 : 1;
     let userAddress = web3.eth.accounts.wallet[0].address;
 
     let groupsLength = await contract.methods.getUserGroupsLength().call({
@@ -251,11 +249,11 @@ class ContractModel {
       let group = await contract.methods.getUserGroup(i).call({
         from: userAddress
       });
-      userGroups.push(group);
+      this.userGroups.push(group);
     }
     localStorage.setItem(
       `userGroups[${contractAddress}]`,
-      JSON.stringify(userGroups)
+      JSON.stringify(this.userGroups)
     );
   }
   //* users groups end
@@ -268,7 +266,7 @@ class ContractModel {
 
     if (localStorage.getItem(`questionGroups[${contractAddress}]`)) {
       savesQuestionGroups = localStorage.getItem(
-        `questionGroups${contractAddress}`
+        `questionGroups[${contractAddress}]`
       );
       this.userGroups = savesQuestionGroups;
     }
@@ -425,10 +423,10 @@ class ContractModel {
       from: address
     });
 
-    if( userVote == '0' ) {
+    if (userVote == '0') {
       let privateKey = web3.eth.accounts.wallet[0].privateKey;
       this.userVote.status = 3;
-  
+
       const ercABI =
         window.__ENV === "development"
           ? JSON.parse(
@@ -450,9 +448,9 @@ class ContractModel {
         from: address
       });
       const { groupAddress, groupType } = userGroups[index - 1];
-  
+
       let userContract = new web3.eth.Contract(ercABI, groupAddress);
-  
+
       if (groupType == "ERC20") {
         let userBalance = await userContract.methods
           .balanceOf(address)
@@ -461,7 +459,7 @@ class ContractModel {
           .approve(contract._address, userBalance)
           .send({ from: address, gas: 1000000 });
       }
-  
+
       this.contract.methods
         .sendVote(descision)
         .send({
@@ -482,7 +480,7 @@ class ContractModel {
         });
 
     } else {
-      alert(`Вы уже проголосовали ${userVote == 1 ? "За": "Против"}`)
+      alert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)
     }
 
   }
