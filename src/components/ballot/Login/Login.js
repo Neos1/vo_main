@@ -1381,7 +1381,7 @@ class Login extends React.Component {
             this.previousStep.push(this.step)
             this.step = 37;
             let address = web3.eth.getCode(this.ERC20.hash).then(data => {
-                data !== '0x' ? this.step = 38 : alert('Адрес не валидный');
+                data !== '0x' ? this.step = 38 : alert('Адрес не валидный'), this.step = 36;
             })
             let defaultABI = window.__ENV === 'development'
                 ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"), "utf8"))
@@ -1428,7 +1428,7 @@ class Login extends React.Component {
                 this.previousStep.push(this.step)
                 this.step = 33;
                 address = web3.eth.getCode(this.contract.hash).then(data => {
-                    data !== '0x' ? writeToProjects() : alert('Адрес не валидный');
+                    data !== '0x' ? writeToProjects() : alert('Адрес не валидный'), this.step = 32;
                 })
             } else {
                 document.existing_project.name.classList.add('field__input--error');
