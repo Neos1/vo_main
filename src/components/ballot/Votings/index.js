@@ -71,12 +71,6 @@ class Votings extends Component {
     await contractModel.getQuestions();
     await contractModel.getVotings();
 
-    setInterval(async () => {
-      await contractModel.refreshLastVoting();
-      await this.filterVotings();
-      this.forceUpdate();
-    }, 10 * 1000);
-
     this.setState({
       loading: false
     });

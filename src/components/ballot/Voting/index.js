@@ -31,29 +31,33 @@ class Voting extends Component {
       },
       preDescision: '',
       graphics: false,
+      interval: '',
     }
   }
   async componentWillMount() {
-    const { data } = this.props;
+    const { data } = this.props
     await this.getTime();
     await this.getVotingDescision();
     await this.getVotesPercents();
-    if (data.status == 0) {
-      setInterval(() => {
+    console.log(`status ${data.status}`)
+    await this.setState({
+      interval: setInterval(() => {
         this.refreshVoting();
-      }, 10 * 1000)
+      }, 5 * 1000)
+    })
+  }
+
+  async refreshVoting() {
+    const { data } = this.props
+    await this.getTime();
+    await this.getVotingDescision();
+    await this.getVotesPercents();
+    if (data.status == 1) {
+      clearInterval(this.state.interval);
+      this.setState({ interval: '' });
     }
   }
 
-  refreshVoting() {
-    this.setState({
-      timeStart: this.state.timeStart,
-      timeEnd: this.state.timeEnd,
-      remaining: this.state.remaining,
-      descision: this.state.descision,
-      preDescision: this.state.preDescision,
-    })
-  }
   toggleExpand() {
     this.setState({
       expanded: !this.state.expanded
@@ -85,7 +89,7 @@ class Voting extends Component {
     const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
-          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining < 0 ? 0 : remaining} минут</span>
+          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining == 0 ? 'меньше' : remaining} минут{remaining == 0 ? 'ы' : ''} </span>
           <span className={styles['voting-about__progress-bar']} style={{ 'width': percent + "%" }}></span>
         </p>
       )
