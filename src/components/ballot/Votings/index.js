@@ -48,11 +48,10 @@ class Votings extends Component {
 
   @observable questions = [];
 
-  async componentDidMount() {
+  async componentWillMount() {
     const { contractModel } = await this.props;
     const { votingTemplate, hints: Hints } = contractModel;
     const { questionId } = votingTemplate;
-    console.log(contractModel.userGroups);
     await this.setState({
       selected: questionId - 1,
       hints: questionId - 1 >= 0 ? Hints[questionId] : []
@@ -74,9 +73,9 @@ class Votings extends Component {
 
     setInterval(async () => {
       await contractModel.refreshLastVoting();
-      this.filterVotings();
+      await this.filterVotings();
       this.forceUpdate();
-    }, 60 * 1000);
+    }, 10 * 1000);
 
     this.setState({
       loading: false
@@ -96,19 +95,22 @@ class Votings extends Component {
   removeError(e) {
     e.target.classList.remove("field__input--error");
   }
-  getLoader() {
+  getLoader(type) {
     const { createVotingStep } = this.state;
     return (
       <div>
         <Loader />
         <p id="loader-text">
-          {createVotingStep == 2
-            ? "Отправка транзакции"
-            : createVotingStep == 3
-              ? "Получение хэша"
-              : createVotingStep == 4
-                ? "Ожидание чека"
-                : ""}
+          {(type == 'left' && this.state.loading) ? 'Проверка статуса' : ''}
+          {type == 'right'
+            ? ''
+            : createVotingStep == 2
+              ? "Отправка транзакции"
+              : createVotingStep == 3
+                ? "Получение хэша"
+                : createVotingStep == 4
+                  ? "Ожидание чека"
+                  : ""}
         </p>
       </div>
     );
@@ -199,17 +201,16 @@ class Votings extends Component {
 
       return input;
     });
-
-    return (
-      <div>
+    let returnContent = () => {
+      return (
         <div className={styles["section-parameters__content"]}>
           <div>
             <h1 className={styles["section-parameters__content-heading"]}>
               Начать голосование
-            </h1>
+          </h1>
             <p className={styles["section-parameters__content-subheading"]}>
               Административные токены
-            </p>
+          </p>
             <Select
               multi={false}
               searchable={false}
@@ -229,10 +230,17 @@ class Votings extends Component {
                 disabled={votingTemplate.prepared}
               >
                 НАЧАТЬ ГОЛОСОВАНИЕ
-              </button>
+            </button>
             </form>
           </div>
         </div>
+      )
+    }
+    let content = this.state.loading ? this.getLoader('left') : returnContent()
+
+    return (
+      <div>
+        {content}
       </div>
     );
   }
@@ -541,8 +549,7 @@ class Votings extends Component {
     let renderVotings = bufferVotings.map((voting, index) => (
       <Voting key={index + 1} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
     ));
-
-    let loader = this.getLoader();
+    let loaderRight = this.getLoader('right');
     let rightPanel =
       createVotingStep == 1
         ? this.getPreparingPanel()
@@ -646,7 +653,7 @@ class Votings extends Component {
             </label>
           </div>
 
-          {renderVotings}
+          {this.state.loading ? loaderRight : renderVotings}
         </section>
         <SetVoteModal descision={this.state.descision} />
         <StartVotingmodal

@@ -2,12 +2,8 @@
 	"host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
 	"projects": [
 		{
-			"name": "Test",
-			"address": "0x8740Fbe1856ccb60c5dc4E9d8d0CA701e43Ec7cC"
-		},
-		{
-			"name": "123",
-			"address": "0x17f7CC4bD23D9849747F04B079BDeeCCCbF5eB92"
+			"name": "test",
+			"address": "0xa4d86dc322076d0602a495E0D3F8C0e86795e001"
 		}
 	]
 }

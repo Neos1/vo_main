@@ -92,7 +92,7 @@ class ContractModel {
       });
       console.log(i, deployedQuestions.hasOwnProperty(i))
       if (deployedQuestions.hasOwnProperty(i)) {
-        this.hints.push(deployedQuestions[i].hints);
+        this.hints[i - 1] = deployedQuestions[i].hints;
       }
       this.questions.push(question);
     }
@@ -450,37 +450,48 @@ class ContractModel {
       let index = await this.contract.methods.findUserGroup(address).call({
         from: address
       });
-      const { groupAddress, groupType } = userGroups[index - 1];
 
-      let userContract = new web3.eth.Contract(ercABI, groupAddress);
+      if (index != 0) {
+        const { groupAddress, groupType } = userGroups[index - 1];
 
-      if (groupType == "ERC20") {
+        let userContract = new web3.eth.Contract(ercABI, groupAddress);
         let userBalance = await userContract.methods
           .balanceOf(address)
           .call({ from: address });
-        await userContract.methods
-          .approve(contract._address, userBalance)
-          .send({ from: address, gas: 1000000 });
+        if (userBalance > 0) {
+          if (groupType == "ERC20") {
+            await userContract.methods
+              .approve(contract._address, userBalance)
+              .send({ from: address, gas: 1000000 });
+          }
+
+          this.contract.methods
+            .sendVote(descision)
+            .send({
+              from: address,
+              gas: web3.utils.toHex(8000000),
+              gasPrice: web3.utils.toHex(40000000000)
+            })
+            .on("error", error => {
+              this.userVote.status = 2;
+              console.log(error);
+            })
+            .on("transactionHash", txHash => {
+              console.log(txHash);
+            })
+            .on("receipt", receipt => {
+              this.userVote.status = 1;
+              this.refreshLastVoting();
+            });
+        } else {
+
+          alert("У вас нет токенов, доступных для голосования")
+        }
+      } else {
+        this.userVote.status = 0;
+        alert("Не можем найти вашу группу. Либо ваш баланс равен нулю, либо вас нет ни в одной группе пользователей")
       }
 
-      this.contract.methods
-        .sendVote(descision)
-        .send({
-          from: address,
-          gas: web3.utils.toHex(8000000),
-          gasPrice: web3.utils.toHex(40000000000)
-        })
-        .on("error", error => {
-          this.userVote.status = 2;
-          console.log(error);
-        })
-        .on("transactionHash", txHash => {
-          console.log(txHash);
-        })
-        .on("receipt", receipt => {
-          this.userVote.status = 1;
-          this.refreshLastVoting();
-        });
 
     } else {
       alert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)

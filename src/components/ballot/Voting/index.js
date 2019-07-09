@@ -34,10 +34,25 @@ class Voting extends Component {
     }
   }
   async componentWillMount() {
-
+    const { data } = this.props;
     await this.getTime();
     await this.getVotingDescision();
     await this.getVotesPercents();
+    if (data.status == 0) {
+      setInterval(() => {
+        this.refreshVoting();
+      }, 10 * 1000)
+    }
+  }
+
+  refreshVoting() {
+    this.setState({
+      timeStart: this.state.timeStart,
+      timeEnd: this.state.timeEnd,
+      remaining: this.state.remaining,
+      descision: this.state.descision,
+      preDescision: this.state.preDescision,
+    })
   }
   toggleExpand() {
     this.setState({
