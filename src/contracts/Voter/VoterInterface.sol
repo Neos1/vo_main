@@ -65,12 +65,10 @@ interface VoterInterface {
 
     /**
      * @notice adds new question to question library
-     * @param _groupType question group type
      * @param _name question group name
      * @return new question id
      */
     function saveNewGroup(
-        QuestionGroups.GroupType _groupType,
         string _name
     ) external returns (uint id);
 

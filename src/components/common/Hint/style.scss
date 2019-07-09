@@ -1,0 +1,39 @@
+.hint {
+  display: inline-block;
+  position: relative;
+  float: right;
+  margin-bottom: 5px;
+  cursor: help;
+  &__icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #d9dfe3;
+    color: #d9dfe3;
+    text-align: center;
+    border-radius: 50%;
+    background: #fff;
+    line-height: 18px;
+    font-weight: bold;
+    transition: 0.2s linear;
+    &:hover {
+      background: #447acc;
+      color: #fff;
+    }
+  }
+  &__description {
+    position: fixed;
+    background: #fff;
+    max-width: 400px;
+    padding: 10px 20px;
+    z-index: 999;
+    p {
+      font-family: "Roboto";
+      font-style: normal;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 16px;
+      color: #37474f;
+    }
+  }
+}

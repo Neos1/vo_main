@@ -42,7 +42,7 @@ class Header extends Component {
   }
 
   copyAddress() {
-    navigator.clipboard.writeText(this.state.address)
+    navigator.clipboard.writeText(`0x${this.state.address}`)
   }
 
   render() { 

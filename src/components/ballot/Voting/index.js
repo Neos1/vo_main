@@ -13,18 +13,18 @@ import negative from '../../../img/set_negative.svg';
 import awaitLastVote from '../../../img/voting_lastVote.svg';
 
 
-@inject('contractModel')@observer
+@inject('contractModel') @observer
 class Voting extends Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       expanded: false,
-      timeStart:'',
+      timeStart: '',
       timeEnd: '',
       remaining: '',
       percent: 0,
       descision: 0,
-      votingPercents : {
+      votingPercents: {
         positive: 0,
         negative: 0,
         totalTokens: 0
@@ -33,37 +33,72 @@ class Voting extends Component {
       graphics: false,
     }
   }
-  async componentDidMount() {
-    this.getTime();
-    this.getVotesPercents();
-    this.getVotingDescision();
+  async componentWillMount() {
+    const { data } = this.props;
+    await this.getTime();
+    await this.getVotingDescision();
+    await this.getVotesPercents();
+    if (data.status == 0) {
+      setInterval(() => {
+        this.refreshVoting();
+      }, 10 * 1000)
+    }
   }
-  toggleExpand(){
+
+  refreshVoting() {
+    this.setState({
+      timeStart: this.state.timeStart,
+      timeEnd: this.state.timeEnd,
+      remaining: this.state.remaining,
+      descision: this.state.descision,
+      preDescision: this.state.preDescision,
+    })
+  }
+  toggleExpand() {
     this.setState({
       expanded: !this.state.expanded
     })
   }
+  closeVoting() {
+    const { contractModel, setStep } = this.props;
+    const { contract } = contractModel;
+    const address = web3.eth.accounts.wallet[0].address;
+    this.setState({
+      expanded: false
+    })
+    contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
+      .on('transactionHash', txhash => {
+        setStep(4)
+      })
+      .on('receipt', receipt => {
+        setStep(1);
+        contractModel.refreshLastVoting();
+      })
+  }
   getFlow() {
-    const {remaining, percent} = this.state;
+    const { remaining, percent } = this.state;
     if (percent > 100) {
       this.setState({
         percent: 100
       })
     }
-    const voteNotEnded = ()=> {
+    const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
           <span className={styles['voting-about__progress-remaining']}>Осталось {remaining < 0 ? 0 : remaining} минут</span>
-          <span className={styles['voting-about__progress-bar']} style={{'width': percent+"%"}}></span>
+          <span className={styles['voting-about__progress-bar']} style={{ 'width': percent + "%" }}></span>
         </p>
       )
     }
-    const voteEnded = ()=> {
+    const voteEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
           <p className={styles['voting-about__progress-last']}>
             <span>Ожидание последнего голоса</span>
-            <img src={awaitLastVote}/>
+            <img src={awaitLastVote} />
+          </p>
+          <p>
+            <a onClick={this.closeVoting.bind(this)}>Завершить голосование</a>
           </p>
         </p>
       )
@@ -74,29 +109,29 @@ class Voting extends Component {
       <div className={styles['voting-about__flow-active']}>
         <p>
           <span>Идет голосование</span>
-          <img src={voteActive}/>
+          <img src={voteActive} />
         </p>
-          {
-            result
-          }
+        {
+          result
+        }
       </div>
     )
   }
-  getVotingDescision(){
-    const {contractModel, index, data} = this.props;
+  getVotingDescision() {
+    const { contractModel, index, data } = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
-    contract.methods.getVotingDescision(data.id).call({from: address})
-      .then(async (result) =>{ 
-        await this.setState({descision: result})
+    contract.methods.getVotingDescision(data.votingId).call({ from: address })
+      .then(async (result) => {
+        await this.setState({ descision: result })
       })
 
   }
 
-  getDescision(){
+  getDescision() {
     const { descision } = this.state;
     let descisions = {
-      0:{ 
+      0: {
         text: "НЕ ПРИНЯТО",
         img: voteNone
       },
@@ -109,24 +144,24 @@ class Voting extends Component {
         img: voteNegative
       }
     }
-    
+
     return (
       <div className={styles['voting-about__flow-descision']}>
         <p>
-          <span>Решение 
-            <br/> 
+          <span>Решение
+            <br />
             <strong>{descisions[descision].text}</strong>
           </span>
-          <img src={descisions[descision].img}/>
+          <img src={descisions[descision].img} />
         </p>
       </div>
     )
   }
   getTime() {
-    const {data} = this.props;
+    const { data } = this.props;
 
-    let startTime = Number(data.startTime)*1000
-    let endTime = Number(data.endTime)*1000;
+    let startTime = Number(data.startTime) * 1000
+    let endTime = Number(data.endTime) * 1000;
 
     let dateStart = new Date();
     let dateEnd = new Date();
@@ -137,80 +172,80 @@ class Voting extends Component {
 
     let duration = dateEnd - dateStart;
     let remaining = dateEnd - dateNow;
-    let percent = remaining/duration * 100;
+    let percent = remaining / duration * 100;
 
     this.setState({
       timeStart: dateStart.toLocaleString(),
       timeEnd: dateEnd.toLocaleString(),
-      remaining: (remaining/60000).toFixed(0),
+      remaining: (remaining / 60000).toFixed(0),
       percent: 100 - percent
     })
   }
 
   getQuestionData() {
-    const {contractModel, index} = this.props;
+    const { contractModel, index } = this.props;
     const { questions, bufferVotings } = contractModel;
-    let id = bufferVotings[index-1][0] - 1;
-    let votingData = bufferVotings[index-1].data;
-    let methodSelector = questions.system[id].methodSelector;
-    let questionParams = questions.system[id]._parameters;
+    let id = bufferVotings[index - 1][0] - 1;
+    let votingData = bufferVotings[index - 1].data;
+    let methodSelector = questions[id].methodSelector;
+    let questionParams = questions[id]._parameters;
     let finalData = [];
 
-    let parametersTypes = questionParams.map((param, index)=>{
+    let parametersTypes = questionParams.map((param, index) => {
       let type = '';
       let parameter = web3.utils.hexToUtf8(param);
-      if (index%2 != 0) {
+      if (index % 2 != 0) {
         type = parameter
       }
-      return type != "" ? type : '' ;
+      return type != "" ? type : '';
     })
-    parametersTypes = parametersTypes.filter(e=>e);
+    parametersTypes = parametersTypes.filter(e => e);
 
 
     if (id == 0) {
-      questionParams = ['ID', 'uint', 'Status','uint8','Name','string','Text','string','Target','address','MethodSelector','bytes4','Formula','uint[]','parameters','bytes32[]'].map(param => web3.utils.utf8ToHex(param))
-      parametersTypes = ['uint[]','uint8','string','string','address','bytes4','uint[]','bytes32[]'];
-    } 
-    
+      questionParams = ['ID', 'uint', 'Status', 'uint8', 'Name', 'string', 'Text', 'string', 'Target', 'address', 'MethodSelector', 'bytes4', 'Formula', 'uint[]', 'parameters', 'bytes32[]'].map(param => web3.utils.utf8ToHex(param))
+      parametersTypes = ['uint[]', 'uint8', 'string', 'string', 'address', 'bytes4', 'uint[]', 'bytes32[]'];
+    }
+
     votingData = votingData.replace(methodSelector, '0x');
     let data = web3.eth.abi.decodeParameters(parametersTypes, votingData);
-        data = Object.values(data);
+    data = Object.values(data);
 
-    for(let i = 0; i < data.length - 1; i++) {
+    for (let i = 0; i < data.length - 1; i++) {
       if (i == 0) {
         if (typeof data[i] == 'object') {
-          finalData.push([questionParams[i*2], data[i][0]])
+          finalData.push([questionParams[i * 2], data[i][0]])
         } else {
-          finalData.push([questionParams[i*2], data[i]])
+          finalData.push([questionParams[i * 2], data[i]])
         }
       } else {
-        finalData.push([questionParams[i*2], data[i]])
+        finalData.push([questionParams[i * 2], data[i]])
       }
     }
 
     return finalData;
   }
-  
+
   prepareToVote(descision, params) {
-    const {data, contractModel} = this.props;
+    const { data, contractModel } = this.props;
     contractModel.getUserVote(true, data[0], descision, params);
   }
 
   getFormula() {
-    const {data, contractModel} = this.props;
+    const { data, contractModel } = this.props;
     let questionId = data[0];
-    let formula = contractModel.questions.system[questionId-1]._formula; 
+    let formula = contractModel.questions[questionId - 1]._formula;
 
-    let f = formula.map(text=> Number(text));
+    let f = formula.map(text => Number(text));
     let r = [];
     let ready = '( )'
-    f[0] === 0 ? r.push('group(') : r.push('user(') ;
-    f[1] === 1 ? r.push('Owners) => condition( ') : r.push('Custom) => condition( ') ;
-    f[2] === 0 ? r.push('quorum') : r.push('positive') ;
-    f[3] === 0 ? r.push(' <= ') : r.push(' >= ') ;
+    f[0] === 0 ? r.push('group(') : r.push('user(');
+    f[1] === 1 ? r.push('Owners) => condition( ') : r.push('Custom) => condition( ');
+    f[2] === 0 ? r.push('quorum') : r.push('positive');
+    f[3] === 0 ? r.push(' <= ') : r.push(' >= ');
     f.length == 6 ? r.push(`${f[4]} %`) : r.push(`${f[4]} % )`)
     if (f.length == 6) {
-      f[5] === 0 ? r.push(' of quorum)') : r.push(' of all)') ;
+      f[5] === 0 ? r.push(' of quorum)') : r.push(' of all)');
     }
 
     formula = r.join('');
@@ -218,22 +253,23 @@ class Voting extends Component {
 
     return ready;
   }
+
   getVotesPercents() {
 
-    const {contractModel, index, data} = this.props;
-    const { contract} = contractModel;
+    const { contractModel, index, data } = this.props;
+    const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
 
-    contract.methods.getVotes(data.id).call({from: address}).then(data => {
+    contract.methods.getVotes(data.votingId).call({ from: address }).then(data => {
       const positive = Number(data[0]);
       const negative = Number(data[1]);
-      const abstained = Number(data[2]) - (positive+ negative);
-      if ((positive > negative) && (positive > abstained)) this.setState({preDescision: 'ЗА'})
-      if ((negative > positive) && (negative > abstained)) this.setState({preDescision: 'ПРОТИВ'})
-      if ((abstained > positive) && (abstained > negative)) this.setState({preDescision: 'НЕ ГОЛОСОВАЛО'})
+      const abstained = Number(data[2]) - (positive + negative);
+      if ((positive > negative) && (positive > abstained)) this.setState({ preDescision: 'ЗА' })
+      if ((negative > positive) && (negative > abstained)) this.setState({ preDescision: 'ПРОТИВ' })
+      if ((abstained > positive) && (abstained > negative)) this.setState({ preDescision: 'НЕ ГОЛОСОВАЛО' })
 
       this.setState({
-        votingPercents : {
+        votingPercents: {
           positive: Number(data[0]),
           negative: Number(data[1]),
           totalTokens: Number(data[2])
@@ -243,111 +279,119 @@ class Voting extends Component {
   }
 
   getGroupBlock() {
-    const {votingPercents} = this.state;
-    const {positive, negative, totalTokens} = votingPercents;
+    const { contractModel, data } = this.props;
 
-    let positive_percent = positive == "0" ? 0 :  (positive/totalTokens) * 100
-    let negative_percent = negative == "0" ? 0 :  (negative/totalTokens) * 100
-    let abstained_percent = totalTokens == "0" ? 0 :  ((totalTokens-(positive+negative))/totalTokens) * 100
+    const { votingPercents } = this.state;
+    const { positive, negative, totalTokens } = votingPercents;
+
+    let positive_percent = positive == "0" ? 0 : (positive / totalTokens) * 100
+    let negative_percent = negative == "0" ? 0 : (negative / totalTokens) * 100
+    let abstained_percent = totalTokens == "0" ? 0 : ((totalTokens - (positive + negative)) / totalTokens) * 100
+
+    let questionId = data.id;
+    let groupId = contractModel.questions[questionId - 1].groupId;
+
+    let groupName = contractModel.userGroups[groupId - 1].name;
+    let groupType = contractModel.userGroups[groupId - 1].groupType;
     return (
-       <div className={styles['voting-group']}>
-              <div className={styles['voting-group__heading']}>
-                <h2>Администраторы</h2>
-                <span>респонденты</span>
-              </div>
-              <div className={styles['voting-group__results']}>
-                <label className={`${styles['voting-group__results-bar']} `}>
-                  <span className={styles['voting-bar__label']}>За</span>
-                  <span className={styles['voting-bar__percent']}> { positive_percent } %</span>
-                  <p className={`${styles['voting-bar']} ${styles['voting-bar--positive']} `}>
-                    <span style={{'width': positive_percent +'%'}}></span>
-                  </p>
-                </label>
-                <label className={`${styles['voting-group__results-bar']}`}>
-                  <span className={styles['voting-bar__label']}>Против</span>
-                  <span className={styles['voting-bar__percent']}> { negative_percent } %</span>
-                  <p className={`${styles['voting-bar']} ${styles['voting-bar--negative']} `}>
-                    <span style={{'width': negative_percent +'%'}}></span>
-                  </p>
-                </label>
-                <label className={`${styles['voting-group__results-bar']}`}>
-                  <span className={styles['voting-bar__label']}>Не голосовало</span>
-                  <span className={styles['voting-bar__percent']}> { abstained_percent } %</span>
-                  <p className={`${styles['voting-bar']} ${styles['voting-bar--abstained']} `}>
-                    <span style={{'width': abstained_percent +'%'}}></span>
-                  </p>
-                </label>
-              </div>
-            </div>
-    )
-  }
-  
-  getVotingsButtons(votingParams) {
-    return(
-      <div className={styles['voting-expanded__split-start']}>
-          <label>
-            <span> ЗА </span>
-            <button className="btn btn--blue" onClick={this.prepareToVote.bind(this, true, votingParams)}>
-              <img src={positive}></img>
-            </button>
+      <div className={styles['voting-group']}>
+        <div className={styles['voting-group__heading']}>
+          <h2>{groupName}</h2>
+          <span>{groupType}</span>
+        </div>
+        <div className={styles['voting-group__results']}>
+          <label className={`${styles['voting-group__results-bar']} `}>
+            <span className={styles['voting-bar__label']}>За</span>
+            <span className={styles['voting-bar__percent']}> {positive_percent} %</span>
+            <p className={`${styles['voting-bar']} ${styles['voting-bar--positive']} `}>
+              <span style={{ 'width': positive_percent + '%' }}></span>
+            </p>
           </label>
-          <label>
-            <span> ПРОТИВ </span>
-            <button className="btn btn--red" onClick={this.prepareToVote.bind(this, false, votingParams)}>
-              <img src={negative}></img>
-            </button>
+          <label className={`${styles['voting-group__results-bar']}`}>
+            <span className={styles['voting-bar__label']}>Против</span>
+            <span className={styles['voting-bar__percent']}> {negative_percent} %</span>
+            <p className={`${styles['voting-bar']} ${styles['voting-bar--negative']} `}>
+              <span style={{ 'width': negative_percent + '%' }}></span>
+            </p>
           </label>
+          <label className={`${styles['voting-group__results-bar']}`}>
+            <span className={styles['voting-bar__label']}>Не голосовало</span>
+            <span className={styles['voting-bar__percent']}> {abstained_percent} %</span>
+            <p className={`${styles['voting-bar']} ${styles['voting-bar--abstained']} `}>
+              <span style={{ 'width': abstained_percent + '%' }}></span>
+            </p>
+          </label>
+        </div>
       </div>
     )
   }
 
-  toggleGraphs(){ 
+  getVotingsButtons(votingParams) {
+    return (
+      <div className={styles['voting-expanded__split-start']}>
+        <label>
+          <span> ЗА </span>
+          <button className="btn btn--blue" onClick={this.prepareToVote.bind(this, true, votingParams)}>
+            <img src={positive}></img>
+          </button>
+        </label>
+        <label>
+          <span> ПРОТИВ </span>
+          <button className="btn btn--red" onClick={this.prepareToVote.bind(this, false, votingParams)}>
+            <img src={negative}></img>
+          </button>
+        </label>
+      </div>
+    )
+  }
+
+  toggleGraphs() {
     this.setState({
-      graphics: !this.state.graphics 
+      graphics: !this.state.graphics
     })
   }
 
   getHideGroupsBtn() {
-    return(
-      <div style={{'textAlign': 'center', 'padding': '20px'}}>
-        <span className={`${styles['label']}`} onClick={this.toggleGraphs.bind(this)}>скрыть группы</span> 
+    return (
+      <div style={{ 'textAlign': 'center', 'padding': '20px' }}>
+        <span className={`${styles['label']}`} onClick={this.toggleGraphs.bind(this)}>скрыть группы</span>
       </div>
     )
   }
 
-  render() { 
-    const {data, index, contractModel} = this.props;
-    const {questions} = contractModel;
-    const {timeStart, timeEnd, graphics} = this.state;
+  render() {
+    const { data, index, contractModel } = this.props;
+    const { questions } = contractModel;
+    const { timeStart, timeEnd, graphics } = this.state;
     const vars = {
       int: 'Число',
       string: 'Строка',
       address: 'Адрес',
     }
 
-    let rightPanel = data.status == 0  ? this.getFlow() : this.getDescision();
+    let rightPanel = data.status == 0 ? this.getFlow() : this.getDescision();
     let votingParams = this.getQuestionData();
     let formula = this.getFormula();
 
-    let votingParameters = votingParams.map(( param, index ) => {
+    let votingParameters = votingParams.map((param, index) => {
       let value;
-      if ((index == votingParams.length - 1 ) && (typeof(param[1]) == 'object')) {
+      if ((index == votingParams.length - 1) && (typeof (param[1]) == 'object')) {
         value = param[1].map((subParam, index) => {
-          if (index % 2 == 0 ) return (
+          if (index % 2 == 0) return (
             <p key={index}>
               <span>{web3.utils.hexToUtf8(subParam)}</span>
               <span> - </span>
-              <span>{web3.utils.hexToUtf8(param[1][index+1])}</span>
+              <span>{web3.utils.hexToUtf8(param[1][index + 1])}</span>
             </p>
           )
-          
+
         })
-      }else if ((index == votingParams.length - 2 ) && (typeof(param[1]) == 'object')){
+      } else if ((index == votingParams.length - 2) && (typeof (param[1]) == 'object')) {
         value = param[1];
       } else {
         value = param[1];
-      }; 
-      
+      };
+
       return (
         <p key={index}>
           <span>{web3.utils.hexToUtf8(param[0])}</span>
@@ -361,21 +405,21 @@ class Voting extends Component {
     let percents = this.getGroupBlock();
     let splitButtons = data.status == 0 ? this.getVotingsButtons(votingParams) : '';
 
-    return ( 
-      <div className={styles.voting + ' ' + `${this.state.expanded ? "opened":''}`} >
+    return (
+      <div className={styles.voting + ' ' + `${this.state.expanded ? "opened" : ''}`} >
         <div className={styles['voting-about']} onClick={this.toggleExpand.bind(this)} >
           <div className={styles['voting-about__info']} >
-            <span className={styles['voting-id']}>{data.id}</span>
+            <span className={styles['voting-id']}>{data.votingId}</span>
             <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>
             <p className={styles['voting-duration']}>Начало <strong>{timeStart}</strong> часа(ов)</p>
             <p className={styles['voting-duration']}>Конец <strong>{timeEnd}</strong> часа(ов)</p>
           </div>
           <div className={styles['voting-about__flow']}>
-                {rightPanel}
+            {rightPanel}
           </div>
         </div>
-        <div className={styles['voting-expanded'] }>
+        <div className={styles['voting-expanded']}>
           <div className={styles['voting-expanded__split']}>
             <div className={styles['voting-expanded__split-info']}>
               {
@@ -388,12 +432,12 @@ class Voting extends Component {
           </div>
           <div className={styles['voting-expanded__formula']}>
             <p className={styles['voting-expanded__formula-heading']}>Формула голосования</p>
-            <p  className={styles['voting-expanded__formula-formula']}>{ formula }</p>
+            <p className={styles['voting-expanded__formula-formula']}>{formula}</p>
           </div>
           <div className={`${styles['voting-expanded__votes']}`}>
-            <div className={`${styles['voting-expanded__votes--placeholder']} ${!graphics? '' :'hidden'}`}> 
+            <div className={`${styles['voting-expanded__votes--placeholder']} ${!graphics ? '' : 'hidden'}`}>
               <p>
-                <span>Большинство голосов<br/> на данный момент</span>
+                <span>Большинство голосов<br /> на данный момент</span>
                 <span>
                   {
                     this.state.preDescision
@@ -402,13 +446,13 @@ class Voting extends Component {
               </p>
               <span className={`${styles['label']}`} onClick={this.toggleGraphs.bind(this)}>Показать графики</span>
             </div>
-              { graphics ? percents: '' }
-              { graphics ? hideBtn : '' }
+            {graphics ? percents : ''}
+            {graphics ? hideBtn : ''}
           </div>
         </div>
       </div>
-     );
+    );
   }
 }
- 
+
 export default Voting;

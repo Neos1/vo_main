@@ -25,6 +25,16 @@ library QuestionGroups {
 
     function init(List storage _self) internal {
         _self.groupIdIndex = 1;
+         Group memory systemGroup = Group({
+            name: 'Системные',
+            groupType: GroupType.SYSTEM
+        });
+        save(_self, systemGroup);
+         Group memory otherGroup = Group({
+            name: "Другие",
+            groupType: GroupType.CUSTOM
+        });
+        save(_self, otherGroup);
     }
 
     function save(List storage _self, Group memory _group) internal returns (uint id) {

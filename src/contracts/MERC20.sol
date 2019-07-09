@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity 0.5;
 
 contract MERC20 {
   string private _name;
