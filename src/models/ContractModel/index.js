@@ -13,6 +13,7 @@ class ContractModel {
   @observable bufferVotings = [];
 
   @observable votingTemplate = {
+    step: 1,
     prepared: false,
     questionId: 0,
     params: [],
@@ -28,6 +29,10 @@ class ContractModel {
     descision: "",
     parameters: []
   };
+
+  @action setVotingStep(num) {
+    this.votingTemplate.step = num;
+  }
 
   @action getUserVote(prepared, questionId, descision, parameters) {
     this.userVote = {
@@ -406,6 +411,7 @@ class ContractModel {
     }
 
     this.votingTemplate = {
+      step: 1,
       questionId: id,
       params: params,
       data: []
@@ -489,7 +495,7 @@ class ContractModel {
         }
       } else {
         this.userVote.status = 0;
-        alert("Не можем найти вашу группу. Либо ваш баланс равен нулю, либо вас нет ни в одной группе пользователей")
+        alert("Не можем найти вашу группу. Либо ваш баланс токенов равен нулю, либо вас нет ни в одной группе пользователей")
       }
 
 

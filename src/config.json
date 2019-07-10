@@ -3,11 +3,7 @@
 	"projects": [
 		{
 			"name": "test",
-			"address": "0xa4d86dc322076d0602a495E0D3F8C0e86795e001"
-		},
-		{
-			"name": "123",
-			"address": "0x84b8eD7E7DA608C62a22c53BA22854bB0e0f2F44"
+			"address": "0xDdDA9AE427d9660FC9eAC7835c06B2C99AEBC9Ea"
 		}
 	]
 }

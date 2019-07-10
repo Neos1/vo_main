@@ -125,8 +125,7 @@ class SendTokenModal extends Component {
   }
 
 
-  sendToken(e) {
-    e.preventDefault();
+  sendToken() {
     const { contractModel, address: fromAddress, type, contractAddress } = this.props;
     const { addressWho, count } = this.state;
     const address = web3.eth.accounts.wallet[0].address

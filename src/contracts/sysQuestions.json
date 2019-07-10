@@ -86,7 +86,7 @@
     "group": 1,
     "name": "Добавить группу вопросов",
     "caption": "Добавить новую группу вопросов",
-    "time": 120,
+    "time": 5,
     "method": "0xdf831328",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
     "parameters": [

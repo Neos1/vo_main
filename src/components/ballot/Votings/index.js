@@ -40,7 +40,6 @@ class Votings extends Component {
       to: undefined,
       descision: false,
       startVoting: false,
-      createVotingStep: 1,
       additionalInputs: [],
       hints: []
     };
@@ -51,7 +50,10 @@ class Votings extends Component {
   async componentWillMount() {
     const { contractModel } = await this.props;
     const { votingTemplate, hints: Hints } = contractModel;
+    const { step } = votingTemplate;
     const { questionId } = votingTemplate;
+
+
     await this.setState({
       selected: questionId - 1,
       hints: questionId - 1 >= 0 ? Hints[questionId] : []
@@ -60,9 +62,8 @@ class Votings extends Component {
   }
 
   async getData() {
-    const { contractModel, accountStore } = this.props;
-    const { address } = accountStore;
-    const { contract } = contractModel;
+    const { contractModel } = this.props;
+    const { step } = contractModel.votingTemplate;
 
     await this.setState({
       loading: true
@@ -74,15 +75,13 @@ class Votings extends Component {
     this.setState({
       loading: false
     });
-
-    if (contractModel.bufferVotings[0].status == 0) {
-      this.setState({
-        createVotingStep: 5
-      });
-    } else {
-      this.setState({
-        createVotingStep: 1
-      });
+    if ((step == 1) || (step == 5)) {
+      console.log('true')
+      if (contractModel.bufferVotings[0].status == 0) {
+        contractModel.setVotingStep(5)
+      } else {
+        contractModel.setVotingStep(1)
+      }
     }
   }
 
@@ -90,7 +89,8 @@ class Votings extends Component {
     e.target.classList.remove("field__input--error");
   }
   getLoader(type) {
-    const { createVotingStep } = this.state;
+    const { contractModel } = this.props;
+    const { step } = contractModel.votingTemplate;
     return (
       <div>
         <Loader />
@@ -98,11 +98,11 @@ class Votings extends Component {
           {(type == 'left' && this.state.loading) ? 'Проверка статуса' : ''}
           {type == 'right'
             ? ''
-            : createVotingStep == 2
+            : step == 2
               ? "Отправка транзакции"
-              : createVotingStep == 3
+              : step == 3
                 ? "Получение хэша"
-                : createVotingStep == 4
+                : step == 4
                   ? "Ожидание чека"
                   : ""}
         </p>
@@ -302,9 +302,7 @@ class Votings extends Component {
     const { selected } = this.state;
 
     votingTemplate.prepared = !votingTemplate.prepared;
-    this.setState({
-      createVotingStep: 2
-    });
+    contractModel.setVotingStep(2)
 
     let mainInputs = target.querySelectorAll(
       'form[name="votingData"] > label input '
@@ -411,15 +409,13 @@ class Votings extends Component {
         .on("transactionHash", txHash => {
           this.txHash = txHash;
           console.log(txHash);
-          this.setState({
-            createVotingStep: 4
-          });
+          contractModel.setVotingStep(4)
         })
         .on("receipt", data => {
           this.setState({
             startVoting: false,
-            createVotingStep: 5
           });
+          contractModel.setVotingStep(5)
           contractModel.getVotings();
         });
     });
@@ -523,9 +519,7 @@ class Votings extends Component {
   }
 
   setVotingStep(num) {
-    this.setState({
-      createVotingStep: num
-    })
+    contractModel.setVotingStep(num)
   }
 
   hideModal() {
@@ -536,8 +530,9 @@ class Votings extends Component {
 
   render() {
     const { contractModel } = this.props;
-    const { selected, from, to, startVoting, createVotingStep } = this.state;
+    const { from, to, startVoting } = this.state;
     const { bufferVotings, votingTemplate, userVote } = contractModel;
+    const { step } = votingTemplate;
     const modifiers = { start: from, end: to };
 
     let renderVotings = bufferVotings.map((voting, index) => (
@@ -545,9 +540,9 @@ class Votings extends Component {
     ));
     let loaderRight = this.getLoader('right');
     let rightPanel =
-      createVotingStep == 1
+      step == 1
         ? this.getPreparingPanel()
-        : createVotingStep == 5
+        : step == 5
           ? this.getActiveVotingPanel()
           : this.getLoader();
 

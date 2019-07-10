@@ -914,7 +914,7 @@ class Login extends React.Component {
     createTokenContract = (e) => {
         e.preventDefault();
         if (e.target.password.value == this.account.password) {
-            if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (!isNaN(Number(this.ERC20.totalSupply)))) {
+            if ((this.ERC20.name != "") && (this.ERC20.symbol != "") && (!isNaN(Number(this.ERC20.totalSupply))) && (Number(this.ERC20.totalSupply) >= 0)) {
                 if (this.account.balances / 1.0e18 > 0.001) {
                     this.step = 51;
                     this.deployToken("token");
@@ -926,7 +926,7 @@ class Login extends React.Component {
                 if (this.ERC20.symbol == "") {
                     document.deploy_project.tokenSymbol.classList.add('field__input--error')
                 }
-                if (isNaN(Number(this.ERC20.totalSupply))) {
+                if (isNaN(Number(this.ERC20.totalSupply)) || (Number(this.ERC20.totalSupply) < 0)) {
                     document.deploy_project.count.classList.add('field__input--error')
                 }
                 alert("Введите корректные данные")
@@ -939,7 +939,7 @@ class Login extends React.Component {
             if (this.ERC20.symbol == "") {
                 document.deploy_project.tokenSymbol.classList.add('field__input--error')
             }
-            if (isNaN(Number(this.ERC20.totalSupply))) {
+            if (isNaN(Number(this.ERC20.totalSupply)) || (Number(this.ERC20.totalSupply) < 0)) {
                 document.deploy_project.count.classList.add('field__input--error')
             }
         }
@@ -1375,30 +1375,25 @@ class Login extends React.Component {
         this.step = 36;
     }
     @action
-    checkExistingERC = (e) => {
+    checkExistingERC = async (e) => {
         e.preventDefault();
-        if (this.ERC20.hash.match(/(?=0x[a-zA-Z0-9]{40})\w+/g) !== null) {
+        if (this.ERC20.hash.match(/(0x)+([0-9 a-f A-F]){40}/g) !== null) {
             this.previousStep.push(this.step)
             this.step = 37;
-            let address = web3.eth.getCode(this.ERC20.hash).then(data => {
-                data !== '0x' ? this.step = 38 : alert('Адрес не валидный'), this.step = 36;
-            })
             let defaultABI = window.__ENV === 'development'
                 ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, "/contracts/ERC20.abi"), "utf8"))
                 : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, 'contracts/ERC20.abi'), "utf8"))
 
             let contract = new web3.eth.Contract(defaultABI, this.ERC20.hash);
 
-            contract.methods.totalSupply().call({ from: this.account.addresses }).then(result => {
-                this.ERC20.totalSupply = result
-            })
-            contract.methods.symbol().call({ from: this.account.addresses }).then(result => {
-                this.ERC20.symbol = result
-            })
+            this.ERC20.totalSupply = await contract.methods.totalSupply().call({ from: this.account.addresses })
+            this.ERC20.symbol = await contract.methods.symbol().call({ from: this.account.addresses })
 
             if ((this.ERC20.totalSupply == "") && (this.ERC20.symbol == "")) {
                 this.step = 36;
                 document.checkERC.querySelector('input').classList.add('field__input--error');
+            } else {
+                this.step = 38
             }
         } else {
             document.checkERC.querySelector('input').classList.add('field__input--error');
@@ -1428,7 +1423,12 @@ class Login extends React.Component {
                 this.previousStep.push(this.step)
                 this.step = 33;
                 address = web3.eth.getCode(this.contract.hash).then(data => {
-                    data !== '0x' ? writeToProjects() : alert('Адрес не валидный'), this.step = 32;
+                    if (data !== '0x') {
+                        writeToProjects()
+                    } else {
+                        this.step = 32
+                        alert('Адрес не валидный');
+                    }
                 })
             } else {
                 document.existing_project.name.classList.add('field__input--error');
