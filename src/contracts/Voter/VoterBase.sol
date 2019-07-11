@@ -195,6 +195,10 @@ contract VoterBase is VoterInterface {
         return userGroups.groupIdIndex ;
     }
 
+    function isActiveVoting() public view returns (bool) {
+
+    }
+
     /**
      * @notice adds new voting to voting library
      * @param _questionId question id
@@ -208,31 +212,39 @@ contract VoterBase is VoterInterface {
         Votings.Status _status,
         uint _starterGroup,
         bytes _data
-    ) external returns (uint id) {
-        uint start = block.timestamp;
-        uint _endTime = start + (questions.question[_questionId].time * 60);
-        uint lastVoting = this.getVotingsCount();
-        Votings.Voting memory voting = Votings.Voting({
-            questionId: _questionId,
-            status: _status,
-            starterGroup: _starterGroup,
-            starterAddress: msg.sender,
-            startTime: block.timestamp,
-            endTime: _endTime,
-            data: _data
-        });
+    ) external returns (bool) {
+        bool canStart;
+        uint votingId = votings.votingIdIndex - 1;
+        if (
+            ((votings.votingIdIndex == 1) && (votings.voting[votingId].status == Votings.Status.ACTIVE)) 
+            || (!(votings.votingIdIndex == 1) && !(votings.voting[votingId].status == Votings.Status.ACTIVE))) {
+            canStart = true;
+            uint start = block.timestamp;
+            uint _endTime = start + (questions.question[_questionId].time * 60);
+            Votings.Voting memory voting = Votings.Voting({
+                questionId: _questionId,
+                status: _status,
+                starterGroup: _starterGroup,
+                starterAddress: msg.sender,
+                startTime: block.timestamp,
+                endTime: _endTime,
+                data: _data
+            });
     
-        id = votings.save(voting);
+            uint id = votings.save(voting);
 
-        emit NewVoting (
-            id,
-            _questionId,
-            _status,
-            _starterGroup,
-            msg.sender,
-            block.number
-        );
-        return id;
+            emit NewVoting (
+                id,
+                _questionId,
+                _status,
+                _starterGroup,
+                msg.sender,
+                block.number
+            );
+        } else {
+            canStart = false;
+        }
+        return canStart;
     }
 
     function voting(uint _id) external view returns (
@@ -350,9 +362,15 @@ contract VoterBase is VoterInterface {
         uint votingId = votings.votingIdIndex - 1;
 		uint questionId =  votings.voting[votingId].questionId;
 		uint groupId = questions.question[questionId].groupId;
+        string memory groupType = userGroups.group[groupId].groupType;
 		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
         uint256 weight = votings.voting[votingId].voteWeigths[address(group)][msg.sender];
-        group.transferFrom(address(group), msg.sender, weight);
+        if( bytes4(keccak256(groupType)) == bytes4(keccak256('ERC20'))) {
+            group.approve(msg.sender, weight);
+            group.transferFrom(address(group), msg.sender, weight);            
+        } else {
+            group.transferFrom(address(group), msg.sender, weight);
+        }
         return true;
     }
 
@@ -384,7 +402,7 @@ contract VoterBase is VoterInterface {
         if (block.timestamp < timestamp ) {
 			if ( balance != 0) {
 				if (votings.voting[_voteId].votes[address(group)][msg.sender] == 0) {
-					ERC20.transferFrom(msg.sender, address(this), balance);
+					group.transferFrom(msg.sender, address(this), balance);
 					votings.voting[_voteId].votes[address(group)][msg.sender] = _choice;
 					votings.voting[_voteId].voteWeigths[address(group)][msg.sender] = balance;
 					votings.voting[_voteId].descisionWeights[_choice][groupName] += balance;

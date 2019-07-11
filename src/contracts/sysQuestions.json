@@ -58,7 +58,14 @@
     "time": 5,
     "method": "0x952b627c",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Name", "string", "Address", "address", "Type", "string"],
+    "parameters": [
+      "Name",
+      "string",
+      "Address",
+      "address",
+      "Type",
+      "string"
+    ],
     "hints": {
       "0": {
         "desc": "Название группы пользователей",
@@ -82,7 +89,10 @@
     "time": 5,
     "method": "0xdf831328",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Name", "string"],
+    "parameters": [
+      "Name",
+      "string"
+    ],
     "hints": {
       "0": {
         "desc": "Имя для группы вопросов",
@@ -98,7 +108,12 @@
     "time": 5,
     "method": "0x3cc0a953",
     "formula": "(group (Owners) => condition (positive >= 20% of all))",
-    "parameters": ["Group", "address", "Admin address", "address"],
+    "parameters": [
+      "Group",
+      "address",
+      "Admin address",
+      "address"
+    ],
     "hints": {
       "0": {
         "desc": "Aдрес группы, в которой произойдет установка администратора",

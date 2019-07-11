@@ -98,7 +98,7 @@ interface VoterInterface {
         Votings.Status status,
         uint starterGroup,
         bytes data
-    ) external returns (uint id);
+    ) external returns (bool);
 
     function voting(uint id) external view returns (
         uint questionId,

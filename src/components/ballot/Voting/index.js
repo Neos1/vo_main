@@ -24,6 +24,8 @@ class Voting extends Component {
       remaining: '',
       percent: 0,
       descision: 0,
+      userVote: null,
+      closing: false,
       votingPercents: {
         positive: 0,
         negative: 0,
@@ -31,42 +33,49 @@ class Voting extends Component {
       },
       preDescision: '',
       graphics: false,
+      interval: '',
     }
   }
   async componentWillMount() {
-    const { data } = this.props;
+    const { data } = this.props
     await this.getTime();
     await this.getVotingDescision();
     await this.getVotesPercents();
-    if (data.status == 0) {
-      setInterval(() => {
+    await this.getUserVote(data.votingId);
+    await this.setState({
+      interval: setInterval(() => {
         this.refreshVoting();
-      }, 10 * 1000)
+      }, 5 * 1000)
+    })
+  }
+
+  async refreshVoting() {
+    const { data } = this.props
+    await this.getTime();
+    await this.getVotingDescision();
+    await this.getVotesPercents();
+    await this.getUserVote(data.votingId)
+    if (data.status == 1) {
+      clearInterval(this.state.interval);
+      this.setState({ interval: '' });
     }
   }
 
-  refreshVoting() {
-    this.setState({
-      timeStart: this.state.timeStart,
-      timeEnd: this.state.timeEnd,
-      remaining: this.state.remaining,
-      descision: this.state.descision,
-      preDescision: this.state.preDescision,
-    })
+  async getUserVote(id) {
+    const { contractModel } = this.props;
+    const { contract } = contractModel;
+    let userVote = await contract.methods.getUserVote(id).call({ from: web3.eth.accounts.wallet[0].address });
+    await this.setState({ userVote });
   }
-  toggleExpand() {
-    this.setState({
-      expanded: !this.state.expanded
-    })
-  }
-  closeVoting() {
+
+  async returnTokens() {
     const { contractModel, setStep } = this.props;
     const { contract } = contractModel;
-    const address = web3.eth.accounts.wallet[0].address;
-    this.setState({
-      expanded: false
-    })
-    contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
+    contract.methods.returnTokens().send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000 })
+      .on('error', (err) => {
+        setStep(1);
+        alert('Произошла ошибка');
+      })
       .on('transactionHash', txhash => {
         setStep(4)
       })
@@ -74,6 +83,37 @@ class Voting extends Component {
         setStep(1);
         contractModel.refreshLastVoting();
       })
+
+  }
+
+  toggleExpand() {
+    this.setState({
+      expanded: !this.state.expanded
+    })
+  }
+  async closeVoting(e) {
+    console.log(e.target.getAttribute('disabled'));
+    const { contractModel, setStep } = this.props;
+    const { contract } = contractModel;
+    const address = web3.eth.accounts.wallet[0].address;
+    await this.setState({
+      expanded: false
+    })
+    if (this.state.closing == false) {
+      await this.setState({
+        expanded: false,
+        closing: true
+      })
+      contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
+        .on('transactionHash', txhash => {
+          setStep(4)
+        })
+        .on('receipt', receipt => {
+          setStep(1);
+          contractModel.refreshLastVoting();
+        })
+    }
+
   }
   getFlow() {
     const { remaining, percent } = this.state;
@@ -85,7 +125,7 @@ class Voting extends Component {
     const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
-          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining < 0 ? 0 : remaining} минут</span>
+          <span className={styles['voting-about__progress-remaining']}>Осталось {remaining == 0 ? 'меньше' : remaining} минут{remaining == 0 ? 'ы' : ''} </span>
           <span className={styles['voting-about__progress-bar']} style={{ 'width': percent + "%" }}></span>
         </p>
       )
@@ -98,7 +138,7 @@ class Voting extends Component {
             <img src={awaitLastVote} />
           </p>
           <p>
-            <a onClick={this.closeVoting.bind(this)}>Завершить голосование</a>
+            <a disabled={this.state.closing} onClick={this.closeVoting.bind(this)}>Завершить голосование</a>
           </p>
         </p>
       )
@@ -129,7 +169,8 @@ class Voting extends Component {
   }
 
   getDescision() {
-    const { descision } = this.state;
+    const { descision, userVote } = this.state;
+    const isVoted = (userVote != 0 && userVote != null);
     let descisions = {
       0: {
         text: "НЕ ПРИНЯТО",
@@ -153,6 +194,9 @@ class Voting extends Component {
             <strong>{descisions[descision].text}</strong>
           </span>
           <img src={descisions[descision].img} />
+        </p>
+        <p className={isVoted ? "" : "hidden"}>
+          <a onClick={this.returnTokens.bind(this)}>Вернуть токены</a>
         </p>
       </div>
     )
@@ -327,17 +371,19 @@ class Voting extends Component {
   }
 
   getVotingsButtons(votingParams) {
+    const { userVote } = this.state
+    const isVoted = (userVote != 0 && userVote != null);
     return (
       <div className={styles['voting-expanded__split-start']}>
-        <label>
-          <span> ЗА </span>
-          <button className="btn btn--blue" onClick={this.prepareToVote.bind(this, true, votingParams)}>
+        <label className={`${userVote == 2 ? 'hidden' : ''}`}>
+          <span> {`${userVote == 1 ? 'Вы проголосовали' : ''}`} ЗА </span>
+          <button className={`btn btn--blue`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
             <img src={positive}></img>
           </button>
         </label>
-        <label>
-          <span> ПРОТИВ </span>
-          <button className="btn btn--red" onClick={this.prepareToVote.bind(this, false, votingParams)}>
+        <label className={`${userVote == 1 ? 'hidden' : ''}`}>
+          <span>{`${userVote == 2 ? 'Вы проголосовали' : ''}`} ПРОТИВ </span>
+          <button className={`btn btn--red`} onClick={isVoted ? '' : this.prepareToVote.bind(this, false, votingParams)}>
             <img src={negative}></img>
           </button>
         </label>

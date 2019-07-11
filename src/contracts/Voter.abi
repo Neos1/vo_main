@@ -393,6 +393,21 @@
 		"signature": "0xc29a6fda"
 	},
 	{
+		"constant": true,
+		"inputs": [],
+		"name": "isActiveVoting",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function",
+		"signature": "0xc39c89df"
+	},
+	{
 		"constant": false,
 		"inputs": [],
 		"name": "closeVoting",
@@ -425,8 +440,8 @@
 		"name": "startNewVoting",
 		"outputs": [
 			{
-				"name": "id",
-				"type": "uint256"
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"payable": false,
