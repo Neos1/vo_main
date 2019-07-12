@@ -82,6 +82,7 @@ class Voting extends Component {
       .on('receipt', receipt => {
         setStep(1);
         contractModel.refreshLastVoting();
+        alert("Токены успешно возвращены")
       })
 
   }

@@ -363,13 +363,15 @@ contract VoterBase is VoterInterface {
 		uint questionId =  votings.voting[votingId].questionId;
 		uint groupId = questions.question[questionId].groupId;
         string memory groupType = userGroups.group[groupId].groupType;
+        
 		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+
         uint256 weight = votings.voting[votingId].voteWeigths[address(group)][msg.sender];
-        if( bytes4(keccak256(groupType)) == bytes4(keccak256('ERC20'))) {
-            group.approve(msg.sender, weight);
-            group.transferFrom(address(group), msg.sender, weight);            
+
+        if( bytes4(keccak256(groupType)) == bytes4(keccak256("ERC20"))) {
+            group.transfer(msg.sender, weight);            
         } else {
-            group.transferFrom(address(group), msg.sender, weight);
+            group.transferFrom(address(this), msg.sender, weight);
         }
         return true;
     }
