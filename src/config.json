@@ -1,5 +1,6 @@
 {
 	"host": "https://ropsten.infura.io/v3/14b2319f08e24f3aadfe1aa933301b38",
+	"gasPrice": 40000000000,
 	"projects": [
 		{
 			"name": "123msa",

@@ -395,7 +395,7 @@ class Votings extends Component {
     let options = {
       data,
       to: contract._address,
-      gasPrice: web3.utils.toHex(40000000000),
+      gasPrice: web3.utils.toHex(window.gasPrice),
       gasLimit: web3.utils.toHex(8000000),
       value: "0x0"
     };

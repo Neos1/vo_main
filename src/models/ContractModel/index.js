@@ -389,7 +389,7 @@ class ContractModel {
 
     this.questionGroups.map((group, index) => {
       options.push({
-        value: group.groupType,
+        value: index + 1,
         label: `${index + 1} ${group.name}`
       });
     });
@@ -468,7 +468,7 @@ class ContractModel {
           if (groupType == "ERC20") {
             await userContract.methods
               .approve(contract._address, userBalance)
-              .send({ from: address, gas: 1000000 });
+              .send({ from: address, gas: 1000000, gasPrice: window.gasPrice });
           }
 
           this.contract.methods
@@ -476,7 +476,7 @@ class ContractModel {
             .send({
               from: address,
               gas: web3.utils.toHex(8000000),
-              gasPrice: web3.utils.toHex(40000000000)
+              gasPrice: web3.utils.toHex(window.gasPrice)
             })
             .on("error", error => {
               this.userVote.status = 2;

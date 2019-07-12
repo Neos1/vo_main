@@ -71,7 +71,7 @@ class Voting extends Component {
   async returnTokens() {
     const { contractModel, setStep } = this.props;
     const { contract } = contractModel;
-    contract.methods.returnTokens().send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000 })
+    contract.methods.returnTokens().send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
       .on('error', (err) => {
         setStep(1);
         alert('Произошла ошибка');
@@ -105,7 +105,7 @@ class Voting extends Component {
         expanded: false,
         closing: true
       })
-      contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
+      contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: window.gasPrice })
         .on('transactionHash', txhash => {
           setStep(4)
         })
@@ -454,8 +454,8 @@ class Voting extends Component {
 
     return (
       <div className={styles.voting + ' ' + `${this.state.expanded ? "opened" : ''}`} >
-        <div className={styles['voting-about']} onClick={this.toggleExpand.bind(this)} >
-          <div className={styles['voting-about__info']} >
+        <div className={styles['voting-about']}  >
+          <div className={styles['voting-about__info']} onClick={this.toggleExpand.bind(this)} >
             <span className={styles['voting-id']}>{data.votingId}</span>
             <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>

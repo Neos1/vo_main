@@ -79,6 +79,7 @@ class Login extends React.Component {
         const web3 = new Web3(config.host); //window.__ENV == 'development'? new Web3('ws://localhost:7545') :  new Web3(config.host);
         window.web3 = web3;
         this.config = window.config = config;
+        window.gasPrice = config.gasPrice;
     }
 
     componentDidMount() {
@@ -1012,7 +1013,7 @@ class Login extends React.Component {
 
         let options = {
             data: transaction.encodeABI(),
-            gasPrice: web3.utils.toHex(40000000000),
+            gasPrice: web3.utils.toHex(window.gasPrice),
             gasLimit: web3.utils.toHex(8000000),
             value: '0x0'
         };
@@ -1133,7 +1134,7 @@ class Login extends React.Component {
                         let rawTx = {
                             to: contractAddress,
                             data: dataTx,
-                            gasPrice: web3.utils.toHex(40000000000),
+                            gasPrice: web3.utils.toHex(window.gasPrice),
                             gasLimit: web3.utils.toHex(8000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
