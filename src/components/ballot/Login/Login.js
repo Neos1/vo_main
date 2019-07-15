@@ -457,7 +457,9 @@ class Login extends React.Component {
                                 && (this.step != 41)
                                 && (this.step != 51)
                                 && (this.step != 52)
-                                && (this.step != 8)) ? styles.hidden : ''} ${this.step == 40 ? "fullwidth" : ''}`}>
+                                && (this.step != 8)) ? styles.hidden : ''} 
+                                
+                                ${(this.step == 8) ? '' : "fullwidth"}`}>
 
                             <div className={`${((this.step != 21) && (this.step != 11) && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : ''}`}>
                                 <Loader className={this.step == 40 ? 'hidden' : ''} />
@@ -466,10 +468,20 @@ class Login extends React.Component {
                                 {this.step == 11 ? <h3>Идет создание ключа</h3> : ''}
                                 {this.step == 33 ? <h3>Проверяем адрес проекта</h3> : ''}
                                 {this.step == 37 ? <h3>Производим проверку контракта ERC20</h3> : ''}
-                                {this.step == 8 ? <h3>Производим дешифровку ключа</h3> : ''}
+                                {this.step == 8 ? <h3 style={{
+                                    'position': 'absolute',
+                                    'font-weight': '400',
+                                    'top': '55%',
+                                    'left': '50%',
+                                    'font-size': '14px',
+                                    'display': 'inline-block',
+                                    'width': '170px',
+                                    'transform': 'translate(-50%, -50%)',
+                                    'opacity': '0.4',
+                                }}>Выполняется вход в систему</h3> : ''}
                                 {this.step == 51 ? <div><h3>Загружаем контракт ERC20 <p className='subtext'>Это может занять до 5 минут</p></h3></div> : ''}
                                 {this.step == 40 ?
-                                    <div c>
+                                    <div >
                                         <h3 style={{ marginBottom: '20px' }}>Производим загрузку контракта</h3>
                                         <p className='subtext' style={{ marginBottom: '30px' }}>Это может занять до 5 минут</p>
                                         <div className="progress">
@@ -576,7 +588,7 @@ class Login extends React.Component {
                         </div>
 
                         <div className={styles.login__description}>
-                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden' : ''}`} style={{ 'maxWidth': "350px" }}>
+                            <div className={`${styles.content} ${(this.step !== 0) && (this.step !== 8) ? 'hidden' : ''}`} style={{ 'maxWidth': "350px" }}>
                                 <img src={`${PATH_TO_IMG}rocket.png`}></img>
                                 <div className={styles.content__description}>
                                     <p> An open source voting system V4Vote will allow you to connect to decision-making those whose help you need. </p>
@@ -623,7 +635,7 @@ class Login extends React.Component {
                                     <p> <strong className="note">Помните!</strong> Эта фраза дает полный контроль над вашим ключом</p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 2 ? 'hidden' : ''}`}>
+                            <div className={`${styles.content} ${(this.step !== 2) ? 'hidden' : ''}`}>
                                 <img src={`${PATH_TO_IMG}lifebuoy.png`}></img>
                                 <div className={styles.content__description}>
                                     <p>Нужно ввести последовательно все <strong className="note">слова полученные при регистрации.</strong></p>
@@ -644,7 +656,7 @@ class Login extends React.Component {
                                     <p>Вы могли получить адрес проекта <span className="note">где-то там</span></p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 32 ? 'hidden' : ''}`}>
+                            <div className={`${styles.content} ${(this.step !== 32) ? 'hidden' : ''}`}>
                                 <img src={`${PATH_TO_IMG}cloud.png`}></img>
                                 <div className={styles.content__description}>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis </p>
@@ -657,7 +669,7 @@ class Login extends React.Component {
                                     <p>При создании проекта необходимо указать его владельцев </p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 36 ? 'hidden' : ''}`}>
+                            <div className={`${styles.content} ${(this.step !== 36) ? 'hidden' : ''}`}>
                                 <img src={`${PATH_TO_IMG}map.png`}></img>
                                 <div className={styles.content__description}>
                                     <p>Вводить вручную необязательно, можно скопировать и вставить</p>

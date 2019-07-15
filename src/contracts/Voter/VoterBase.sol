@@ -358,22 +358,32 @@ contract VoterBase is VoterInterface {
         return votes;
     }
 
-    function returnTokens() public returns (bool status){
-        uint votingId = votings.votingIdIndex - 1;
+    function returnTokens(uint votingId) public returns (bool status){
 		uint questionId =  votings.voting[votingId].questionId;
 		uint groupId = questions.question[questionId].groupId;
         string memory groupType = userGroups.group[groupId].groupType;
-        
 		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
-
         uint256 weight = votings.voting[votingId].voteWeigths[address(group)][msg.sender];
+        bool isReturned = this.isUserReturnTokens(votingId, msg.sender);
 
-        if( bytes4(keccak256(groupType)) == bytes4(keccak256("ERC20"))) {
-            group.transfer(msg.sender, weight);            
-        } else {
-            group.transferFrom(address(this), msg.sender, weight);
+        if (!isReturned) {
+            if( bytes4(keccak256(groupType)) == bytes4(keccak256("ERC20"))) {
+                group.transfer(msg.sender, weight);            
+            } else {
+                group.transferFrom(address(this), msg.sender, weight);
+            }
+            votings.voting[votingId].tokenReturns[address(group)][msg.sender] = weight;
         }
         return true;
+    }
+
+    function isUserReturnTokens(uint votingId, address user) returns (bool result) {
+        uint questionId =  votings.voting[votingId].questionId;
+		uint groupId = questions.question[questionId].groupId;
+        string memory groupType = userGroups.group[groupId].groupType;
+		IERC20 group = IERC20(userGroups.group[groupId].groupAddr);
+        uint256 returnedTokens = votings.voting[votingId].tokenReturns[address(group)][user];
+        return returnedTokens > 0;
     }
 
 

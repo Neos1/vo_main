@@ -137,6 +137,26 @@
 		"constant": false,
 		"inputs": [
 			{
+				"name": "votingId",
+				"type": "uint256"
+			}
+		],
+		"name": "returnTokens",
+		"outputs": [
+			{
+				"name": "status",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x3ae1786f"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"name": "group",
 				"type": "address"
 			},
@@ -171,6 +191,30 @@
 		"stateMutability": "view",
 		"type": "function",
 		"signature": "0x42429139"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "votingId",
+				"type": "uint256"
+			},
+			{
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "isUserReturnTokens",
+		"outputs": [
+			{
+				"name": "result",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function",
+		"signature": "0x4a1e82a0"
 	},
 	{
 		"constant": true,
@@ -634,21 +678,6 @@
 		"stateMutability": "nonpayable",
 		"type": "function",
 		"signature": "0xf7448a31"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "returnTokens",
-		"outputs": [
-			{
-				"name": "status",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function",
-		"signature": "0xf9718fc8"
 	},
 	{
 		"constant": true,

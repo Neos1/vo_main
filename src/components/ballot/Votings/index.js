@@ -281,10 +281,10 @@ class Votings extends Component {
     matched[0] == "group" ? convertedFormula.push(0) : convertedFormula.push(1);
     matched[1] == "Owners"
       ? convertedFormula.push(1)
-      : convertedFormula.push(2);
-    matched[3] == "quorum"
-      ? convertedFormula.push(0)
-      : convertedFormula.push(1);
+      :
+      matched[3] == "quorum"
+        ? convertedFormula.push(0)
+        : convertedFormula.push(1);
     matched[4] == "<=" ? convertedFormula.push(0) : convertedFormula.push(1);
     convertedFormula.push(Number(matched[5]));
 

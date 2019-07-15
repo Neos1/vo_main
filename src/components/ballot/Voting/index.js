@@ -25,6 +25,7 @@ class Voting extends Component {
       percent: 0,
       descision: 0,
       userVote: null,
+      isReturned: false,
       closing: false,
       votingPercents: {
         positive: 0,
@@ -62,16 +63,17 @@ class Voting extends Component {
   }
 
   async getUserVote(id) {
-    const { contractModel } = this.props;
+    const { contractModel, data } = this.props;
     const { contract } = contractModel;
     let userVote = await contract.methods.getUserVote(id).call({ from: web3.eth.accounts.wallet[0].address });
-    await this.setState({ userVote });
+    let isReturned = await contract.methods.isUserReturnTokens(data.votingId, web3.eth.accounts.wallet[0].address).call({ from: web3.eth.accounts.wallet[0].address })
+    await this.setState({ userVote, isReturned });
   }
 
   async returnTokens() {
-    const { contractModel, setStep } = this.props;
+    const { contractModel, setStep, data } = this.props;
     const { contract } = contractModel;
-    contract.methods.returnTokens().send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
+    contract.methods.returnTokens(data.votingId).send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
       .on('error', (err) => {
         setStep(1);
         alert('Произошла ошибка');
@@ -82,6 +84,7 @@ class Voting extends Component {
       .on('receipt', receipt => {
         setStep(1);
         contractModel.refreshLastVoting();
+        this.setState({ isReturned: true });
         alert("Токены успешно возвращены")
       })
 
@@ -109,7 +112,7 @@ class Voting extends Component {
         .on('transactionHash', txhash => {
           setStep(4)
         })
-        .on('receipt', receipt => {
+        .on('receipt', async (receipt) => {
           setStep(1);
           contractModel.refreshLastVoting();
         })
@@ -170,8 +173,9 @@ class Voting extends Component {
   }
 
   getDescision() {
-    const { descision, userVote } = this.state;
+    const { descision, userVote, isReturned } = this.state;
     const isVoted = (userVote != 0 && userVote != null);
+
     let descisions = {
       0: {
         text: "НЕ ПРИНЯТО",
@@ -196,7 +200,7 @@ class Voting extends Component {
           </span>
           <img src={descisions[descision].img} />
         </p>
-        <p className={isVoted ? "" : "hidden"}>
+        <p className={(isVoted && !isReturned) ? "" : "hidden"}>
           <a onClick={this.returnTokens.bind(this)}>Вернуть токены</a>
         </p>
       </div>
