@@ -35,6 +35,7 @@ class Votings extends Component {
       selectedRange: "",
       selected: 0,
       questionId: 0,
+      invalidFormula: false,
       id: null,
       from: undefined,
       to: undefined,
@@ -266,11 +267,12 @@ class Votings extends Component {
     contractModel.prepareVoting(Number(selected.value));
     this.setState({
       selected: selected.value - 1,
-      hints: contractModel.hints[selected.value - 1]
+      hints: contractModel.hints[selected.value - 1],
+      invalidFormula: false
     });
   }
 
-  prepareFormula(formula) {
+  async prepareFormula(formula) {
     const FORMULA_REGEXP = new RegExp(
       /(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g
     );
@@ -281,10 +283,10 @@ class Votings extends Component {
     matched[0] == "group" ? convertedFormula.push(0) : convertedFormula.push(1);
     matched[1] == "Owners"
       ? convertedFormula.push(1)
-      :
-      matched[3] == "quorum"
-        ? convertedFormula.push(0)
-        : convertedFormula.push(1);
+      : convertedFormula.push(this.findUserGroup(matched[1]))
+    matched[3] == "quorum"
+      ? convertedFormula.push(0)
+      : convertedFormula.push(1);
     matched[4] == "<=" ? convertedFormula.push(0) : convertedFormula.push(1);
     convertedFormula.push(Number(matched[5]));
 
@@ -293,11 +295,33 @@ class Votings extends Component {
         ? convertedFormula.push(0)
         : convertedFormula.push(1);
     }
+    console.log(convertedFormula)
+
+    if (convertedFormula[1] == null) {
+      await this.setState({ invalidFormula: true })
+    } else {
+      await this.setState({ invalidFormula: false })
+    }
     return convertedFormula;
+  }
+  findUserGroup(name) {
+    const { contractModel } = this.props;
+    const { contract } = contractModel
+    const userGroups = JSON.parse(localStorage.getItem(`userGroups[${contract._address}]`));
+    console.log(name)
+    let groupId = userGroups.map((group, index) => {
+      let id;
+      if (group.name == name) {
+        id = index + 1;
+      }
+      return id;
+    }).filter(e => e)
+    console.log(groupId.length);
+    return groupId.length > 0 ? groupId[0] : null;
   }
 
   async createVotingData(target) {
-    const { contractModel } = this.props;
+
     const { questions, votingTemplate } = contractModel;
     const { selected } = this.state;
 
@@ -373,8 +397,12 @@ class Votings extends Component {
         values.push(input.value);
       });
     }
-
-    let hexString = web3.eth.abi.encodeParameters(parametersTypes, values);
+    let hexString
+    if (!this.state.invalidFormula) {
+      hexString = web3.eth.abi.encodeParameters(parametersTypes, values);
+    } else {
+      hexString = '0x';
+    }
 
     hexString = hexString.replace("0x", methodSelector);
     return hexString;
@@ -389,36 +417,43 @@ class Votings extends Component {
     let privateKey = web3.eth.accounts.wallet[0].privateKey;
     let votingData = await this.createVotingData(document.forms.votingData);
 
-    let data = contract.methods
-      .startNewVoting(questionId, 0, 0, votingData)
-      .encodeABI();
-    let options = {
-      data,
-      to: contract._address,
-      gasPrice: web3.utils.toHex(window.gasPrice),
-      gasLimit: web3.utils.toHex(8000000),
-      value: "0x0"
-    };
+    console.log(this.state.invalidFormula)
+    if (!this.state.invalidFormula) {
+      let data = contract.methods
+        .startNewVoting(questionId, 0, 0, votingData)
+        .encodeABI();
+      let options = {
+        data,
+        to: contract._address,
+        gasPrice: web3.utils.toHex(window.gasPrice),
+        gasLimit: web3.utils.toHex(8000000),
+        value: "0x0"
+      };
 
-    web3.eth.accounts.signTransaction(options, privateKey).then(data => {
-      web3.eth
-        .sendSignedTransaction(data.rawTransaction)
-        .on("error", err => {
-          console.log(err);
-        })
-        .on("transactionHash", txHash => {
-          this.txHash = txHash;
-          console.log(txHash);
-          contractModel.setVotingStep(4)
-        })
-        .on("receipt", data => {
-          this.setState({
-            startVoting: false,
+      web3.eth.accounts.signTransaction(options, privateKey).then(data => {
+        web3.eth
+          .sendSignedTransaction(data.rawTransaction)
+          .on("error", err => {
+            console.log(err);
+          })
+          .on("transactionHash", txHash => {
+            this.txHash = txHash;
+            console.log(txHash);
+            contractModel.setVotingStep(4)
+          })
+          .on("receipt", data => {
+            this.setState({
+              startVoting: false,
+            });
+            contractModel.setVotingStep(5)
+            contractModel.getVotings();
           });
-          contractModel.setVotingStep(5)
-          contractModel.getVotings();
-        });
-    });
+      });
+    } else {
+      contractModel.setVotingStep(1);
+      alert('Такой группы пользователей нет, проверьте еще раз')
+    }
+
   }
 
   async selectQuestionId(selected) {
@@ -456,7 +491,7 @@ class Votings extends Component {
   validateInputs(target) {
     let inputs = target.querySelectorAll("input");
     let valids = [];
-    inputs.forEach(input => {
+    inputs.forEach((input, index) => {
       let name = input.getAttribute("name");
       let valid = false;
       switch (name) {
@@ -490,6 +525,7 @@ class Votings extends Component {
     });
     return [...new Set(valids)];
   }
+
   toggleSubmit(e) {
     e.preventDefault();
     const { contractModel } = this.props;
