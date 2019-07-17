@@ -21,6 +21,7 @@ import contractModel from "../../../models/ContractModel";
 import Loader from "../../common/Loader";
 
 import VotingActive from "../../../img/voting_active.svg";
+import addIcon from "../../../img/add_icon.svg";
 import Hint from "../../common/Hint";
 
 @inject("accountStore", "contractModel")
@@ -181,13 +182,17 @@ class Votings extends Component {
           <div className="votings-additionals">
             <h2>Параметры вопроса</h2>
             {this.state.additionalInputs.map(input => input)}
-            <button
-              type="button"
-              className="btn btn--blue"
-              onClick={this.addInput.bind(this)}
-            >
-              ДОБАВИТЬ ПАРАМЕТР
-            </button>
+            <div className="votings-additionals__add">
+              <button
+                type="button"
+                className="btn btn--blue"
+                onClick={this.addInput.bind(this)}
+                style={{ 'width': '80px', "padding": '10px' }}
+              >
+                <img src={addIcon} />
+              </button>
+              <span>Добавить параметр</span>
+            </div>
           </div>
         );
       };

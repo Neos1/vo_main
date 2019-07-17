@@ -8,6 +8,7 @@ class ContractModel {
   @observable votings = [];
   @observable userGroups = [];
   @observable questionGroups = [];
+  @observable balances = {}
 
   @observable bufferQuestions = [];
   @observable bufferVotings = [];

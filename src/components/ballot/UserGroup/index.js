@@ -104,9 +104,9 @@ class UserGroup extends Component {
     const { data } = this.props;
     return (
       <div className='group'>
-        <div className='group-head'>
+        <div className='group-head' onClick={this.expandCard.bind(this)}>
           <div className='group-head__about'>
-            <h1 onClick={this.expandCard.bind(this)}> {data.name} </h1>
+            <h1> {data.name} </h1>
             <p>
               {
                 data.name == 'Owner' ? "Неограниченные права" : "Могут голосовать по определенным вопросам"

@@ -382,7 +382,7 @@ class Voting extends Component {
       <div className={styles['voting-expanded__split-start']}>
         <label className={`${userVote == 2 ? 'hidden' : ''}`}>
           <span> {`${userVote == 1 ? 'Вы проголосовали' : ''}`} ЗА </span>
-          <button className={`btn btn--blue`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
+          <button className={`btn btn--positive`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
             <img src={positive}></img>
           </button>
         </label>
@@ -463,8 +463,8 @@ class Voting extends Component {
             <span className={styles['voting-id']}>{data.votingId}</span>
             <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>
-            <p className={styles['voting-duration']}>Начало <strong>{timeStart}</strong> часа(ов)</p>
-            <p className={styles['voting-duration']}>Конец <strong>{timeEnd}</strong> часа(ов)</p>
+            <p className={styles['voting-duration']}>Начало {timeStart}</p>
+            <p className={styles['voting-duration']}>Конец {timeEnd}</p>
           </div>
           <div className={styles['voting-about__flow']}>
             {rightPanel}

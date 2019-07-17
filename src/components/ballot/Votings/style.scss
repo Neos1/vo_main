@@ -148,6 +148,12 @@
           font-weight: 400;
           text-align: left;
         }
+        .field {
+          margin-bottom: 20px;
+        }
+        input {
+          height: 40px;
+        }
 
         &:last-child {
           & > span {
@@ -161,8 +167,11 @@
       }
 
       .votings-additionals {
-        margin: 30px 0;
-
+        margin: 30px 0 50px;
+        & > h2 {
+          font-weight: 400;
+          color: #37474F;
+        }
         & > div {
           margin-bottom: 20px;
           display: flex;
@@ -183,12 +192,31 @@
             cursor: pointer;
           }
         }
+        &__add {
+          span {
+            flex-grow: 1;
+            margin-left: 30px;
+            font-weight: 500;
+            font-size: 16px;
+            color: #5B778D;
+            cursor: default;
+          }
+        }
       }
     }
 
     &__active {
       text-align: center;
-      width: 261px;
+      width: 263px;
+      color: #37474F;
+      & > h1 {
+        font-weight: 400;
+        font-size: 24px;    
+      }
+      & > p {
+        width: 90%;
+        margin: 0 auto;
+      }
     }
   }
 
@@ -243,6 +271,7 @@
           }
 
           &-control {
+            width: 170px;
             transition: 0.2s linear;
             border: none;
             background: transparent;
@@ -254,6 +283,7 @@
           }
 
           &-value {
+            width: 90%;
             padding: 0 !important;
           }
 
@@ -281,6 +311,7 @@
           }
 
           &-arrow-zone {
+            left: 25px;
             border: none;
           }
 
