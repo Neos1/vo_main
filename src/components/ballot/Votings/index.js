@@ -118,12 +118,15 @@ class Votings extends Component {
       return (
         <div>
           <SimpleInput />
-          <select>
-            <option value="int"> Число </option>
-            <option value="string"> Текст </option>
-            <option value="address"> Адрес </option>
-            <option value="bytes4"> Строка (4 байта) </option>
-          </select>
+          <div className='select-wrapper'>
+            <select>
+              <option value="int"> Число </option>
+              <option value="string"> Текст </option>
+              <option value="address"> Адрес </option>
+              <option value="bytes4"> Строка (4 байта) </option>
+            </select>
+            <span></span>
+          </div>
           <span onClick={this.removeEl.bind(this, idx)}>
             {" "}
             <img src={close} />{" "}
@@ -163,7 +166,7 @@ class Votings extends Component {
     let inputs = contractModel.votingTemplate.params.map((param, index) => {
       let returnField = () => {
         return (
-          <label key={index}>
+          <p key={index}>
             <span>{param[0]}</span>
             {hints.hasOwnProperty(selected) ? <Hint data={hints[selected][index]} /> : ""}
             <SimpleInput
@@ -173,7 +176,7 @@ class Votings extends Component {
               required
               name={param[1]}
             />
-          </label>
+          </p>
         );
       };
 

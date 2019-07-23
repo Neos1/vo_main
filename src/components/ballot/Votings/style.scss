@@ -140,7 +140,9 @@
       margin-top: 165px;
       padding-bottom: 20px;
 
-      label {
+      p {
+        display: block;
+        color: #5B778D;
         & > span {
           display: inline-block;
           margin-bottom: 5px;
@@ -181,15 +183,53 @@
 
           .field {
             display: inline-block;
-            width: 40%;
+            width: 50%;
+            max-height: 40px;
+            margin: 0;
+            &__input {
+              padding: 12px 24px;
+            }
           }
-
-          select {
-            width: 30%;
+          .select-wrapper {
+            width: 32%;
+            select {
+              position: relative;
+              width: 100%;
+              height: 40px;
+              padding: 0 10px;
+              background: #fff;
+              border: 1px solid #D9DFE3;
+              border-radius: 3px;
+              margin: 0;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              color: #5B778D;
+              outline: none;
+              &:active {
+                border: 1px solid #447ACC;
+                &+span {
+                  &:before {
+                    transform: rotate(-180deg);
+                  }
+                }
+              }
+              &+span {
+                position: relative;
+                &::before {
+                  content: url($image_path +'select-arrow_grey.svg');
+                  position: absolute;
+                  right: 10px;
+                  top: 50%;
+                }
+              }
+            }  
           }
-
-          span {
+          
+          & > span {
+            position: relative;
             cursor: pointer;
+           
           }
         }
         &__add {

@@ -6,16 +6,17 @@
   cursor: help;
   &__icon {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     border: 1px solid #d9dfe3;
     color: #d9dfe3;
     text-align: center;
     border-radius: 50%;
     background: #fff;
-    line-height: 18px;
+    line-height: 14px;
     font-weight: bold;
     transition: 0.2s linear;
+    font-size: 10px;
     &:hover {
       background: #447acc;
       color: #fff;
@@ -33,7 +34,7 @@
       font-style: normal;
       font-weight: 300;
       font-size: 14px;
-      line-height: 16px;
+      line-height: 15px;
       color: #37474f;
     }
   }
