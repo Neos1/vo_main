@@ -26,6 +26,7 @@
 	&__input {
 		display: block;
 		width: 100%;
+		max-height: 40px;
 		outline: none;
 		background-color: rgba($color: #fff, $alpha: 1);
 		color: #A6B4BF;

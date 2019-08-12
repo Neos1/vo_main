@@ -268,7 +268,40 @@
     box-sizing: border-box;
     background-color: #e6e8ed;
     overflow-y: auto;
-
+    &::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+      border: 1px none #D9DFE3;
+    }
+    &::-webkit-scrollbar-button {
+      width: 0px;
+      height: 0px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #fbfbfb;
+      border: 1px none #D9DFE3;;
+      border-radius: 50px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+    }
+    &::-webkit-scrollbar-thumb:active {
+      background: #fbfbfb;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border: 0px none #ffffff;
+      border-radius: 0px;
+    }
+    &::-webkit-scrollbar-track:hover {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-track:active {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
     &__filters {
       display: table;
       margin-bottom: 20px;

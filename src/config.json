@@ -5,6 +5,10 @@
 		{
 			"name": "tetete",
 			"address": "0x1Df6AdA9f170D0FdFb075140333A44c0C651f4AC"
+		},
+		{
+			"name": "test",
+			"address": "0x1Cd9D97EC3f3283cD564bB82f7d0Ee2737D6F352"
 		}
 	]
 }

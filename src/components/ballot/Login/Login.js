@@ -80,6 +80,7 @@ class Login extends React.Component {
         window.web3 = web3;
         this.config = window.config = config;
         window.gasPrice = config.gasPrice;
+        window.step = (num) => this.step = num;
     }
 
     componentDidMount() {
@@ -192,7 +193,7 @@ class Login extends React.Component {
                                     <div className={`${styles.seed__key} `} style={{ textAlign: 'center' }}>
                                         <div className={styles.login__select}>
                                             <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                                <h4>Шаг 2</h4>
+                                                <h4 className='stepCount'>Шаг 2 из 3</h4>
                                                 <h4>Проверка контракта</h4>
                                                 <div style={{ display: 'inline-block' }}>
                                                     <div className={`${styles.login__progress} active`}></div>
@@ -352,7 +353,7 @@ class Login extends React.Component {
                                 <form name="checkERC" onSubmit={this.checkExistingERC}>
                                     <div className={styles.login__select}>
                                         <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                            <h4>
+                                            <h4 className='stepCount'>
                                                 Шаг 1 из 3
                                             </h4>
                                             <h4>
@@ -385,8 +386,8 @@ class Login extends React.Component {
                                 <form name="deploy_step_2" onSubmit={this.deploySolidity}>
                                     <div className={styles.login__select}>
                                         <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                            <h4>
-                                                Шаг 3
+                                            <h4 className='stepCount'>
+                                                Шаг 3 из 3
                                             </h4>
                                             <h4>
                                                 Загрузка контракта проекта
@@ -461,17 +462,17 @@ class Login extends React.Component {
                                 
                                 ${(this.step == 8) ? '' : "fullwidth"}`}>
 
-                            <div className={`${((this.step != 21) && (this.step != 11) && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : ''}`}>
+                            <div className={`${((this.step != 21) && (this.step != 11) && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : `${this.step != 40 ? 'infoMessage' : ''}`}`}>
                                 <Loader className={this.step == 40 ? 'hidden' : ''} />
-                                {this.step == 21 ? <h3>Проверяем резервную фразу</h3> : ''}
-                                {this.step == 24 ? <h3>Идет сохранение ключа</h3> : ''}
-                                {this.step == 11 ? <h3>Идет создание ключа</h3> : ''}
-                                {this.step == 33 ? <h3>Проверяем адрес проекта</h3> : ''}
-                                {this.step == 37 ? <h3>Производим проверку контракта ERC20</h3> : ''}
+                                {this.step == 21 ? <div><h3>Проверяем резервную фразу</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 24 ? <div><h3>Идет сохранение ключа</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 11 ? <div><h3>Идет создание ключа</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 33 ? <div><h3>Проверяем адрес проекта</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 37 ? <div><h3>Производим проверку контракта ERC20</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
                                 {this.step == 8 ? <h3 style={{
                                     'position': 'absolute',
                                     'font-weight': '400',
-                                    'top': '55%',
+                                    'top': '100%',
                                     'left': '50%',
                                     'font-size': '14px',
                                     'display': 'inline-block',
@@ -552,14 +553,14 @@ class Login extends React.Component {
                                 && (this.step != 34)
                                 && (this.step != 41)
                                 && (this.step != 52) ? styles.hidden : ''}`}>
-                                <img src={`${PATH_TO_IMG}contract.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting_after_message.svg`}></img>
                             </div>
 
                             <div className={`${styles.seed__key} ${(this.step != 22) ? styles.hidden : ''}`}>
-                                <h3>Резервная фраза проверена, ваш ключ:</h3>
+                                <h3 className='seed-checked'>Резервная фраза проверена, ваш ключ:</h3>
                                 <div className={styles.seed__wallet}>
-                                    <p>Ваш ключ: <strong className="note">{this.account.addresses}</strong></p>
-                                    <p>Баланс: <strong className="note">{this.account.balances / 1.0e18} Eth</strong></p>
+                                    <p><span>Ваш ключ:</span> <strong className="note">{this.account.addresses}</strong></p>
+                                    <p><span>Баланс:</span> <strong className="note">{this.account.balances / 1.0e18} Eth</strong></p>
                                 </div>
 
                             </div>
@@ -589,7 +590,7 @@ class Login extends React.Component {
 
                         <div className={styles.login__description}>
                             <div className={`${styles.content} ${(this.step !== 0) && (this.step !== 8) ? 'hidden' : ''}`} style={{ 'maxWidth': "350px" }}>
-                                <img src={`${PATH_TO_IMG}rocket.png`}></img>
+                                <img src={`${PATH_TO_IMG}logo.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p> An open source voting system V4Vote will allow you to connect to decision-making those whose help you need. </p>
                                     <p>Connect the project owners, company employees, management, holders of tokens purchased on ICO. </p>
@@ -597,7 +598,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 1) && (this.step !== 23) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}safe.png`}></img>
+                                <img src={`${PATH_TO_IMG}safe.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Пароль должен состоять как минимум из <strong className={`${this.passwordMatches[4] ? 'note' : ''} `}>6 символов.</strong></p>
                                     <table className={styles.content__password}>
@@ -628,7 +629,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 12) && (this.step !== 13) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}letter.png`}></img>
+                                <img src={`${PATH_TO_IMG}letter.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p> Резервная фраза состоит из <strong className="note">12 слов</strong></p>
                                     <p> <strong className="warning">Обязательно запишите</strong> эти слова и не сообщайте их никому</p>
@@ -636,7 +637,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 2) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}lifebuoy.png`}></img>
+                                <img src={`${PATH_TO_IMG}letter-check.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Нужно ввести последовательно все <strong className="note">слова полученные при регистрации.</strong></p>
                                     <p>Вы ведь их сохранили или записали?</p>
@@ -644,46 +645,46 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 3 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}sextant.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting-select.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>За что проголосуем на этот раз?</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 31 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}briefcase.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting-create.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Cоздайте новый проект либо подключите уже существующий </p>
                                     <p>Вы могли получить адрес проекта <span className="note">где-то там</span></p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 32) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}cloud.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting-create.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis </p>
 
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 35 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}structure.png`}></img>
+                                <img src={`${PATH_TO_IMG}structure.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>При создании проекта необходимо указать его владельцев </p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 36) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}map.png`}></img>
+                                <img src={`${PATH_TO_IMG}contract-with-tokens.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Вводить вручную необязательно, можно скопировать и вставить</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 38 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}check-list.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting_after_message.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Всё идет хорошо</p>
                                     <p>Можно продолжать</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 39 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}document.png`}></img>
+                                <img src={`${PATH_TO_IMG}document.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Контракт проекта будет загружен в сеть при помощи кошелька</p>
                                     <p>Название проекта будет записано в блокчейн</p>
@@ -691,7 +692,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 5 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}document.png`}></img>
+                                <img src={`${PATH_TO_IMG}create-erc20.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже</p>
                                     <p>{this.account.addresses}</p>
