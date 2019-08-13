@@ -303,9 +303,11 @@
       background: transparent;
     }
     &__filters {
-      display: table;
+      width: 100%;
+      display: flex;
       margin-bottom: 20px;
-
+      flex-flow: row nowrap;
+      justify-content: space-between;
       &-numbers {
         display: inline-block;
 
@@ -384,7 +386,7 @@
           }
 
           &-arrow-zone {
-            left: 25px;
+            left: 15px;
             border: none;
           }
 
@@ -399,19 +401,32 @@
 
         &--questions {
           .Select {
-            width: 200px !important;
+            width: 185px !important;
+          }
+          .Select-control {
+            width: 185px ;
           }
         }
 
         &--descision {
           .Select {
-            width: 120px !important;
+            width: 120px ;
+          }
+          .Select-control {
+            width: 120px ;
           }
         }
 
         &--id {
           .Select {
-            width: 120px !important;
+            width: 75px;
+            text-align: center;
+          }
+          .Select-control {
+            width: 75px;
+          }
+          .Select-arrow-zone {
+            left: 26px;
           }
         }
 

@@ -329,7 +329,7 @@ class ContractModel {
     let options = [
       {
         value: null,
-        label: "Все вопросы"
+        label: "Все"
       }
     ];
     let length = this.votings.length;

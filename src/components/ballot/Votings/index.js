@@ -239,6 +239,7 @@ class Votings extends Component {
         </div>
       )
     }
+
     let content = this.state.loading ? this.getLoader('left') : returnContent()
 
     return (
@@ -337,7 +338,7 @@ class Votings extends Component {
     contractModel.setVotingStep(2)
 
     let mainInputs = target.querySelectorAll(
-      'form[name="votingData"] > label input '
+      'form[name="votingData"] > p input'
     );
     let additionalInputs = target.querySelectorAll(
       ".votings-additionals input"
@@ -405,8 +406,12 @@ class Votings extends Component {
         values.push(input.value);
       });
     }
+
+    console.log(mainInputs);
+
     let hexString
     if (!this.state.invalidFormula) {
+      console.log(parametersTypes, values)
       hexString = web3.eth.abi.encodeParameters(parametersTypes, values);
     } else {
       hexString = '0x';

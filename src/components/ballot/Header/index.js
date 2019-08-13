@@ -17,6 +17,7 @@ class Header extends Component {
       addressHover: false,
       address: '',
       prettyAddress: '',
+      addressCopied: false,
     }
   }
   componentWillMount() {
@@ -43,7 +44,11 @@ class Header extends Component {
   }
 
   copyAddress() {
+    this.setState({ addressCopied: true });
     navigator.clipboard.writeText(`0x${this.state.address}`)
+    setTimeout(() => {
+      this.setState({ addressCopied: false });
+    }, 3000)
   }
 
   render() {
@@ -93,9 +98,16 @@ class Header extends Component {
             onMouseOut={this.toggleAddress.bind(this)}
           >
             <img src={avatar} />
-            <span className={styles['nav-profile__address']} onClick={this.copyAddress.bind(this)}>
+            <span className={styles['nav-profile__address']}
+              onClick={this.copyAddress.bind(this)}
+            >
               {
                 this.state.addressHover ? `0x${this.state.address}` : this.state.prettyAddress
+              }
+            </span>
+            <span className={`${styles['nav-profile__hint']} ${this.state.addressHover ? '' : 'hidden'}`}>
+              {
+                this.state.addressCopied ? "Адрес успешно скопирован" : "Кликните на адрес, чтобы скопировать его"
               }
             </span>
           </div>
