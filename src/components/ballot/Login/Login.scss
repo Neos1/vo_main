@@ -279,8 +279,9 @@
         right: 0%;
         transform: translate(0, -50%);
         .content{
+            position: relative;
             width: 100%;
-            max-width: 250px;
+            max-width: 300px;
             margin: 0 auto;
             height: auto;
             text-align: center;
@@ -289,6 +290,14 @@
                     font-weight: 300;
                     color: #37474F;
                    
+                }
+                &-info {
+                    margin-top: 80px;
+                    padding: 10px 20px;
+                    background: #fff;
+                    &>p{
+                        color: #A6B4BF;
+                    }
                 }
             }
             img{
@@ -507,6 +516,7 @@
         }
     }
     &__seed{
+        position: relative;
         width: 56% !important;
         padding: 15px 10px;
         font-size: 14px;
@@ -526,6 +536,12 @@
             font-size: 16px;
             text-transform: uppercase;
         }
+    }
+    &__toggle {
+        position: absolute;
+        top: 50%;
+        right: -45px;
+        transform: translateY(-50%);
     }
 }
 .content__password{

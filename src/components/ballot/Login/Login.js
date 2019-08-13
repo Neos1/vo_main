@@ -188,7 +188,7 @@ class Login extends React.Component {
 
                             {/** Окно загрузки  step: 21 - Проверка сида, 22 - сид проверен, 11 - создание ключа */}
 
-                            <div className={`${styles.seed__form} ${(this.step !== 38) ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${(this.step !== 38) ? styles.hidden : ''}`} style={{ height: '80%' }}>
                                 <div className={`${this.step !== 38 ? styles.hidden : ''}`}>
                                     <div className={`${styles.seed__key} `} style={{ textAlign: 'center' }}>
                                         <div className={styles.login__select}>
@@ -217,7 +217,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${this.step !== 38 ? styles.hidden : ''}`}>Продолжить</button>
+                                        <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${this.step !== 38 ? styles.hidden : ''}`}>ПРОДОЛЖИТЬ</button>
                                     </div>
                                 </div>
                             </div>
@@ -249,11 +249,13 @@ class Login extends React.Component {
                                     </p>
                                     <p className={styles.seed__seed}>
                                         {this.showSeed ? this.account.randomSeed : this.hiddenSeed}
+                                        <a className={styles.seed__toggle} onClick={this.toggleSeed}>
+                                            <img src={`${PATH_TO_IMG}${this.showSeed ? "eye-off.png" : "eye.png"} `} />
+                                        </a>
                                     </p>
-                                    <a onClick={this.toggleSeed}> {this.showSeed ? "Скрыть слова" : "Показать слова"} </a>
                                 </div>
                                 <div className={styles.login__submit}>
-                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал. Честно.</button>
+                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я ЗАПИСАЛ</button>
                                 </div>
                             </div>
 
@@ -276,7 +278,7 @@ class Login extends React.Component {
                             {/** Окно выбора деплоя: step = 31 - окно добавления проекта, 35 - выбор типа проекта */}
                             <div className={`${styles.seed__form} ${(this.step !== 31) && (this.step !== 35) ? styles.hidden : ''}`}>
                                 <div className={this.step != 31 ? "" : ""}>
-                                    <h3>Добавление проекта</h3>
+                                    <h3>{this.step == 31 ? 'Добавление проекта' : 'Создание нового проекта'}</h3>
                                     <div className={styles.login__select}>
                                         <p className='deploy__desc'>
                                             Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
@@ -291,16 +293,24 @@ class Login extends React.Component {
                                                 <p>У меня есть <span className="note">адрес&nbsp;проекта</span></p>
                                             </div>
                                         </p>
-                                        <p className={`${styles.deploy__select} ${this.step != 35 ? 'hidden' : ''}`}>
+                                        <p className={`${styles.deploy__select} ${this.step != 35 ? 'hidden' : ''}`} style={{ 'flex-flow': "row wrap" }}>
+                                            <p style={{
+                                                "fontSize": "18px",
+                                                "fontWeight": "400",
+                                                "color": "#37474F",
+                                                "margin-bottom": "25px",
+                                                "width": "60%"
+                                            }}>
+                                                У владельцев проекта есть токены?
+                                            </p>
                                             <div>
-                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владеют</button>
-                                                <p>Владельцы проекта уже владеют токенами</p>
-                                            </div>
-                                            <div>
-                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Не владеют</button>
-                                                <p>Владельцы проекта еще не владеют токенами</p>
-                                            </div>
+                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">ЕСТЬ ТОКЕНЫ</button>
 
+                                            </div>
+                                            <div>
+                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">НЕТ ТОКЕНОВ</button>
+
+                                            </div>
                                         </p>
                                     </div>
                                 </div>
@@ -348,7 +358,7 @@ class Login extends React.Component {
                             </div>
 
                             {/** Новый адрес */}
-                            <div className={`${styles.seed__form} ${this.step !== 36 ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${this.step !== 36 ? styles.hidden : ''}`} style={{ height: '80%' }}>
 
                                 <form name="checkERC" onSubmit={this.checkExistingERC}>
                                     <div className={styles.login__select}>
@@ -375,13 +385,13 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">Следующий шаг</button>
                                     </div>
                                 </form>
                             </div>
 
                             {/** Шаг 2 деплоя существующего ERC20 */}
-                            <div className={`${styles.seed__form} ${this.step !== 39 ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${this.step !== 39 ? styles.hidden : ''}`} style={{ height: '80%' }}>
 
                                 <form name="deploy_step_2" onSubmit={this.deploySolidity}>
                                     <div className={styles.login__select}>
@@ -410,7 +420,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">СЛЕДУЮЩИЙ ШАГ</button>
                                     </div>
                                 </form>
                             </div>
@@ -437,7 +447,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">СОЗДАТЬ</button>
                                     </div>
                                 </form>
 
@@ -696,12 +706,14 @@ class Login extends React.Component {
                                 <div className={styles.content__description}>
                                     <p>Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже</p>
                                     <p>{this.account.addresses}</p>
-                                    <p>
-                                        <strong>Баланс: </strong>
-                                        <strong className="note">{Number((this.account.balances / 1.0e18)).toFixed(4)} ETH</strong>
-                                    </p>
-                                    <p>Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth.</p>
                                     <p>Все ERC20 токены будут начислены на этот кошелек, после чего их можно будет распределить на необходимые адреса.</p>
+                                    <div className='content__description-info'>
+                                        <p>
+                                            <strong>Баланс: </strong>
+                                            <strong className="note">{Number((this.account.balances / 1.0e18)).toFixed(4)} ETH</strong>
+                                        </p>
+                                        <p>Для загрузки необходимо наличие ~ 0.0001 ETH на кошельке</p>
+                                    </div>
                                 </div>
                             </div>
 
