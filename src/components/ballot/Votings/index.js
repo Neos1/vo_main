@@ -24,6 +24,7 @@ import Loader from "../../common/Loader";
 import VotingActive from "../../../img/voting_active.svg";
 import addIcon from "../../../img/add_icon.svg";
 import Hint from "../../common/Hint";
+import Alert from "../../common/Alert";
 
 @inject("accountStore", "contractModel")
 @observer
@@ -105,6 +106,11 @@ class Votings extends Component {
         contractModel.setVotingStep(1)
       }
     }
+  }
+
+  showAlert(text) {
+    const { contractModel } = this.props;
+    contractModel.showAlert(text);
   }
 
   removeError(e) {
@@ -482,7 +488,7 @@ class Votings extends Component {
       });
     } else {
       contractModel.setVotingStep(1);
-      alert('Такой группы пользователей нет, проверьте еще раз')
+      this.showAlert.bind(this, 'Такой группы пользователей нет, проверьте еще раз')
     }
 
   }
@@ -598,7 +604,7 @@ class Votings extends Component {
   render() {
     const { contractModel } = this.props;
     const { from, to, startVoting } = this.state;
-    const { bufferVotings, votingTemplate, userVote } = contractModel;
+    const { bufferVotings, votingTemplate, userVote, alertVisible, alertText } = contractModel;
     const { step } = votingTemplate;
     const modifiers = { start: from, end: to };
 
@@ -717,6 +723,7 @@ class Votings extends Component {
           submit={this.startVoting.bind(this)}
           closeWindow={this.hideModal.bind(this)}
         />
+        <Alert visible={alertVisible} text={alertText} />
         <AlertModal />
       </div>
     );

@@ -472,6 +472,7 @@ class ContractModel {
               .send({ from: address, gas: 1000000, gasPrice: window.gasPrice });
           }
 
+          console.log(this.contract._address)
           this.contract.methods
             .sendVote(descision)
             .send({
@@ -491,17 +492,14 @@ class ContractModel {
               this.refreshLastVoting();
             });
         } else {
-
-          alert("У вас нет токенов, доступных для голосования")
+          this.showAlert("У вас нет токенов, доступных для голосования")
         }
       } else {
         this.userVote.status = 0;
-        alert("Не можем найти вашу группу. Либо ваш баланс токенов равен нулю, либо вас нет ни в одной группе пользователей")
+        this.showAlert("Не можем найти вашу группу. Либо ваш баланс токенов равен нулю, либо вас нет ни в одной группе пользователей")
       }
-
-
     } else {
-      alert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)
+      this.showAlert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)
     }
 
   }
@@ -525,6 +523,19 @@ class ContractModel {
       `votings[${contract._address}]`,
       JSON.stringify(this.votings)
     );
+  }
+
+
+  @observable alertVisible = false;
+  @observable alertText = ''
+
+  @action showAlert(text) {
+    this.alertVisible = true;
+    this.alertText = text;
+
+    setTimeout(() => {
+      this.alertVisible = false;
+    }, 3000);
   }
 }
 

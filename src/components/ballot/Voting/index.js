@@ -3,7 +3,6 @@ import { observer, inject } from 'mobx-react';
 //import { AbiCoder } from 'web3-eth-abi';
 import start from '../../../img/start_icon.svg'
 import styles from './style.scss';
-
 import voteActive from '../../../img/vote_active.svg';
 import votePositive from '../../../img/vote_positive.svg';
 import voteNegative from '../../../img/vote_negative.svg';
@@ -11,6 +10,7 @@ import voteNone from '../../../img/vote_none.svg';
 import positive from '../../../img/set_positive.svg';
 import negative from '../../../img/set_negative.svg';
 import awaitLastVote from '../../../img/voting_lastVote.svg';
+import Alert from '../../common/Alert';
 
 
 @inject('contractModel') @observer
@@ -62,6 +62,11 @@ class Voting extends Component {
     }
   }
 
+  showAlert(text) {
+    const { contractModel } = this.props;
+    contractModel.showAlert(text);
+  }
+
   async getUserVote(id) {
     const { contractModel, data } = this.props;
     const { contract } = contractModel;
@@ -76,7 +81,7 @@ class Voting extends Component {
     contract.methods.returnTokens(data.votingId).send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
       .on('error', (err) => {
         setStep(1);
-        alert('Произошла ошибка');
+        this.showAlert('Произошла ошибка');
       })
       .on('transactionHash', txhash => {
         setStep(4)
@@ -85,7 +90,7 @@ class Voting extends Component {
         setStep(1);
         contractModel.refreshLastVoting();
         this.setState({ isReturned: true });
-        alert("Токены успешно возвращены")
+        this.showAlert("Токены успешно возвращены")
       })
 
   }
@@ -412,7 +417,7 @@ class Voting extends Component {
 
   render() {
     const { data, index, contractModel } = this.props;
-    const { questions } = contractModel;
+    const { questions, alertVisible, alertText } = contractModel;
     const { timeStart, timeEnd, graphics } = this.state;
     const vars = {
       int: 'Число',

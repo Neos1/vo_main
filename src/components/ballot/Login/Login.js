@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { observable, action } from 'mobx';
 import Container from '../Container';
 import { SimpleInput } from '../Input/index';
+import Alert from "../../common/Alert"
 import Select from 'react-select';
 import Loader from '../../common/Loader';
 import styles from './Login.scss';
@@ -67,6 +68,10 @@ class Login extends React.Component {
         keystore: ''
     };
 
+    @action showAlert(text) {
+        this.props.contractModel.showAlert(text)
+    }
+
 
 
     componentWillMount() {
@@ -97,7 +102,8 @@ class Login extends React.Component {
     render() {
         const props = this.props;
         const accountStore = props.accountStore;
-        const contractModel = props.accountStore;
+        const contractModel = props.contractModel;
+        const { showAlert, alertVisible, alertText } = contractModel;
         let projects = this.config.projects.map((project, index) => {
             return <li key={index}>
                 <Link to="/cabinet">
@@ -108,9 +114,11 @@ class Login extends React.Component {
 
 
 
+
         if (accountStore.authorized) return <Redirect to="/votings" />
         return (
             <div className={styles.login}>
+                <Alert visible={alertVisible} text={alertText} />
                 <Container>
                     <div className={styles.login__container}>
                         <button className={`
@@ -944,7 +952,7 @@ class Login extends React.Component {
                 if (this.account.balances / 1.0e18 > 0.001) {
                     this.step = 51;
                     this.deployToken("token");
-                } else alert("Недостаточно средств на кошельке, пополните баланс")
+                } else this.showAlert("Недостаточно средств на кошельке, пополните баланс")
             } else {
                 if (this.ERC20.name == "") {
                     document.deploy_project.token.classList.add('field__input--error')
@@ -955,7 +963,7 @@ class Login extends React.Component {
                 if (isNaN(Number(this.ERC20.totalSupply)) || (Number(this.ERC20.totalSupply) < 0)) {
                     document.deploy_project.count.classList.add('field__input--error')
                 }
-                alert("Введите корректные данные")
+                this.showAlert("Введите корректные данные")
             }
         } else {
             document.deploy_project.password.classList.add('field__input--error')
@@ -1028,7 +1036,7 @@ class Login extends React.Component {
                 this.step = 40
                 this.substep = 1;
                 this.deployToken('contract')
-            } else alert("Недостаточно средств на кошельке, пополните баланс")
+            } else this.showAlert("Недостаточно средств на кошельке, пополните баланс")
         } else {
             document.deploy_step_2.querySelectorAll('input')[1].classList.add('field__input--error');
         }
@@ -1192,7 +1200,7 @@ class Login extends React.Component {
     @action
     checkContractAddress = () => {
         let address = web3.eth.getCode(this.contract.hash).then(data => {
-            data !== '0x' ? alert('Адрес валидный') : alert('Адрес не валидный');
+            data !== '0x' ? this.showAlert('Адрес валидный') : this.showAlert('Адрес не валидный');
         })
     }
 
@@ -1267,7 +1275,7 @@ class Login extends React.Component {
             setTimeout(() => {
                 this.step = 0;
             }, 1500)
-        } else alert('Проверьте правильность ввода')
+        } else this.showAlert('Проверьте правильность ввода')
     }
     @action
     backToStart = () => {
@@ -1322,7 +1330,7 @@ class Login extends React.Component {
             })
             this.step = 21;
             this.recoverWallet('recover');
-        } else alert("Проверьте правильность ввода")
+        } else this.showAlert("Проверьте правильность ввода")
     }
     @action
     handleSubmit = (e) => {
@@ -1349,7 +1357,7 @@ class Login extends React.Component {
                 } else {
                     document.forms.login_form.password.classList.add('field__input--error')
                     this.step = 0;
-                    alert('Проверьте правильность ввода пароля')
+                    this.showAlert('Проверьте правильность ввода пароля')
                     loginWorker.terminate();
                 }
             }
@@ -1453,7 +1461,7 @@ class Login extends React.Component {
                         writeToProjects()
                     } else {
                         this.step = 32
-                        alert('Адрес не валидный');
+                        this.showAlert('Адрес не валидный');
                     }
                 })
             } else {
