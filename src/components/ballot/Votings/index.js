@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import Select from "react-select";
+import CustomSelect from "../../common/Select";
 import moment from "moment";
 import close from "../../../img/modal-close.svg";
 
@@ -43,18 +44,37 @@ class Votings extends Component {
       descision: false,
       startVoting: false,
       additionalInputs: [],
-      hints: []
+      hints: [],
+      option: null
     };
   }
 
-  @observable questions = [];
+  @observable option = 'null';
+  @observable values = [{
+    value: 'null',
+    label: 'Выберите'
+  }, {
+    value: 'int',
+    label: 'Число'
+  },
+  {
+    value: 'string',
+    label: 'Текст'
+  },
+  {
+    value: 'address',
+    label: 'Адрес'
+  }, {
+    value: 'bytes4',
+    label: 'Строка (4 байта)'
+  }]
 
   async componentWillMount() {
     const { contractModel } = await this.props;
     const { votingTemplate, hints: Hints } = contractModel;
     const { step } = votingTemplate;
     const { questionId } = votingTemplate;
-
+    window.options = this.options;
 
     await this.setState({
       selected: questionId - 1,
@@ -111,21 +131,19 @@ class Votings extends Component {
       </div>
     );
   }
+  updateOption(selected) {
+    this.option = selected.value
+  }
+
   addInput() {
-    const { additionalInputs } = this.state;
+    const { additionalInputs, } = this.state;
     const getInputBlock = () => {
       let idx = additionalInputs.length;
       return (
         <div>
           <SimpleInput />
           <div className='select-wrapper'>
-            <select>
-              <option value="int"> Число </option>
-              <option value="string"> Текст </option>
-              <option value="address"> Адрес </option>
-              <option value="bytes4"> Строка (4 байта) </option>
-            </select>
-            <span></span>
+            <CustomSelect />
           </div>
           <span onClick={this.removeEl.bind(this, idx)}>
             {" "}
@@ -281,7 +299,7 @@ class Votings extends Component {
     });
   }
 
-  async prepareFormula(formula) {
+  prepareFormula(formula) {
     const FORMULA_REGEXP = new RegExp(
       /(group)|((?:[a-zA-Z0-9]{1,}))|((quorum|positive))|(>=|<=)|([0-9%]{1,})|(quorum|all)/g
     );
@@ -307,9 +325,9 @@ class Votings extends Component {
     console.log(convertedFormula)
 
     if (convertedFormula[1] == null) {
-      await this.setState({ invalidFormula: true })
+      this.setState({ invalidFormula: true })
     } else {
-      await this.setState({ invalidFormula: false })
+      this.setState({ invalidFormula: false })
     }
     return convertedFormula;
   }
@@ -341,10 +359,10 @@ class Votings extends Component {
       'form[name="votingData"] > p input'
     );
     let additionalInputs = target.querySelectorAll(
-      ".votings-additionals input"
+      ".votings-additionals .field input"
     );
     let additionalSelects = target.querySelectorAll(
-      ".votings-additionals select"
+      ".votings-additionals .select input"
     );
 
     let methodSelector = questions[selected].methodSelector;

@@ -1,0 +1,52 @@
+@import "../../../styles/ballot/variables";
+
+.select {
+  position: relative;
+  z-index: 1;
+  &__input {
+    display: none;
+  }
+  &__select {
+   
+  }
+  &__wrapper {
+    position: relative;
+    &::after{
+      content: url($image_path +'select-arrow_grey.svg');
+      position: absolute;
+      right: 5px;
+      top: 20px;
+      transform: translateY(-50%);
+    }
+  }
+  &__heading {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 10px 10px;
+    background: #fff;
+    border: 1px solid #D9DFE3;
+    border-radius: 2px;
+    cursor: pointer;
+    p {
+      position: relative;
+      margin: 0;
+    }
+  }
+  &__opened {
+    &::after{
+      transform: translateY(-50%)rotate(180deg);
+    }
+  }
+  &__options {
+    background: #fff;
+    border: 1px solid #D9DFE3;
+  }
+  &__option {
+    padding: 7px 10px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #D9DFE3;
+    color: #5B778D;
+    cursor: pointer;
+  }
+}
