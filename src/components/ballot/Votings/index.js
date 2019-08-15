@@ -50,7 +50,6 @@ class Votings extends Component {
     };
   }
 
-  @observable option = 'null';
   @observable values = [{
     value: 'null',
     label: 'Выберите'
@@ -136,9 +135,6 @@ class Votings extends Component {
         </p>
       </div>
     );
-  }
-  updateOption(selected) {
-    this.option = selected.value
   }
 
   addInput() {
@@ -609,7 +605,7 @@ class Votings extends Component {
     const modifiers = { start: from, end: to };
 
     let renderVotings = bufferVotings.map((voting, index) => (
-      <Voting key={index + 1} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
+      <Voting key={voting.votingId} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
     ));
     let loaderRight = this.getLoader('right');
     let rightPanel =

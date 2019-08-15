@@ -34,6 +34,7 @@ class Voting extends Component {
       },
       preDescision: '',
       graphics: false,
+      status: 0,
       interval: '',
     }
   }
@@ -125,12 +126,10 @@ class Voting extends Component {
 
   }
   getFlow() {
-    const { remaining, percent } = this.state;
-    if (percent > 100) {
-      this.setState({
-        percent: 100
-      })
-    }
+    const { contractModel, data } = this.props;
+    console.log(data.votingId);
+    const { remaining, percent, status } = this.state;
+    console.log(remaining, percent, status);
     const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
@@ -223,6 +222,7 @@ class Voting extends Component {
 
     dateStart.setTime(startTime);
     dateEnd.setTime(endTime);
+    dateNow = new Date();
 
     let duration = dateEnd - dateStart;
     let remaining = dateEnd - dateNow;
@@ -419,15 +419,23 @@ class Voting extends Component {
     const { data, index, contractModel } = this.props;
     const { questions, alertVisible, alertText } = contractModel;
     const { timeStart, timeEnd, graphics } = this.state;
+    const { remaining, percent } = this.state;
     const vars = {
       int: 'Число',
       string: 'Строка',
       address: 'Адрес',
     }
 
-    let rightPanel = data.status == 0 ? this.getFlow() : this.getDescision();
+    if (percent > 100) {
+      this.setState({
+        percent: 100,
+        status: data.status
+      })
+    }
+
     let votingParams = this.getQuestionData();
     let formula = this.getFormula();
+    let rightPanel = (remaining > 0 || data.status == 0) ? this.getFlow() : this.getDescision();
 
     let votingParameters = votingParams.map((param, index) => {
       let value;

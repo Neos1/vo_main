@@ -163,7 +163,6 @@ class ContractModel {
       let userVote = await this.contract.methods.getUserVote(i).call({
         from: address
       });
-      console.log(userVote);
       voting['userVote'] = userVote;
 
       this.votings.push(voting);

@@ -22,7 +22,6 @@ const createWallet = ({
     wallet,
     v3wallet,
   };
-  console.log(message);
   return message;
 };
 
@@ -48,7 +47,6 @@ onmessage = (e) => {
     action,
   } = payload;
   let response;
-  console.log(action);
   switch (action) {
     case 'create':
       response = createWallet(payload);

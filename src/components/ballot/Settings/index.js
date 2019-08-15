@@ -8,17 +8,17 @@ class Settings extends React.Component {
     render() {
         return (
             <RequiredAuthorization>
-                <div> 
-                    <Header/>
+                <div>
+                    <Header />
                     <Container>
                         <div style={{
-                            position:'absolute',
-                            width:'100%',
-                            height:'100%',
-                            backgroundColor: '#fff'
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: '#e6e8ed'
                         }}>
                             <h1 style={{
-                                position:'absolute',
+                                position: 'absolute',
                                 left: '50%',
                                 top: '50%',
                                 transform: 'translate(-50%, -50%)'

@@ -26,6 +26,7 @@
     & > div {
       position: relative;
       width: 85%;
+      max-width: 500px;
       height: 100%;
       display: flex;
       flex-flow: column nowrap;
@@ -308,10 +309,10 @@
       display: flex;
       margin-bottom: 20px;
       flex-flow: row nowrap;
-      justify-content: space-between;
+      justify-content: unset;
       &-numbers {
         display: inline-block;
-
+        margin-right: 25px;
         .Select {
           display: inline-block;
           width: 80px;

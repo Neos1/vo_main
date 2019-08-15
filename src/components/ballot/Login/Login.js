@@ -835,12 +835,6 @@ class Login extends React.Component {
                 this.newAddresses(address, privKey);
                 this.setWeb3Provider(this.account.keystore);
 
-                let name = `UTC--${this.date}--${address}`
-
-                this.wallets = window.__ENV == 'development'
-                    ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), "utf8"))
-                    : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), "utf8"))
-
                 this.handleShowSeed();
                 worker.terminate();
             }
@@ -901,16 +895,18 @@ class Login extends React.Component {
         this.account.addresses = address
         this.wallets[address] = {};
         this.wallets[address] = this.account.keystore;
-
-        let name = `UTC--${this.date}--${address}`
         this.getBalance();
+    }
+
+    @action writeWallet = () => {
+        let name = `UTC--${this.date}--${this.account.addresses}`
         if (window.__ENV == 'development') {
             fs.writeFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         } else {
             fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         }
-
     }
+
     @action getBalance = () => {
         web3.eth.getBalance(this.account.addresses).then(data => { this.account.balances = data })
     }
@@ -1272,6 +1268,7 @@ class Login extends React.Component {
             })
             let privKey = web3.eth.accounts.wallet[0].privateKey
             this.newAddresses(this.account.addresses, privKey);
+            this.writeWallet();
             setTimeout(() => {
                 this.step = 0;
             }, 1500)
@@ -1312,6 +1309,7 @@ class Login extends React.Component {
             document.forms.password_input.reset();
             this.step = 24;
             this.recoverWallet('create');
+            this.writeWallet()
         } else {
             e.target.password.classList.add('field__input--error')
             e.target.password_confirm.classList.add('field__input--error')
