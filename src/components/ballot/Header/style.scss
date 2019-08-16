@@ -92,6 +92,23 @@
         border-radius: 2px;
         text-align: center;
       }
+      &__balances {
+        margin: 10px auto;
+        td {
+          width: 50%;
+        }
+        thead {
+          line-height: 30px;
+          td {
+           color: #37474F;
+          }
+        }
+        tbody {
+          td {
+            color: #5B778D;
+          }
+        }
+      }
     }
   } 
 }

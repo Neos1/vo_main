@@ -139,15 +139,18 @@ class SendTokenModal extends Component {
       customContract.methods.transfer(addressWho, count).send({ from: address, gas: 8000000, gasPrice: window.gasPrice })
         .on('receipt', async receipt => {
           await this.setState({ step: 2 });
+          contractModel.updateBalance(type, contractAddress, address)
         })
     } else {
       const abi = window.__ENV == 'development'
         ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
         : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
-      const customContract = new web3.eth.Contract(abi, contractAddress);
+      const customContract = window.customContract = new web3.eth.Contract(abi, contractAddress);
       customContract.methods.transferFrom(fromAddress, addressWho, count).send({ from: address, gas: 8000000, gasPrice: window.gasPrice })
         .on('receipt', async receipt => {
           await this.setState({ step: 2 });
+          contractModel.updateBalance(type, contractAddress, fromAddress)
+          contractModel.updateBalance(type, contractAddress, addressWho)
         })
     }
 

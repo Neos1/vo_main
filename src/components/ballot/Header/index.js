@@ -9,7 +9,7 @@ import logo from '../../../img/logo.svg';
 
 import { NavLink } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-@inject('accountStore') @observer
+@inject('accountStore', 'contractModel') @observer
 class Header extends Component {
   constructor(props) {
     super(props);
@@ -18,6 +18,7 @@ class Header extends Component {
       address: '',
       prettyAddress: '',
       addressCopied: false,
+      userBalances: [],
     }
   }
   componentWillMount() {
@@ -27,7 +28,6 @@ class Header extends Component {
   prettyAddress() {
     const { accountStore } = this.props;
     const { address } = accountStore;
-
     let arrayOfParts = [...new Set(address.replace('0x', '').split(new RegExp(/(\w{8})/g)))].filter(function (e) { return e })
     let length = arrayOfParts.length
     let prettyAddress = `0x${arrayOfParts[0]}...${arrayOfParts[length - 1]}`
@@ -41,6 +41,7 @@ class Header extends Component {
     this.setState({
       addressHover: !this.state.addressHover
     })
+    this.getUserBalances();
   }
 
   copyAddress() {
@@ -51,10 +52,24 @@ class Header extends Component {
     }, 3000)
   }
 
+  getUserBalances() {
+    const { contractModel, accountStore } = this.props;
+    const { address } = web3.eth.accounts.wallet[0];
+    const { balances, userGroups } = contractModel;
+    const groups = Object.keys(balances)
+
+    const userBalances = userGroups.map(group => [group.name, balances[group.groupAddress].balances[address]])
+
+    this.setState({ userBalances })
+  }
+
   render() {
+    const { userBalances } = this.state
+    const balances = userBalances.map(balance => {
+      return <tr> <td><strong style={{ color: '#3AD29F' }}>{balance[0]}</strong></td> <td> <strong>{balance[1]}</strong> TKN</td></tr>
+    })
     return (
       <header className={styles.header}>
-
         <nav className={styles.nav}>
           <div style={{ 'display': 'flex' }}>
             <div className={styles.logo}>
@@ -105,11 +120,24 @@ class Header extends Component {
                 this.state.addressHover ? `0x${this.state.address}` : this.state.prettyAddress
               }
             </span>
-            <span className={`${styles['nav-profile__hint']} ${this.state.addressHover ? '' : 'hidden'}`}>
+            <div className={`${styles['nav-profile__hint']} ${this.state.addressHover ? '' : 'hidden'}`}>
               {
                 this.state.addressCopied ? "Адрес успешно скопирован" : "Кликните на адрес, чтобы скопировать его"
               }
-            </span>
+              <hr />
+              <table className={styles['nav-profile__balances']}>
+                <thead>
+                  <tr>
+                    <td>Группа</td>
+                    <td>Баланс</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {balances}
+                </tbody>
+              </table>
+            </div>
+
           </div>
         </nav>
       </header>

@@ -14,10 +14,9 @@ class UserGroup extends Component {
       groupType: '',
       symbol: '',
       address: '',
-      balances: [],
+      balances: {},
       userBalance: '',
       users: [],
-      interval: '',
       userAddress: web3.eth.accounts.wallet[0].address
     }
   }
@@ -27,8 +26,6 @@ class UserGroup extends Component {
     await this.getInfo();
   }
   async componentWillUnmount() {
-    clearInterval(this.state.interval);
-    await this.setState({ interval: '' });
   }
 
   async getInfo() {
@@ -37,14 +34,10 @@ class UserGroup extends Component {
     const { groupAddress, groupType } = this.props.data;
     await this.setState({ groupType });
     groupType == 'ERC20' ? await this.getERCinfo(groupAddress) : await this.getCustomInfo(groupAddress);
-    await this.setState({
-      interval: setInterval(async () => {
-        groupType == 'ERC20' ? await this.getERCinfo(groupAddress) : await this.getCustomInfo(groupAddress);
-      }, 10 * 1000)
-    })
   }
 
   async getERCinfo(address) {
+    const { contractModel } = this.props;
     const { userAddress } = this.state;
     const abi = window.__ENV == 'development'
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/ERC20.abi'), 'utf8'))
@@ -52,11 +45,14 @@ class UserGroup extends Component {
     const contract = await new web3.eth.Contract(abi, address);
     let symbol = await contract.methods.symbol().call({ from: userAddress })
     let totalSupply = await contract.methods.totalSupply().call({ from: userAddress })
-    let userBalance = await contract.methods.balanceOf(userAddress).call({ from: userAddress })
-    await this.setState({ symbol, totalSupply, userBalance })
+    await contractModel.getBalances("ERC20", address);
+    let balances = contractModel.balances[address].balances
+
+    await this.setState({ symbol, totalSupply, balances })
   }
 
   async getCustomInfo(address) {
+    const { contractModel } = this.props;
     const { userAddress } = this.state;
     let abi = window.__ENV == 'development'
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
@@ -65,10 +61,10 @@ class UserGroup extends Component {
     let symbol = await contract.methods.symbol().call({ from: userAddress })
     let totalSupply = await contract.methods.totalSupply().call({ from: userAddress })
     let userBalance = await contract.methods.balanceOf(userAddress).call({ from: userAddress })
-    let users = await contract.methods.getUsers().call({ from: userAddress })
-    let balances = await this.getCustomUsersBalances(address, users);
-    console.log(JSON.stringify(balances))
-    await this.setState({ symbol, totalSupply, userBalance, users, balances });
+    await contractModel.getBalances("Custom", address);
+    let balances = contractModel.balances[address].balances
+    console.log("custom", balances)
+    await this.setState({ symbol, totalSupply, balances });
   }
 
   async getCustomUsersBalances(address, users) {
@@ -77,12 +73,7 @@ class UserGroup extends Component {
       ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, '/contracts/MERC20.abi'), 'utf8'))
       : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/MERC20.abi'), 'utf8'))
     const customContract = new web3.eth.Contract(abi, address);
-    let balances = [];
-    await users.map(async user => {
-      await customContract.methods.balanceOf(user).call({ from: userAddress }).then(balance => {
-        balances.push(balance)
-      })
-    })
+
     return balances;
   }
 
@@ -123,19 +114,19 @@ class UserGroup extends Component {
         <div className={`group-users ${expanded ? '' : 'hidden'}`}>
           {data.groupType == 'ERC20'
             ? <User
-              address={userAddress}
-              balance={userBalance}
+              address={Object.keys(balances)[0]}
+              balance={balances[userAddress]}
               totalSupply={totalSupply}
               symbol={symbol}
               onclick={this.openModal.bind(this, data.groupType, data.groupAddress, userAddress)}
             />
-            : balances.map((balance, index) => <User
+            : Object.keys(balances).map((addr, index) => <User
               key={index}
-              address={users[index]}
-              balance={balance}
+              address={addr}
+              balance={balances[addr]}
               totalSupply={totalSupply}
               symbol={symbol}
-              onclick={this.openModal.bind(this, data.groupType, data.groupAddress, users[index])}
+              onclick={this.openModal.bind(this, data.groupType, data.groupAddress, addr)}
             />)
           }
           <hr />

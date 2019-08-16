@@ -1,4 +1,4 @@
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, runInAction } from "mobx";
 import { Redirect } from "react-router";
 
 class ContractModel {
@@ -30,6 +30,10 @@ class ContractModel {
     descision: "",
     parameters: []
   };
+
+  @observable balances = {
+
+  }
 
   @action setVotingStep(num) {
     this.votingTemplate.step = num;
@@ -259,6 +263,11 @@ class ContractModel {
       });
       this.userGroups.push(group);
     }
+
+    this.userGroups.map(group => {
+      this.getBalances(group.groupType, group.groupAddress)
+    })
+
     localStorage.setItem(
       `userGroups[${contractAddress}]`,
       JSON.stringify(this.userGroups)
@@ -535,6 +544,70 @@ class ContractModel {
     setTimeout(() => {
       this.alertVisible = false;
     }, 3000);
+  }
+
+
+  @action async getBalances(type, address) {
+
+    const userAddress = web3.eth.accounts.wallet[0].address;
+
+    const folder = window.__ENV == 'development'
+      ? path.join(window.process.env.INIT_CWD, '/contracts/')
+      : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/')
+
+    const abi = type == 'ERC20'
+      ? JSON.parse(fs.readFileSync(path.join(folder, 'ERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(folder, 'MERC20.abi'), 'utf8'))
+
+    const testContract = await new web3.eth.Contract(abi, address);
+
+
+    type == "ERC20"
+      ? await this.getERCBalance(testContract, userAddress)
+      : await this.getCustomBalances(testContract, userAddress)
+
+    return this.balances[address].balances;
+  }
+
+
+  @action getERCBalance = async (testContract, userAddress) => {
+    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const contractAddr = testContract._address
+    this.balances[contractAddr] = {}
+    this.balances[contractAddr].balances = {}
+    const userBalance = await testContract.methods.balanceOf(userAddress).call({ from: userAddress })
+    this.balances[contractAddr].balances[userAddress] = userBalance
+  }
+
+
+  @action getCustomBalances = async (testContract, userAddress) => {
+    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const contractAddr = testContract._address
+    const users = await testContract.methods.getUsers().call({ from: userAddress });
+    this.balances[contractAddr] = {}
+    this.balances[contractAddr].balances = {}
+    await users.map(async user => {
+      await testContract.methods.balanceOf(user).call({ from: userAddress }).then(balance => {
+        this.balances[contractAddr].balances[user] = balance
+      })
+    })
+  }
+
+  @action updateBalance = async (type, group, userAddress) => {
+
+    const folder = window.__ENV == 'development'
+      ? path.join(window.process.env.INIT_CWD, '/contracts/')
+      : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/')
+
+    const abi = type == 'ERC20'
+      ? JSON.parse(fs.readFileSync(path.join(folder, 'ERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(folder, 'MERC20.abi'), 'utf8'))
+
+    const testContract = await new web3.eth.Contract(abi, group);
+
+    const balance = await testContract.methods.balanceOf(userAddress).call({ from: userAddress })
+
+    this.balances[group].balances[userAddress] = balance;
   }
 }
 
