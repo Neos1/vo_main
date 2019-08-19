@@ -3,7 +3,6 @@ import { observer, inject } from 'mobx-react';
 //import { AbiCoder } from 'web3-eth-abi';
 import start from '../../../img/start_icon.svg'
 import styles from './style.scss';
-
 import voteActive from '../../../img/vote_active.svg';
 import votePositive from '../../../img/vote_positive.svg';
 import voteNegative from '../../../img/vote_negative.svg';
@@ -11,6 +10,7 @@ import voteNone from '../../../img/vote_none.svg';
 import positive from '../../../img/set_positive.svg';
 import negative from '../../../img/set_negative.svg';
 import awaitLastVote from '../../../img/voting_lastVote.svg';
+import Alert from '../../common/Alert';
 
 
 @inject('contractModel') @observer
@@ -25,6 +25,7 @@ class Voting extends Component {
       percent: 0,
       descision: 0,
       userVote: null,
+      isReturned: false,
       closing: false,
       votingPercents: {
         positive: 0,
@@ -33,6 +34,7 @@ class Voting extends Component {
       },
       preDescision: '',
       graphics: false,
+      status: 0,
       interval: '',
     }
   }
@@ -61,20 +63,26 @@ class Voting extends Component {
     }
   }
 
-  async getUserVote(id) {
+  showAlert(text) {
     const { contractModel } = this.props;
+    contractModel.showAlert(text);
+  }
+
+  async getUserVote(id) {
+    const { contractModel, data } = this.props;
     const { contract } = contractModel;
     let userVote = await contract.methods.getUserVote(id).call({ from: web3.eth.accounts.wallet[0].address });
-    await this.setState({ userVote });
+    let isReturned = await contract.methods.isUserReturnTokens(data.votingId, web3.eth.accounts.wallet[0].address).call({ from: web3.eth.accounts.wallet[0].address })
+    await this.setState({ userVote, isReturned });
   }
 
   async returnTokens() {
-    const { contractModel, setStep } = this.props;
+    const { contractModel, setStep, data } = this.props;
     const { contract } = contractModel;
-    contract.methods.returnTokens().send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000 })
+    contract.methods.returnTokens(data.votingId).send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
       .on('error', (err) => {
         setStep(1);
-        alert('Произошла ошибка');
+        this.showAlert('Произошла ошибка');
       })
       .on('transactionHash', txhash => {
         setStep(4)
@@ -82,7 +90,8 @@ class Voting extends Component {
       .on('receipt', receipt => {
         setStep(1);
         contractModel.refreshLastVoting();
-        alert("Токены успешно возвращены")
+        this.setState({ isReturned: true });
+        this.showAlert("Токены успешно возвращены")
       })
 
   }
@@ -105,11 +114,11 @@ class Voting extends Component {
         expanded: false,
         closing: true
       })
-      contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: 40000000000 })
+      contract.methods.closeVoting().send({ from: address, gas: 8000000, gasPrice: window.gasPrice })
         .on('transactionHash', txhash => {
           setStep(4)
         })
-        .on('receipt', receipt => {
+        .on('receipt', async (receipt) => {
           setStep(1);
           contractModel.refreshLastVoting();
         })
@@ -117,12 +126,10 @@ class Voting extends Component {
 
   }
   getFlow() {
-    const { remaining, percent } = this.state;
-    if (percent > 100) {
-      this.setState({
-        percent: 100
-      })
-    }
+    const { contractModel, data } = this.props;
+    console.log(data.votingId);
+    const { remaining, percent, status } = this.state;
+    console.log(remaining, percent, status);
     const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
@@ -170,8 +177,9 @@ class Voting extends Component {
   }
 
   getDescision() {
-    const { descision, userVote } = this.state;
+    const { descision, userVote, isReturned } = this.state;
     const isVoted = (userVote != 0 && userVote != null);
+
     let descisions = {
       0: {
         text: "НЕ ПРИНЯТО",
@@ -196,7 +204,7 @@ class Voting extends Component {
           </span>
           <img src={descisions[descision].img} />
         </p>
-        <p className={isVoted ? "" : "hidden"}>
+        <p className={(isVoted && !isReturned) ? "" : "hidden"}>
           <a onClick={this.returnTokens.bind(this)}>Вернуть токены</a>
         </p>
       </div>
@@ -214,6 +222,7 @@ class Voting extends Component {
 
     dateStart.setTime(startTime);
     dateEnd.setTime(endTime);
+    dateNow = new Date();
 
     let duration = dateEnd - dateStart;
     let remaining = dateEnd - dateNow;
@@ -378,7 +387,7 @@ class Voting extends Component {
       <div className={styles['voting-expanded__split-start']}>
         <label className={`${userVote == 2 ? 'hidden' : ''}`}>
           <span> {`${userVote == 1 ? 'Вы проголосовали' : ''}`} ЗА </span>
-          <button className={`btn btn--blue`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
+          <button className={`btn btn--positive`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
             <img src={positive}></img>
           </button>
         </label>
@@ -408,17 +417,25 @@ class Voting extends Component {
 
   render() {
     const { data, index, contractModel } = this.props;
-    const { questions } = contractModel;
+    const { questions, alertVisible, alertText } = contractModel;
     const { timeStart, timeEnd, graphics } = this.state;
+    const { remaining, percent } = this.state;
     const vars = {
       int: 'Число',
       string: 'Строка',
       address: 'Адрес',
     }
 
-    let rightPanel = data.status == 0 ? this.getFlow() : this.getDescision();
+    if (percent > 100) {
+      this.setState({
+        percent: 100,
+        status: data.status
+      })
+    }
+
     let votingParams = this.getQuestionData();
     let formula = this.getFormula();
+    let rightPanel = (remaining > 0 || data.status == 0) ? this.getFlow() : this.getDescision();
 
     let votingParameters = votingParams.map((param, index) => {
       let value;
@@ -454,13 +471,13 @@ class Voting extends Component {
 
     return (
       <div className={styles.voting + ' ' + `${this.state.expanded ? "opened" : ''}`} >
-        <div className={styles['voting-about']} onClick={this.toggleExpand.bind(this)} >
-          <div className={styles['voting-about__info']} >
+        <div className={styles['voting-about']}  >
+          <div className={styles['voting-about__info']} onClick={this.toggleExpand.bind(this)} >
             <span className={styles['voting-id']}>{data.votingId}</span>
             <h1 className={styles['voting-caption']} >{data.caption}</h1>
             <p className={styles['voting-text']}>{data.text}</p>
-            <p className={styles['voting-duration']}>Начало <strong>{timeStart}</strong> часа(ов)</p>
-            <p className={styles['voting-duration']}>Конец <strong>{timeEnd}</strong> часа(ов)</p>
+            <p className={styles['voting-duration']}>Начало {timeStart}</p>
+            <p className={styles['voting-duration']}>Конец {timeEnd}</p>
           </div>
           <div className={styles['voting-about__flow']}>
             {rightPanel}

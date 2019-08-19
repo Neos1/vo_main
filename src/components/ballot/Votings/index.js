@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import Select from "react-select";
+import CustomSelect from "../../common/Select";
 import moment from "moment";
 import close from "../../../img/modal-close.svg";
 
@@ -21,7 +22,9 @@ import contractModel from "../../../models/ContractModel";
 import Loader from "../../common/Loader";
 
 import VotingActive from "../../../img/voting_active.svg";
+import addIcon from "../../../img/add_icon.svg";
 import Hint from "../../common/Hint";
+import Alert from "../../common/Alert";
 
 @inject("accountStore", "contractModel")
 @observer
@@ -35,24 +38,43 @@ class Votings extends Component {
       selectedRange: "",
       selected: 0,
       questionId: 0,
+      invalidFormula: false,
       id: null,
       from: undefined,
       to: undefined,
       descision: false,
       startVoting: false,
       additionalInputs: [],
-      hints: []
+      hints: [],
+      option: null
     };
   }
 
-  @observable questions = [];
+  @observable values = [{
+    value: 'null',
+    label: 'Выберите'
+  }, {
+    value: 'int',
+    label: 'Число'
+  },
+  {
+    value: 'string',
+    label: 'Текст'
+  },
+  {
+    value: 'address',
+    label: 'Адрес'
+  }, {
+    value: 'bytes4',
+    label: 'Строка (4 байта)'
+  }]
 
   async componentWillMount() {
     const { contractModel } = await this.props;
     const { votingTemplate, hints: Hints } = contractModel;
     const { step } = votingTemplate;
     const { questionId } = votingTemplate;
-
+    window.options = this.options;
 
     await this.setState({
       selected: questionId - 1,
@@ -85,6 +107,11 @@ class Votings extends Component {
     }
   }
 
+  showAlert(text) {
+    const { contractModel } = this.props;
+    contractModel.showAlert(text);
+  }
+
   removeError(e) {
     e.target.classList.remove("field__input--error");
   }
@@ -109,19 +136,17 @@ class Votings extends Component {
       </div>
     );
   }
+
   addInput() {
-    const { additionalInputs } = this.state;
+    const { additionalInputs, } = this.state;
     const getInputBlock = () => {
       let idx = additionalInputs.length;
       return (
         <div>
           <SimpleInput />
-          <select>
-            <option value="int"> Число </option>
-            <option value="string"> Текст </option>
-            <option value="address"> Адрес </option>
-            <option value="bytes4"> Строка (4 байта) </option>
-          </select>
+          <div className='select-wrapper'>
+            <CustomSelect />
+          </div>
           <span onClick={this.removeEl.bind(this, idx)}>
             {" "}
             <img src={close} />{" "}
@@ -161,7 +186,7 @@ class Votings extends Component {
     let inputs = contractModel.votingTemplate.params.map((param, index) => {
       let returnField = () => {
         return (
-          <label key={index}>
+          <p key={index}>
             <span>{param[0]}</span>
             {hints.hasOwnProperty(selected) ? <Hint data={hints[selected][index]} /> : ""}
             <SimpleInput
@@ -171,7 +196,7 @@ class Votings extends Component {
               required
               name={param[1]}
             />
-          </label>
+          </p>
         );
       };
 
@@ -180,13 +205,17 @@ class Votings extends Component {
           <div className="votings-additionals">
             <h2>Параметры вопроса</h2>
             {this.state.additionalInputs.map(input => input)}
-            <button
-              type="button"
-              className="btn btn--blue"
-              onClick={this.addInput.bind(this)}
-            >
-              ДОБАВИТЬ ПАРАМЕТР
-            </button>
+            <div className="votings-additionals__add">
+              <button
+                type="button"
+                className="btn btn--blue"
+                onClick={this.addInput.bind(this)}
+                style={{ 'width': '80px', "padding": '10px' }}
+              >
+                <img src={addIcon} />
+              </button>
+              <span>Добавить параметр</span>
+            </div>
           </div>
         );
       };
@@ -230,6 +259,7 @@ class Votings extends Component {
         </div>
       )
     }
+
     let content = this.state.loading ? this.getLoader('left') : returnContent()
 
     return (
@@ -266,7 +296,8 @@ class Votings extends Component {
     contractModel.prepareVoting(Number(selected.value));
     this.setState({
       selected: selected.value - 1,
-      hints: contractModel.hints[selected.value - 1]
+      hints: contractModel.hints[selected.value - 1],
+      invalidFormula: false
     });
   }
 
@@ -281,7 +312,7 @@ class Votings extends Component {
     matched[0] == "group" ? convertedFormula.push(0) : convertedFormula.push(1);
     matched[1] == "Owners"
       ? convertedFormula.push(1)
-      : convertedFormula.push(2);
+      : convertedFormula.push(this.findUserGroup(matched[1]))
     matched[3] == "quorum"
       ? convertedFormula.push(0)
       : convertedFormula.push(1);
@@ -293,11 +324,33 @@ class Votings extends Component {
         ? convertedFormula.push(0)
         : convertedFormula.push(1);
     }
+    console.log(convertedFormula)
+
+    if (convertedFormula[1] == null) {
+      this.setState({ invalidFormula: true })
+    } else {
+      this.setState({ invalidFormula: false })
+    }
     return convertedFormula;
+  }
+  findUserGroup(name) {
+    const { contractModel } = this.props;
+    const { contract } = contractModel
+    const userGroups = JSON.parse(localStorage.getItem(`userGroups[${contract._address}]`));
+    console.log(name)
+    let groupId = userGroups.map((group, index) => {
+      let id;
+      if (group.name == name) {
+        id = index + 1;
+      }
+      return id;
+    }).filter(e => e)
+    console.log(groupId.length);
+    return groupId.length > 0 ? groupId[0] : null;
   }
 
   async createVotingData(target) {
-    const { contractModel } = this.props;
+
     const { questions, votingTemplate } = contractModel;
     const { selected } = this.state;
 
@@ -305,13 +358,13 @@ class Votings extends Component {
     contractModel.setVotingStep(2)
 
     let mainInputs = target.querySelectorAll(
-      'form[name="votingData"] > label input '
+      'form[name="votingData"] > p input'
     );
     let additionalInputs = target.querySelectorAll(
-      ".votings-additionals input"
+      ".votings-additionals .field input"
     );
     let additionalSelects = target.querySelectorAll(
-      ".votings-additionals select"
+      ".votings-additionals .select input"
     );
 
     let methodSelector = questions[selected].methodSelector;
@@ -374,7 +427,15 @@ class Votings extends Component {
       });
     }
 
-    let hexString = web3.eth.abi.encodeParameters(parametersTypes, values);
+    console.log(mainInputs);
+
+    let hexString
+    if (!this.state.invalidFormula) {
+      console.log(parametersTypes, values)
+      hexString = web3.eth.abi.encodeParameters(parametersTypes, values);
+    } else {
+      hexString = '0x';
+    }
 
     hexString = hexString.replace("0x", methodSelector);
     return hexString;
@@ -389,36 +450,43 @@ class Votings extends Component {
     let privateKey = web3.eth.accounts.wallet[0].privateKey;
     let votingData = await this.createVotingData(document.forms.votingData);
 
-    let data = contract.methods
-      .startNewVoting(questionId, 0, 0, votingData)
-      .encodeABI();
-    let options = {
-      data,
-      to: contract._address,
-      gasPrice: web3.utils.toHex(40000000000),
-      gasLimit: web3.utils.toHex(8000000),
-      value: "0x0"
-    };
+    console.log(this.state.invalidFormula)
+    if (!this.state.invalidFormula) {
+      let data = contract.methods
+        .startNewVoting(questionId, 0, 0, votingData)
+        .encodeABI();
+      let options = {
+        data,
+        to: contract._address,
+        gasPrice: web3.utils.toHex(window.gasPrice),
+        gasLimit: web3.utils.toHex(8000000),
+        value: "0x0"
+      };
 
-    web3.eth.accounts.signTransaction(options, privateKey).then(data => {
-      web3.eth
-        .sendSignedTransaction(data.rawTransaction)
-        .on("error", err => {
-          console.log(err);
-        })
-        .on("transactionHash", txHash => {
-          this.txHash = txHash;
-          console.log(txHash);
-          contractModel.setVotingStep(4)
-        })
-        .on("receipt", data => {
-          this.setState({
-            startVoting: false,
+      web3.eth.accounts.signTransaction(options, privateKey).then(data => {
+        web3.eth
+          .sendSignedTransaction(data.rawTransaction)
+          .on("error", err => {
+            console.log(err);
+          })
+          .on("transactionHash", txHash => {
+            this.txHash = txHash;
+            console.log(txHash);
+            contractModel.setVotingStep(4)
+          })
+          .on("receipt", data => {
+            this.setState({
+              startVoting: false,
+            });
+            contractModel.setVotingStep(5)
+            contractModel.getVotings();
           });
-          contractModel.setVotingStep(5)
-          contractModel.getVotings();
-        });
-    });
+      });
+    } else {
+      contractModel.setVotingStep(1);
+      this.showAlert.bind(this, 'Такой группы пользователей нет, проверьте еще раз')
+    }
+
   }
 
   async selectQuestionId(selected) {
@@ -456,7 +524,7 @@ class Votings extends Component {
   validateInputs(target) {
     let inputs = target.querySelectorAll("input");
     let valids = [];
-    inputs.forEach(input => {
+    inputs.forEach((input, index) => {
       let name = input.getAttribute("name");
       let valid = false;
       switch (name) {
@@ -490,6 +558,7 @@ class Votings extends Component {
     });
     return [...new Set(valids)];
   }
+
   toggleSubmit(e) {
     e.preventDefault();
     const { contractModel } = this.props;
@@ -531,12 +600,12 @@ class Votings extends Component {
   render() {
     const { contractModel } = this.props;
     const { from, to, startVoting } = this.state;
-    const { bufferVotings, votingTemplate, userVote } = contractModel;
+    const { bufferVotings, votingTemplate, userVote, alertVisible, alertText } = contractModel;
     const { step } = votingTemplate;
     const modifiers = { start: from, end: to };
 
     let renderVotings = bufferVotings.map((voting, index) => (
-      <Voting key={index + 1} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
+      <Voting key={voting.votingId} data={voting} index={index + 1} setStep={this.setVotingStep.bind(this)} />
     ));
     let loaderRight = this.getLoader('right');
     let rightPanel =
@@ -650,6 +719,7 @@ class Votings extends Component {
           submit={this.startVoting.bind(this)}
           closeWindow={this.hideModal.bind(this)}
         />
+        <Alert visible={alertVisible} text={alertText} />
         <AlertModal />
       </div>
     );

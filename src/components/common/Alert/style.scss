@@ -1,0 +1,30 @@
+.alert {
+  //position & size
+  position: fixed;
+  left: 50%;
+  top: -150px;
+  width: 30%;
+  padding: 5px 10px;
+  transform: translateX(-50%);
+  z-index: 1001;
+
+  //display
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
+
+  //styling
+  background: #FFFFFF;
+  box-sizing: border-box;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+  border: 1px solid #D9DFE3;
+  border-radius: 2px;
+  transition: top .2s ease-out;
+  &-visible {
+    top: 30px;
+  }
+  &__message {
+    color: #5B778D;
+  }
+}

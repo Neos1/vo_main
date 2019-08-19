@@ -46,6 +46,9 @@
             }
         }
     }
+    &--positive {
+        background: #5C9EFF;
+    }
     &--small {
         padding: 7px 6px;
     }
@@ -55,10 +58,10 @@
         border: 1px solid #E5EBED;
         &:hover{
             color: #fff;
-            background-color: #434BDF;
+            background-color: #447ACC;
         }
         &:active{
-            background-color: #3840CC;
+            background-color: #4288F3;
         }
     }
     &--arrow{
@@ -85,10 +88,6 @@
     }
     &--red {
         background: #FB4F6E;
-        box-shadow: 0px 5px 15px 0px rgba(233, 40, 110, 0.5);
-        &:hover {
-            box-shadow: 0px 8px 25px 0px rgba(233, 40, 110, 0.3);
-        }
     }
     &--gray {
         background-color: #f3f4f5;

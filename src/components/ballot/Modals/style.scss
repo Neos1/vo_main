@@ -7,6 +7,7 @@
   width:100%;
   height:100%;
   background: rgba($color: #000, $alpha: .4);
+  z-index: 1000;
   &-voting {
     .modal-content {
       height: auto;
@@ -37,23 +38,26 @@
   }
   &-send {
     .modal-content {
-      width: 460px;
+      width: 580px;
       min-height: 70%;
       max-height: 90%;
       height: 70%;
+      .modal-body {
+        padding: 30px 140px;
+      }
     }
   }
   &-content{
     display: inline-block;
     position: absolute;
     left: 50%;
-    right: 50%;
+    top: 50%;
     width: 580px;
     max-height: 90%;
     height: 85%;
     padding-bottom: 0;
-    transform: translate(-50%, 10%);
-    background: #E5E5E5;
+    transform: translate(-50%, -50%);
+    background: #F1F4F5;
     transition: .3s ease-in-out;
   }
   &-head{
@@ -75,7 +79,7 @@
     align-items: center;
     justify-content: space-between;
     height: calc(100% - 90px);
-    padding: 30px 60px;
+    padding: 30px 85px;
     box-sizing: border-box;
     &>div{
       width: 100%;
@@ -86,9 +90,40 @@
         text-align: center;
       }
     }
+    &__notification {
+      p {
+        &:first-child {
+          font-size: 18px;
+          margin-top: 0;
+        }
+        &:last-child {
+          font-size: 22px;
+        }
+      }
+    }
+    &__data {
+      p {
+        display: table;
+        width: 100%;
+        color: #5B778D;
+        span {
+          &:first-child {
+            display: table-cell;
+            text-align: center;
+          }
+          &:last-child {
+            display: table-cell;
+            text-align: left;
+            font-weight: bold;
+          }
+        }
+      }
+    }
     &__form {
       h2 {
         text-align: center;
+        font-size: 24px;
+        color: #5B778D;
       }
       & > p {
         color: #5B778D;
@@ -96,9 +131,13 @@
         text-align: center;
       }
       & > [name="userVote"]{
+        p {
+          color: #5B778D;
+          margin: 5px;
+        }
         .field {
           display: inline-block;
-          width: 80%;
+          width: 75%;
           input {
             padding: 10px;
             &:hover, &:focus {
@@ -108,7 +147,7 @@
         }
         button {
           padding: 5px 30px;
-          width: 20%;
+          width: 25%;
           vertical-align: middle;
         }
       }
@@ -130,10 +169,40 @@
           vertical-align: middle;
         }
       }
+      & > [name="sendToken"] {
+        p {
+          color: #5B778D;
+          word-break: break-all;
+        }
+        &>p {
+          font-weight: bold;
+          margin-bottom: 40px;
+        } 
+        &>label {
+          p {
+            margin: 5px;
+          }
+          .field {
+            &__input {
+              padding: 12px 24px;
+              &:hover, &:focus {
+                padding: 11px 23px;
+              }
+            }
+          }
+        }
+
+        button {
+          margin-top: 35px;
+        }
+      }
     }
   }
   &-footer{
     text-align: center;
+    a {
+      color: #5B778D;
+    }
   }
 }
 .hidden {

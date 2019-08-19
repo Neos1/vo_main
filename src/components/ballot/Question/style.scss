@@ -56,7 +56,24 @@
           button {
             padding: 10px;
             img{
+              position: relative;
               height: 30px;
+              z-index: 2;
+            }
+            &:hover {
+              &:before {
+                content: '';
+                position: absolute;
+                left: 50%;
+                top:50%;
+                width: 30px;
+                height: 30px;
+                transform: translate(-50%,-50%);
+                border-radius: 50%;
+                background: rgba($color: #08F0FF, $alpha: .4);
+                filter: blur(7px);
+                z-index: 1;
+              }
             }
           }
         }

@@ -22,6 +22,8 @@ library Votings {
     // contains total weights for voting variants
     mapping (address=> mapping(address => uint256)) voteWeigths;
     mapping (uint=> mapping(string => uint256)) descisionWeights;
+    mapping (address=> mapping (address=>uint256)) tokenReturns;
+    
     bytes data;
   }
 

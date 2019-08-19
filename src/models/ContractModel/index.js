@@ -1,4 +1,4 @@
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, runInAction } from "mobx";
 import { Redirect } from "react-router";
 
 class ContractModel {
@@ -8,6 +8,7 @@ class ContractModel {
   @observable votings = [];
   @observable userGroups = [];
   @observable questionGroups = [];
+  @observable balances = {}
 
   @observable bufferQuestions = [];
   @observable bufferVotings = [];
@@ -29,6 +30,10 @@ class ContractModel {
     descision: "",
     parameters: []
   };
+
+  @observable balances = {
+
+  }
 
   @action setVotingStep(num) {
     this.votingTemplate.step = num;
@@ -162,7 +167,6 @@ class ContractModel {
       let userVote = await this.contract.methods.getUserVote(i).call({
         from: address
       });
-      console.log(userVote);
       voting['userVote'] = userVote;
 
       this.votings.push(voting);
@@ -259,6 +263,11 @@ class ContractModel {
       });
       this.userGroups.push(group);
     }
+
+    this.userGroups.map(group => {
+      this.getBalances(group.groupType, group.groupAddress)
+    })
+
     localStorage.setItem(
       `userGroups[${contractAddress}]`,
       JSON.stringify(this.userGroups)
@@ -328,7 +337,7 @@ class ContractModel {
     let options = [
       {
         value: null,
-        label: "Все вопросы"
+        label: "Все"
       }
     ];
     let length = this.votings.length;
@@ -389,7 +398,7 @@ class ContractModel {
 
     this.questionGroups.map((group, index) => {
       options.push({
-        value: group.groupType,
+        value: index + 1,
         label: `${index + 1} ${group.name}`
       });
     });
@@ -468,15 +477,16 @@ class ContractModel {
           if (groupType == "ERC20") {
             await userContract.methods
               .approve(contract._address, userBalance)
-              .send({ from: address, gas: 1000000 });
+              .send({ from: address, gas: 1000000, gasPrice: window.gasPrice });
           }
 
+          console.log(this.contract._address)
           this.contract.methods
             .sendVote(descision)
             .send({
               from: address,
               gas: web3.utils.toHex(8000000),
-              gasPrice: web3.utils.toHex(40000000000)
+              gasPrice: web3.utils.toHex(window.gasPrice)
             })
             .on("error", error => {
               this.userVote.status = 2;
@@ -490,17 +500,14 @@ class ContractModel {
               this.refreshLastVoting();
             });
         } else {
-
-          alert("У вас нет токенов, доступных для голосования")
+          this.showAlert("У вас нет токенов, доступных для голосования")
         }
       } else {
         this.userVote.status = 0;
-        alert("Не можем найти вашу группу. Либо ваш баланс токенов равен нулю, либо вас нет ни в одной группе пользователей")
+        this.showAlert("Не можем найти вашу группу. Либо ваш баланс токенов равен нулю, либо вас нет ни в одной группе пользователей")
       }
-
-
     } else {
-      alert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)
+      this.showAlert(`Вы уже проголосовали ${userVote == 1 ? "За" : "Против"}`)
     }
 
   }
@@ -524,6 +531,83 @@ class ContractModel {
       `votings[${contract._address}]`,
       JSON.stringify(this.votings)
     );
+  }
+
+
+  @observable alertVisible = false;
+  @observable alertText = ''
+
+  @action showAlert(text) {
+    this.alertVisible = true;
+    this.alertText = text;
+
+    setTimeout(() => {
+      this.alertVisible = false;
+    }, 3000);
+  }
+
+
+  @action async getBalances(type, address) {
+
+    const userAddress = web3.eth.accounts.wallet[0].address;
+
+    const folder = window.__ENV == 'development'
+      ? path.join(window.process.env.INIT_CWD, '/contracts/')
+      : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/')
+
+    const abi = type == 'ERC20'
+      ? JSON.parse(fs.readFileSync(path.join(folder, 'ERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(folder, 'MERC20.abi'), 'utf8'))
+
+    const testContract = await new web3.eth.Contract(abi, address);
+
+
+    type == "ERC20"
+      ? await this.getERCBalance(testContract, userAddress)
+      : await this.getCustomBalances(testContract, userAddress)
+
+    return this.balances[address].balances;
+  }
+
+
+  @action getERCBalance = async (testContract, userAddress) => {
+    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const contractAddr = testContract._address
+    this.balances[contractAddr] = {}
+    this.balances[contractAddr].balances = {}
+    const userBalance = await testContract.methods.balanceOf(userAddress).call({ from: userAddress })
+    this.balances[contractAddr].balances[userAddress] = userBalance
+  }
+
+
+  @action getCustomBalances = async (testContract, userAddress) => {
+    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const contractAddr = testContract._address
+    const users = await testContract.methods.getUsers().call({ from: userAddress });
+    this.balances[contractAddr] = {}
+    this.balances[contractAddr].balances = {}
+    await users.map(async user => {
+      await testContract.methods.balanceOf(user).call({ from: userAddress }).then(balance => {
+        this.balances[contractAddr].balances[user] = balance
+      })
+    })
+  }
+
+  @action updateBalance = async (type, group, userAddress) => {
+
+    const folder = window.__ENV == 'development'
+      ? path.join(window.process.env.INIT_CWD, '/contracts/')
+      : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, '/contracts/')
+
+    const abi = type == 'ERC20'
+      ? JSON.parse(fs.readFileSync(path.join(folder, 'ERC20.abi'), 'utf8'))
+      : JSON.parse(fs.readFileSync(path.join(folder, 'MERC20.abi'), 'utf8'))
+
+    const testContract = await new web3.eth.Contract(abi, group);
+
+    const balance = await testContract.methods.balanceOf(userAddress).call({ from: userAddress })
+
+    this.balances[group].balances[userAddress] = balance;
   }
 }
 

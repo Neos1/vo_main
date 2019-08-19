@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { observable, action } from 'mobx';
 import Container from '../Container';
 import { SimpleInput } from '../Input/index';
+import Alert from "../../common/Alert"
 import Select from 'react-select';
 import Loader from '../../common/Loader';
 import styles from './Login.scss';
@@ -67,6 +68,10 @@ class Login extends React.Component {
         keystore: ''
     };
 
+    @action showAlert(text) {
+        this.props.contractModel.showAlert(text)
+    }
+
 
 
     componentWillMount() {
@@ -79,6 +84,8 @@ class Login extends React.Component {
         const web3 = new Web3(config.host); //window.__ENV == 'development'? new Web3('ws://localhost:7545') :  new Web3(config.host);
         window.web3 = web3;
         this.config = window.config = config;
+        window.gasPrice = config.gasPrice;
+        window.step = (num) => this.step = num;
     }
 
     componentDidMount() {
@@ -95,7 +102,8 @@ class Login extends React.Component {
     render() {
         const props = this.props;
         const accountStore = props.accountStore;
-        const contractModel = props.accountStore;
+        const contractModel = props.contractModel;
+        const { showAlert, alertVisible, alertText } = contractModel;
         let projects = this.config.projects.map((project, index) => {
             return <li key={index}>
                 <Link to="/cabinet">
@@ -106,9 +114,11 @@ class Login extends React.Component {
 
 
 
+
         if (accountStore.authorized) return <Redirect to="/votings" />
         return (
             <div className={styles.login}>
+                <Alert visible={alertVisible} text={alertText} />
                 <Container>
                     <div className={styles.login__container}>
                         <button className={`
@@ -186,12 +196,12 @@ class Login extends React.Component {
 
                             {/** Окно загрузки  step: 21 - Проверка сида, 22 - сид проверен, 11 - создание ключа */}
 
-                            <div className={`${styles.seed__form} ${(this.step !== 38) ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${(this.step !== 38) ? styles.hidden : ''}`} style={{ height: '80%' }}>
                                 <div className={`${this.step !== 38 ? styles.hidden : ''}`}>
                                     <div className={`${styles.seed__key} `} style={{ textAlign: 'center' }}>
                                         <div className={styles.login__select}>
                                             <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                                <h4>Шаг 2</h4>
+                                                <h4 className='stepCount'>Шаг 2 из 3</h4>
                                                 <h4>Проверка контракта</h4>
                                                 <div style={{ display: 'inline-block' }}>
                                                     <div className={`${styles.login__progress} active`}></div>
@@ -215,7 +225,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${this.step !== 38 ? styles.hidden : ''}`}>Продолжить</button>
+                                        <button onClick={this.continueDeploy} type="button" className={`btn btn--block btn--blue ${this.step !== 38 ? styles.hidden : ''}`}>ПРОДОЛЖИТЬ</button>
                                     </div>
                                 </div>
                             </div>
@@ -247,11 +257,13 @@ class Login extends React.Component {
                                     </p>
                                     <p className={styles.seed__seed}>
                                         {this.showSeed ? this.account.randomSeed : this.hiddenSeed}
+                                        <a className={styles.seed__toggle} onClick={this.toggleSeed}>
+                                            <img src={`${PATH_TO_IMG}${this.showSeed ? "eye-off.png" : "eye.png"} `} />
+                                        </a>
                                     </p>
-                                    <a onClick={this.toggleSeed}> {this.showSeed ? "Скрыть слова" : "Показать слова"} </a>
                                 </div>
                                 <div className={styles.login__submit}>
-                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я записал. Честно.</button>
+                                    <button onClick={this.inputCreatedSeed} type="button" className="btn btn--block btn--blue">Я ЗАПИСАЛ</button>
                                 </div>
                             </div>
 
@@ -274,7 +286,7 @@ class Login extends React.Component {
                             {/** Окно выбора деплоя: step = 31 - окно добавления проекта, 35 - выбор типа проекта */}
                             <div className={`${styles.seed__form} ${(this.step !== 31) && (this.step !== 35) ? styles.hidden : ''}`}>
                                 <div className={this.step != 31 ? "" : ""}>
-                                    <h3>Добавление проекта</h3>
+                                    <h3>{this.step == 31 ? 'Добавление проекта' : 'Создание нового проекта'}</h3>
                                     <div className={styles.login__select}>
                                         <p className='deploy__desc'>
                                             Вы можете добавить проект, чтобы принимать участие в голосованиях по нему
@@ -289,16 +301,24 @@ class Login extends React.Component {
                                                 <p>У меня есть <span className="note">адрес&nbsp;проекта</span></p>
                                             </div>
                                         </p>
-                                        <p className={`${styles.deploy__select} ${this.step != 35 ? 'hidden' : ''}`}>
+                                        <p className={`${styles.deploy__select} ${this.step != 35 ? 'hidden' : ''}`} style={{ 'flex-flow': "row wrap" }}>
+                                            <p style={{
+                                                "fontSize": "18px",
+                                                "fontWeight": "400",
+                                                "color": "#37474F",
+                                                "margin-bottom": "25px",
+                                                "width": "60%"
+                                            }}>
+                                                У владельцев проекта есть токены?
+                                            </p>
                                             <div>
-                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">Владеют</button>
-                                                <p>Владельцы проекта уже владеют токенами</p>
-                                            </div>
-                                            <div>
-                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">Не владеют</button>
-                                                <p>Владельцы проекта еще не владеют токенами</p>
-                                            </div>
+                                                <button onClick={this.newAddress} type="button" className="btn btn--block btn--blue">ЕСТЬ ТОКЕНЫ</button>
 
+                                            </div>
+                                            <div>
+                                                <button onClick={this.toCreateToken} type="button" className="btn btn--block btn--blue">НЕТ ТОКЕНОВ</button>
+
+                                            </div>
                                         </p>
                                     </div>
                                 </div>
@@ -346,12 +366,12 @@ class Login extends React.Component {
                             </div>
 
                             {/** Новый адрес */}
-                            <div className={`${styles.seed__form} ${this.step !== 36 ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${this.step !== 36 ? styles.hidden : ''}`} style={{ height: '80%' }}>
 
                                 <form name="checkERC" onSubmit={this.checkExistingERC}>
                                     <div className={styles.login__select}>
                                         <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                            <h4>
+                                            <h4 className='stepCount'>
                                                 Шаг 1 из 3
                                             </h4>
                                             <h4>
@@ -373,19 +393,19 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">Следующий шаг</button>
                                     </div>
                                 </form>
                             </div>
 
                             {/** Шаг 2 деплоя существующего ERC20 */}
-                            <div className={`${styles.seed__form} ${this.step !== 39 ? styles.hidden : ''}`} style={{ height: '100%' }}>
+                            <div className={`${styles.seed__form} ${this.step !== 39 ? styles.hidden : ''}`} style={{ height: '80%' }}>
 
                                 <form name="deploy_step_2" onSubmit={this.deploySolidity}>
                                     <div className={styles.login__select}>
                                         <div style={{ marginBottom: 80 + 'px', marginTop: 40 + 'px' }}>
-                                            <h4>
-                                                Шаг 3
+                                            <h4 className='stepCount'>
+                                                Шаг 3 из 3
                                             </h4>
                                             <h4>
                                                 Загрузка контракта проекта
@@ -408,7 +428,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">СЛЕДУЮЩИЙ ШАГ</button>
                                     </div>
                                 </form>
                             </div>
@@ -435,7 +455,7 @@ class Login extends React.Component {
                                         </div>
                                     </div>
                                     <div className={styles.login__submit}>
-                                        <button type="submit" className="btn btn--block btn--blue">Продолжить</button>
+                                        <button type="submit" className="btn btn--block btn--blue">СОЗДАТЬ</button>
                                     </div>
                                 </form>
 
@@ -456,19 +476,31 @@ class Login extends React.Component {
                                 && (this.step != 41)
                                 && (this.step != 51)
                                 && (this.step != 52)
-                                && (this.step != 8)) ? styles.hidden : ''} ${this.step == 40 ? "fullwidth" : ''}`}>
+                                && (this.step != 8)) ? styles.hidden : ''} 
+                                
+                                ${(this.step == 8) ? '' : "fullwidth"}`}>
 
-                            <div className={`${((this.step != 21) && (this.step != 11) && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : ''}`}>
+                            <div className={`${((this.step != 21) && (this.step != 11) && (this.step != 24) && (this.step != 33) && (this.step != 37) && (this.step != 40) && (this.step != 51) && (this.step != 8)) ? styles.hidden : `${this.step != 40 ? 'infoMessage' : ''}`}`}>
                                 <Loader className={this.step == 40 ? 'hidden' : ''} />
-                                {this.step == 21 ? <h3>Проверяем резервную фразу</h3> : ''}
-                                {this.step == 24 ? <h3>Идет сохранение ключа</h3> : ''}
-                                {this.step == 11 ? <h3>Идет создание ключа</h3> : ''}
-                                {this.step == 33 ? <h3>Проверяем адрес проекта</h3> : ''}
-                                {this.step == 37 ? <h3>Производим проверку контракта ERC20</h3> : ''}
-                                {this.step == 8 ? <h3>Производим дешифровку ключа</h3> : ''}
+                                {this.step == 21 ? <div><h3>Проверяем резервную фразу</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 24 ? <div><h3>Идет сохранение ключа</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 11 ? <div><h3>Идет создание ключа</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 33 ? <div><h3>Проверяем адрес проекта</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 37 ? <div><h3>Производим проверку контракта ERC20</h3> <p className='subtext'>Это займет немного времени</p> </div> : ''}
+                                {this.step == 8 ? <h3 style={{
+                                    'position': 'absolute',
+                                    'font-weight': '400',
+                                    'top': '100%',
+                                    'left': '50%',
+                                    'font-size': '14px',
+                                    'display': 'inline-block',
+                                    'width': '170px',
+                                    'transform': 'translate(-50%, -50%)',
+                                    'opacity': '0.4',
+                                }}>Выполняется вход в систему</h3> : ''}
                                 {this.step == 51 ? <div><h3>Загружаем контракт ERC20 <p className='subtext'>Это может занять до 5 минут</p></h3></div> : ''}
                                 {this.step == 40 ?
-                                    <div c>
+                                    <div >
                                         <h3 style={{ marginBottom: '20px' }}>Производим загрузку контракта</h3>
                                         <p className='subtext' style={{ marginBottom: '30px' }}>Это может занять до 5 минут</p>
                                         <div className="progress">
@@ -539,14 +571,14 @@ class Login extends React.Component {
                                 && (this.step != 34)
                                 && (this.step != 41)
                                 && (this.step != 52) ? styles.hidden : ''}`}>
-                                <img src={`${PATH_TO_IMG}contract.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting_after_message.svg`}></img>
                             </div>
 
                             <div className={`${styles.seed__key} ${(this.step != 22) ? styles.hidden : ''}`}>
-                                <h3>Резервная фраза проверена, ваш ключ:</h3>
+                                <h3 className='seed-checked'>Резервная фраза проверена, ваш ключ:</h3>
                                 <div className={styles.seed__wallet}>
-                                    <p>Ваш ключ: <strong className="note">{this.account.addresses}</strong></p>
-                                    <p>Баланс: <strong className="note">{this.account.balances / 1.0e18} Eth</strong></p>
+                                    <p><span>Ваш ключ:</span> <strong className="note">{this.account.addresses}</strong></p>
+                                    <p><span>Баланс:</span> <strong className="note">{this.account.balances / 1.0e18} Eth</strong></p>
                                 </div>
 
                             </div>
@@ -575,8 +607,8 @@ class Login extends React.Component {
                         </div>
 
                         <div className={styles.login__description}>
-                            <div className={`${styles.content} ${this.step !== 0 ? 'hidden' : ''}`} style={{ 'maxWidth': "350px" }}>
-                                <img src={`${PATH_TO_IMG}rocket.png`}></img>
+                            <div className={`${styles.content} ${(this.step !== 0) && (this.step !== 8) ? 'hidden' : ''}`} style={{ 'maxWidth': "350px" }}>
+                                <img src={`${PATH_TO_IMG}logo.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p> An open source voting system V4Vote will allow you to connect to decision-making those whose help you need. </p>
                                     <p>Connect the project owners, company employees, management, holders of tokens purchased on ICO. </p>
@@ -584,7 +616,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 1) && (this.step !== 23) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}safe.png`}></img>
+                                <img src={`${PATH_TO_IMG}safe.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Пароль должен состоять как минимум из <strong className={`${this.passwordMatches[4] ? 'note' : ''} `}>6 символов.</strong></p>
                                     <table className={styles.content__password}>
@@ -615,15 +647,15 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${(this.step !== 12) && (this.step !== 13) ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}letter.png`}></img>
+                                <img src={`${PATH_TO_IMG}letter.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p> Резервная фраза состоит из <strong className="note">12 слов</strong></p>
                                     <p> <strong className="warning">Обязательно запишите</strong> эти слова и не сообщайте их никому</p>
                                     <p> <strong className="note">Помните!</strong> Эта фраза дает полный контроль над вашим ключом</p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 2 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}lifebuoy.png`}></img>
+                            <div className={`${styles.content} ${(this.step !== 2) ? 'hidden' : ''}`}>
+                                <img src={`${PATH_TO_IMG}letter-check.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Нужно ввести последовательно все <strong className="note">слова полученные при регистрации.</strong></p>
                                     <p>Вы ведь их сохранили или записали?</p>
@@ -631,46 +663,46 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 3 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}sextant.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting-select.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>За что проголосуем на этот раз?</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 31 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}briefcase.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting-create.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Cоздайте новый проект либо подключите уже существующий </p>
                                     <p>Вы могли получить адрес проекта <span className="note">где-то там</span></p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 32 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}cloud.png`}></img>
+                            <div className={`${styles.content} ${(this.step !== 32) ? 'hidden' : ''}`}>
+                                <img src={`${PATH_TO_IMG}voting-create.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis </p>
 
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 35 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}structure.png`}></img>
+                                <img src={`${PATH_TO_IMG}structure.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>При создании проекта необходимо указать его владельцев </p>
                                 </div>
                             </div>
-                            <div className={`${styles.content} ${this.step !== 36 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}map.png`}></img>
+                            <div className={`${styles.content} ${(this.step !== 36) ? 'hidden' : ''}`}>
+                                <img src={`${PATH_TO_IMG}contract-with-tokens.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Вводить вручную необязательно, можно скопировать и вставить</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 38 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}check-list.png`}></img>
+                                <img src={`${PATH_TO_IMG}voting_after_message.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Всё идет хорошо</p>
                                     <p>Можно продолжать</p>
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 39 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}document.png`}></img>
+                                <img src={`${PATH_TO_IMG}document.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Контракт проекта будет загружен в сеть при помощи кошелька</p>
                                     <p>Название проекта будет записано в блокчейн</p>
@@ -678,16 +710,18 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className={`${styles.content} ${this.step !== 5 ? 'hidden' : ''}`}>
-                                <img src={`${PATH_TO_IMG}document.png`}></img>
+                                <img src={`${PATH_TO_IMG}create-erc20.svg`}></img>
                                 <div className={styles.content__description}>
                                     <p>Контракт ERC20 будет загружен в сеть при помощи кошелька, указанного ниже</p>
                                     <p>{this.account.addresses}</p>
-                                    <p>
-                                        <strong>Баланс: </strong>
-                                        <strong className="note">{Number((this.account.balances / 1.0e18)).toFixed(4)} ETH</strong>
-                                    </p>
-                                    <p>Для загрузки необходимо наличие на кошельке средств, в размере примерно 0.0001 Eth.</p>
                                     <p>Все ERC20 токены будут начислены на этот кошелек, после чего их можно будет распределить на необходимые адреса.</p>
+                                    <div className='content__description-info'>
+                                        <p>
+                                            <strong>Баланс: </strong>
+                                            <strong className="note">{Number((this.account.balances / 1.0e18)).toFixed(4)} ETH</strong>
+                                        </p>
+                                        <p>Для загрузки необходимо наличие ~ 0.0001 ETH на кошельке</p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -801,12 +835,6 @@ class Login extends React.Component {
                 this.newAddresses(address, privKey);
                 this.setWeb3Provider(this.account.keystore);
 
-                let name = `UTC--${this.date}--${address}`
-
-                this.wallets = window.__ENV == 'development'
-                    ? JSON.parse(fs.readFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), "utf8"))
-                    : JSON.parse(fs.readFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), "utf8"))
-
                 this.handleShowSeed();
                 worker.terminate();
             }
@@ -867,16 +895,18 @@ class Login extends React.Component {
         this.account.addresses = address
         this.wallets[address] = {};
         this.wallets[address] = this.account.keystore;
-
-        let name = `UTC--${this.date}--${address}`
         this.getBalance();
+    }
+
+    @action writeWallet = () => {
+        let name = `UTC--${this.date}--${this.account.addresses}`
         if (window.__ENV == 'development') {
             fs.writeFileSync(path.join(window.process.env.INIT_CWD, `./wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         } else {
             fs.writeFileSync(path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, `wallets/${name}.json`), JSON.stringify(this.account.keystore, null, '\t'), "utf8")
         }
-
     }
+
     @action getBalance = () => {
         web3.eth.getBalance(this.account.addresses).then(data => { this.account.balances = data })
     }
@@ -918,7 +948,7 @@ class Login extends React.Component {
                 if (this.account.balances / 1.0e18 > 0.001) {
                     this.step = 51;
                     this.deployToken("token");
-                } else alert("Недостаточно средств на кошельке, пополните баланс")
+                } else this.showAlert("Недостаточно средств на кошельке, пополните баланс")
             } else {
                 if (this.ERC20.name == "") {
                     document.deploy_project.token.classList.add('field__input--error')
@@ -929,7 +959,7 @@ class Login extends React.Component {
                 if (isNaN(Number(this.ERC20.totalSupply)) || (Number(this.ERC20.totalSupply) < 0)) {
                     document.deploy_project.count.classList.add('field__input--error')
                 }
-                alert("Введите корректные данные")
+                this.showAlert("Введите корректные данные")
             }
         } else {
             document.deploy_project.password.classList.add('field__input--error')
@@ -1002,7 +1032,7 @@ class Login extends React.Component {
                 this.step = 40
                 this.substep = 1;
                 this.deployToken('contract')
-            } else alert("Недостаточно средств на кошельке, пополните баланс")
+            } else this.showAlert("Недостаточно средств на кошельке, пополните баланс")
         } else {
             document.deploy_step_2.querySelectorAll('input')[1].classList.add('field__input--error');
         }
@@ -1012,7 +1042,7 @@ class Login extends React.Component {
 
         let options = {
             data: transaction.encodeABI(),
-            gasPrice: web3.utils.toHex(40000000000),
+            gasPrice: web3.utils.toHex(window.gasPrice),
             gasLimit: web3.utils.toHex(8000000),
             value: '0x0'
         };
@@ -1133,7 +1163,7 @@ class Login extends React.Component {
                         let rawTx = {
                             to: contractAddress,
                             data: dataTx,
-                            gasPrice: web3.utils.toHex(40000000000),
+                            gasPrice: web3.utils.toHex(window.gasPrice),
                             gasLimit: web3.utils.toHex(8000000),
                             value: '0x0',
                             nonce: web3.utils.toHex(nonce),
@@ -1166,7 +1196,7 @@ class Login extends React.Component {
     @action
     checkContractAddress = () => {
         let address = web3.eth.getCode(this.contract.hash).then(data => {
-            data !== '0x' ? alert('Адрес валидный') : alert('Адрес не валидный');
+            data !== '0x' ? this.showAlert('Адрес валидный') : this.showAlert('Адрес не валидный');
         })
     }
 
@@ -1238,10 +1268,11 @@ class Login extends React.Component {
             })
             let privKey = web3.eth.accounts.wallet[0].privateKey
             this.newAddresses(this.account.addresses, privKey);
+            this.writeWallet();
             setTimeout(() => {
                 this.step = 0;
             }, 1500)
-        } else alert('Проверьте правильность ввода')
+        } else this.showAlert('Проверьте правильность ввода')
     }
     @action
     backToStart = () => {
@@ -1278,6 +1309,7 @@ class Login extends React.Component {
             document.forms.password_input.reset();
             this.step = 24;
             this.recoverWallet('create');
+            this.writeWallet()
         } else {
             e.target.password.classList.add('field__input--error')
             e.target.password_confirm.classList.add('field__input--error')
@@ -1296,7 +1328,7 @@ class Login extends React.Component {
             })
             this.step = 21;
             this.recoverWallet('recover');
-        } else alert("Проверьте правильность ввода")
+        } else this.showAlert("Проверьте правильность ввода")
     }
     @action
     handleSubmit = (e) => {
@@ -1323,7 +1355,7 @@ class Login extends React.Component {
                 } else {
                     document.forms.login_form.password.classList.add('field__input--error')
                     this.step = 0;
-                    alert('Проверьте правильность ввода пароля')
+                    this.showAlert('Проверьте правильность ввода пароля')
                     loginWorker.terminate();
                 }
             }
@@ -1427,7 +1459,7 @@ class Login extends React.Component {
                         writeToProjects()
                     } else {
                         this.step = 32
-                        alert('Адрес не валидный');
+                        this.showAlert('Адрес не валидный');
                     }
                 })
             } else {

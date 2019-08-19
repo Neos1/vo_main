@@ -26,6 +26,7 @@
     & > div {
       position: relative;
       width: 85%;
+      max-width: 500px;
       height: 100%;
       display: flex;
       flex-flow: column nowrap;
@@ -140,13 +141,21 @@
       margin-top: 165px;
       padding-bottom: 20px;
 
-      label {
+      p {
+        display: block;
+        color: #5B778D;
         & > span {
           display: inline-block;
           margin-bottom: 5px;
           color: #5b778d;
           font-weight: 400;
           text-align: left;
+        }
+        .field {
+          margin-bottom: 20px;
+        }
+        input {
+          height: 40px;
         }
 
         &:last-child {
@@ -161,8 +170,11 @@
       }
 
       .votings-additionals {
-        margin: 30px 0;
-
+        margin: 30px 0 50px;
+        & > h2 {
+          font-weight: 400;
+          color: #37474F;
+        }
         & > div {
           margin-bottom: 20px;
           display: flex;
@@ -172,15 +184,64 @@
 
           .field {
             display: inline-block;
-            width: 40%;
+            width: 50%;
+            max-height: 40px;
+            margin: 0;
+            &__input {
+              padding: 12px 24px;
+            }
           }
-
-          select {
-            width: 30%;
+          .select-wrapper {
+            width: 32%;
+            height: 40px;
+            select {
+              position: relative;
+              width: 100%;
+              height: 40px;
+              padding: 0 10px;
+              background: #fff;
+              border: 1px solid #D9DFE3;
+              border-radius: 3px;
+              margin: 0;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              color: #5B778D;
+              outline: none;
+              &:active {
+                border: 1px solid #447ACC;
+                &+span {
+                  &:before {
+                    transform: rotate(-180deg);
+                  }
+                }
+              }
+              &+span {
+                position: relative;
+                &::before {
+                  content: url($image_path +'select-arrow_grey.svg');
+                  position: absolute;
+                  right: 10px;
+                  top: 50%;
+                }
+              }
+            }  
           }
-
-          span {
+          
+          & > span {
+            position: relative;
             cursor: pointer;
+           
+          }
+        }
+        &__add {
+          span {
+            flex-grow: 1;
+            margin-left: 30px;
+            font-weight: 500;
+            font-size: 16px;
+            color: #5B778D;
+            cursor: default;
           }
         }
       }
@@ -188,7 +249,16 @@
 
     &__active {
       text-align: center;
-      width: 261px;
+      width: 263px;
+      color: #37474F;
+      & > h1 {
+        font-weight: 400;
+        font-size: 24px;    
+      }
+      & > p {
+        width: 90%;
+        margin: 0 auto;
+      }
     }
   }
 
@@ -200,14 +270,49 @@
     box-sizing: border-box;
     background-color: #e6e8ed;
     overflow-y: auto;
-
+    &::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+      border: 1px none #D9DFE3;
+    }
+    &::-webkit-scrollbar-button {
+      width: 0px;
+      height: 0px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #fbfbfb;
+      border: 1px none #D9DFE3;;
+      border-radius: 50px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+    }
+    &::-webkit-scrollbar-thumb:active {
+      background: #fbfbfb;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border: 0px none #ffffff;
+      border-radius: 0px;
+    }
+    &::-webkit-scrollbar-track:hover {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-track:active {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
     &__filters {
-      display: table;
+      width: 100%;
+      display: flex;
       margin-bottom: 20px;
-
+      flex-flow: row nowrap;
+      justify-content: unset;
       &-numbers {
         display: inline-block;
-
+        margin-right: 25px;
         .Select {
           display: inline-block;
           width: 80px;
@@ -243,6 +348,7 @@
           }
 
           &-control {
+            width: 170px;
             transition: 0.2s linear;
             border: none;
             background: transparent;
@@ -254,6 +360,7 @@
           }
 
           &-value {
+            width: 90%;
             padding: 0 !important;
           }
 
@@ -281,6 +388,7 @@
           }
 
           &-arrow-zone {
+            left: 15px;
             border: none;
           }
 
@@ -295,19 +403,32 @@
 
         &--questions {
           .Select {
-            width: 200px !important;
+            width: 185px !important;
+          }
+          .Select-control {
+            width: 185px ;
           }
         }
 
         &--descision {
           .Select {
-            width: 120px !important;
+            width: 120px ;
+          }
+          .Select-control {
+            width: 120px ;
           }
         }
 
         &--id {
           .Select {
-            width: 120px !important;
+            width: 75px;
+            text-align: center;
+          }
+          .Select-control {
+            width: 75px;
+          }
+          .Select-arrow-zone {
+            left: 26px;
           }
         }
 
