@@ -43,17 +43,16 @@ class Voting extends Component {
     await this.getTime();
     await this.getVotingDescision();
     await this.getVotesPercents();
-    await this.getUserVote(data.votingId);
     await this.setState({
-      interval: setInterval(() => {
-        this.refreshVoting();
-      }, 60 * 1000)
+      interval: data.status == 0
+        ? setInterval(() => { this.refreshVoting() }, 60 * 1000)
+        : ''
     })
   }
 
   componentWillUnmount() {
     clearInterval(this.state.interval);
-    this.setState({ interval: clearInterval(this.state.interval) })
+    this.setState({ interval: '' })
   }
 
   async refreshVoting() {
@@ -64,7 +63,7 @@ class Voting extends Component {
     await this.getUserVote(data.votingId)
     if (data.status == 1) {
       clearInterval(this.state.interval);
-      this.setState({ interval: clearInterval(this.state.interval) });
+      this.setState({ interval: '' });
     }
   }
 
@@ -76,7 +75,7 @@ class Voting extends Component {
   async getUserVote(id) {
     const { contractModel, data } = this.props;
     const { contract } = contractModel;
-    let userVote = await contract.methods.getUserVote(id).call({ from: web3.eth.accounts.wallet[0].address });
+    let userVote = data.userVote || "0"
     let isReturned = await contract.methods.isUserReturnTokens(data.votingId, web3.eth.accounts.wallet[0].address).call({ from: web3.eth.accounts.wallet[0].address })
     await this.setState({ userVote, isReturned });
   }
@@ -108,7 +107,6 @@ class Voting extends Component {
     })
   }
   async closeVoting(e) {
-    console.log(e.target.getAttribute('disabled'));
     const { contractModel, accountStore, setStep } = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
@@ -134,9 +132,7 @@ class Voting extends Component {
   }
   getFlow() {
     const { contractModel, data } = this.props;
-    console.log(data.votingId);
     const { remaining, percent, status } = this.state;
-    console.log(remaining, percent, status);
     const voteNotEnded = () => {
       return (
         <p className={styles['voting-about__progress']}>
@@ -320,23 +316,21 @@ class Voting extends Component {
     const { contractModel, index, data } = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
+    const votesPercents = data.votesPercents
+    const positive = Number(votesPercents[0]);
+    const negative = Number(votesPercents[1]);
+    const abstained = Number(votesPercents[2]) - (positive + negative);
+    if ((positive > negative) && (positive > abstained)) this.setState({ preDescision: 'ЗА' })
+    if ((negative > positive) && (negative > abstained)) this.setState({ preDescision: 'ПРОТИВ' })
+    if ((abstained > positive) && (abstained > negative)) this.setState({ preDescision: 'НЕ ГОЛОСОВАЛО' })
 
-    contract.methods.getVotes(data.votingId).call({ from: address }).then(data => {
-      const positive = Number(data[0]);
-      const negative = Number(data[1]);
-      const abstained = Number(data[2]) - (positive + negative);
-      if ((positive > negative) && (positive > abstained)) this.setState({ preDescision: 'ЗА' })
-      if ((negative > positive) && (negative > abstained)) this.setState({ preDescision: 'ПРОТИВ' })
-      if ((abstained > positive) && (abstained > negative)) this.setState({ preDescision: 'НЕ ГОЛОСОВАЛО' })
-
-      this.setState({
-        votingPercents: {
-          positive: Number(data[0]),
-          negative: Number(data[1]),
-          totalTokens: Number(data[2])
-        }
-      })
-    });
+    this.setState({
+      votingPercents: {
+        positive: Number(votesPercents[0]),
+        negative: Number(votesPercents[1]),
+        totalTokens: Number(votesPercents[2])
+      }
+    })
   }
 
   getGroupBlock() {

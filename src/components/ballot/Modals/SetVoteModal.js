@@ -27,16 +27,53 @@ class SetVoteModal extends Component {
     contractModel.switchFromVoteToStatus();
   }
 
+  getFormula(rawFormula) {
+    let f = rawFormula.map(text => Number(text));
+    let r = [];
+    let ready = '( )'
+    f[0] === 0 ? r.push('group( ') : r.push('user(0x298e231fcf67b4aa9f41f902a5c5e05983e1d5f8) => condition( ');
+    f[1] === 1 ? r.push('Owner) => condition(') : r.push('Custom) => condition(');
+    f[2] === 0 ? r.push('quorum') : r.push('positive');
+    f[3] === 0 ? r.push(' <= ') : r.push(' >= ');
+    f.length == 6 ? r.push(`${f[4]} %`) : r.push(`${f[4]} % )`)
+    if (f.length == 6) {
+      f[5] === 0 ? r.push(' of quorum)') : r.push(' of all)');
+    }
+
+    let formula = r.join('');
+    ready = ready.replace(' ', formula);
+    return ready;
+  }
+
   render() {
     const { contractModel } = this.props
     const { votingTemplate, questions, userVote } = contractModel;
     const { descision, questionId } = userVote;
     let questionName = Number(questionId) ? contractModel.questions[questionId - 1].caption : '';
     let votingParameters = userVote.parameters.map((param, index) => {
+      let parameter;
+      console.log(param[0], param[1])
+      if (web3.utils.hexToUtf8(param[0]) == 'Formula') {
+        parameter = this.getFormula(param[1])
+        console.log(parameter)
+      } else if (web3.utils.hexToUtf8(param[0]) == 'parameters') {
+        console.log(parameter)
+        parameter = param[1].map((subParam, index) => {
+          if (index % 2 == 0) return (
+            <span key={index} className={styles['modal-body__data--subparameter']}>
+              <span>{web3.utils.hexToUtf8(subParam)}</span>
+              <span> - </span>
+              <span>{web3.utils.hexToUtf8(param[1][index + 1])}</span>
+            </span>
+          )
+        })
+      } else {
+        parameter = param[1]
+      }
       return (
-        <p key={index}>
+        <p key={index} className={styles['modal-body__data--parameter']}>
           <span>{web3.utils.hexToUtf8(param[0])}</span>
-          <span>{param[1]}</span>
+          <span>{parameter}</span>
         </p>
       )
     })

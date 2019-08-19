@@ -168,6 +168,8 @@ class ContractModel {
       let userVote = await this.contract.methods.getUserVote(i).call({
         from: address
       });
+      let votesPercents = await contract.methods.getVotes(i).call({ from: address })
+      voting['votesPercents'] = votesPercents
       voting['userVote'] = userVote;
 
       this.votings.push(voting);

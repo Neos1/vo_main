@@ -115,12 +115,13 @@
       }
     }
     &__data {
-      p {
+      &--parameter {
         display: block;
         width: 100%;
         color: #5B778D;
         text-align: left;
-        span {
+        white-space: nowrap;
+        & > span {
           &:first-child {
             display: inline-block;
             text-align: left;
@@ -132,6 +133,7 @@
             max-width: 50%;
             width: 50%;
             float: right;
+            text-align: left;
           }
         }
       }
@@ -141,6 +143,14 @@
         background: #fff;
         border: 1px solid #D9DFE3;
         overflow-y: auto;
+      }
+      &--subparameter {
+        display: block;
+        &>span {
+          display: inline-block;
+          width: auto;
+          float: unset;
+        }
       }
     }
     &__form {
