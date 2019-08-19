@@ -1,4 +1,5 @@
 import { observable, computed, action, runInAction } from "mobx";
+import contractModel from '../ContractModel'
 
 //import contracts from '../../contracts';
 import storage from "../../utils/storage";
@@ -19,7 +20,7 @@ if (window.process.platform == 'linux') {
 const PATH_TO_WALLETS = window.__ENV == 'development'
     ? path.join(window.process.env.INIT_CWD, "./wallets/")
     : path.join(window.process.env.PORTABLE_EXECUTABLE_DIR, './wallets/')
-    
+
 
 
 
@@ -27,6 +28,7 @@ const PATH_TO_WALLETS = window.__ENV == 'development'
 class AccountModel {
     @observable name;
     @observable address; //='0xd02b332792c6ebbab85783fea8383c693ae462b2';
+    @observable ethBalance = 0;
     @observable wallet_object;
     @observable account_type;
     @observable tokens = 0;
@@ -35,18 +37,18 @@ class AccountModel {
     constructor() {
         const _self = this;
         const address = storage.getItem('account');
-        
-        let files = window.fs.readdirSync(PATH_TO_WALLETS); 
-            files.map( file =>{
-                let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
-                let wallet_object = {}
-                wallet_object[wallet.address] = wallet
-                _self.accounts = Object.assign(_self.accounts, wallet_object)
-            });
 
-        window.fs.watch(PATH_TO_WALLETS, (evtType, file)=>{
+        let files = window.fs.readdirSync(PATH_TO_WALLETS);
+        files.map(file => {
+            let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
+            let wallet_object = {}
+            wallet_object[wallet.address] = wallet
+            _self.accounts = Object.assign(_self.accounts, wallet_object)
+        });
+
+        window.fs.watch(PATH_TO_WALLETS, (evtType, file) => {
             if (file) {
-                if(evtType === 'change'){
+                if (evtType === 'change') {
                     let wallet = JSON.parse(fs.readFileSync(path.join(PATH_TO_WALLETS, file), 'utf8'))
                     let wallets = _self.accounts
                     this.accounts = {}
@@ -59,8 +61,8 @@ class AccountModel {
             } else {
                 console.info('filename not provided');
             }
-        }) 
-        
+        })
+
 
         if (!address) return;
 
@@ -84,7 +86,7 @@ class AccountModel {
         return this.address ? this.address : 0;
     }
 
-    @computed 
+    @computed
     get options() {
         return Object.keys(this.accounts).map((item, index) => ({
             value: item,
@@ -92,17 +94,23 @@ class AccountModel {
         }))
     }
 
-    @computed 
+    @computed
     get type() {
-       if (this.account_type === 0) return 'Упр. ';
-       if (this.account_type === 1) return 'Адм. ';
-       return '';
+        if (this.account_type === 0) return 'Упр. ';
+        if (this.account_type === 1) return 'Адм. ';
+        return '';
     }
 
-    @computed 
+    @computed
     get avatar() {
         return avatar;
     }
+
+    @computed
+    get balance() {
+        return (this.ethBalance / 1.0e18).toFixed(4);
+    }
+
 
     @action
     setAccount(address) {
@@ -143,11 +151,12 @@ class AccountModel {
     }
 
     @action
-    getTokens() {
+    async getBalance() {
         const _self = this;
-        
+        const balance = await web3.eth.getBalance(_self.address);
+        _self.ethBalance = balance;
     }
 }
 
-const accountStore = window.accountStore = new AccountModel(); 
+const accountStore = window.accountStore = new AccountModel();
 export default accountStore;

@@ -1,5 +1,6 @@
 import { observable, action, computed, runInAction } from "mobx";
 import { Redirect } from "react-router";
+import accountStore from "../BallotAccount/AccountModel";
 
 class ContractModel {
   @observable contract;
@@ -477,7 +478,9 @@ class ContractModel {
           if (groupType == "ERC20") {
             await userContract.methods
               .approve(contract._address, userBalance)
-              .send({ from: address, gas: 1000000, gasPrice: window.gasPrice });
+              .send({ from: address, gas: 1000000, gasPrice: window.gasPrice }).on('reciept', () => {
+                accountStore.getBalance();
+              });
           }
 
           console.log(this.contract._address)
@@ -498,6 +501,7 @@ class ContractModel {
             .on("receipt", receipt => {
               this.userVote.status = 1;
               this.refreshLastVoting();
+              accountStore.getBalance();
             });
         } else {
           this.showAlert("У вас нет токенов, доступных для голосования")
@@ -571,9 +575,10 @@ class ContractModel {
 
 
   @action getERCBalance = async (testContract, userAddress) => {
-    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const symbol = await testContract.methods.symbol().call({ from: userAddress })
     const contractAddr = testContract._address
     this.balances[contractAddr] = {}
+    this.balances[contractAddr].symbol = symbol
     this.balances[contractAddr].balances = {}
     const userBalance = await testContract.methods.balanceOf(userAddress).call({ from: userAddress })
     this.balances[contractAddr].balances[userAddress] = userBalance
@@ -581,10 +586,11 @@ class ContractModel {
 
 
   @action getCustomBalances = async (testContract, userAddress) => {
-    //const sybmol = await testContract.methods.sybmol().call({ from: userAddress })
+    const symbol = await testContract.methods.symbol().call({ from: userAddress })
     const contractAddr = testContract._address
     const users = await testContract.methods.getUsers().call({ from: userAddress });
     this.balances[contractAddr] = {}
+    this.balances[contractAddr].symbol = symbol
     this.balances[contractAddr].balances = {}
     await users.map(async user => {
       await testContract.methods.balanceOf(user).call({ from: userAddress }).then(balance => {

@@ -13,7 +13,7 @@ import awaitLastVote from '../../../img/voting_lastVote.svg';
 import Alert from '../../common/Alert';
 
 
-@inject('contractModel') @observer
+@inject('contractModel', 'accountStore') @observer
 class Voting extends Component {
   constructor(props) {
     super(props);
@@ -47,8 +47,13 @@ class Voting extends Component {
     await this.setState({
       interval: setInterval(() => {
         this.refreshVoting();
-      }, 5 * 1000)
+      }, 60 * 1000)
     })
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+    this.setState({ interval: clearInterval(this.state.interval) })
   }
 
   async refreshVoting() {
@@ -59,7 +64,7 @@ class Voting extends Component {
     await this.getUserVote(data.votingId)
     if (data.status == 1) {
       clearInterval(this.state.interval);
-      this.setState({ interval: '' });
+      this.setState({ interval: clearInterval(this.state.interval) });
     }
   }
 
@@ -77,7 +82,7 @@ class Voting extends Component {
   }
 
   async returnTokens() {
-    const { contractModel, setStep, data } = this.props;
+    const { contractModel, accountStore, setStep, data } = this.props;
     const { contract } = contractModel;
     contract.methods.returnTokens(data.votingId).send({ from: web3.eth.accounts.wallet[0].address, gas: 5000000, gasPrice: window.gasPrice })
       .on('error', (err) => {
@@ -90,6 +95,7 @@ class Voting extends Component {
       .on('receipt', receipt => {
         setStep(1);
         contractModel.refreshLastVoting();
+        accountStore.getBalance();
         this.setState({ isReturned: true });
         this.showAlert("Токены успешно возвращены")
       })
@@ -103,7 +109,7 @@ class Voting extends Component {
   }
   async closeVoting(e) {
     console.log(e.target.getAttribute('disabled'));
-    const { contractModel, setStep } = this.props;
+    const { contractModel, accountStore, setStep } = this.props;
     const { contract } = contractModel;
     const address = web3.eth.accounts.wallet[0].address;
     await this.setState({
@@ -121,6 +127,7 @@ class Voting extends Component {
         .on('receipt', async (receipt) => {
           setStep(1);
           contractModel.refreshLastVoting();
+          accountStore.getBalance();
         })
     }
 

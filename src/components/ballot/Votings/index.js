@@ -443,7 +443,7 @@ class Votings extends Component {
 
   async startVoting(e) {
     e.preventDefault();
-    const { contractModel } = this.props;
+    const { contractModel, accountStore } = this.props;
     const { contract, votingTemplate } = contractModel;
     const { questionId } = votingTemplate;
 
@@ -480,6 +480,7 @@ class Votings extends Component {
             });
             contractModel.setVotingStep(5)
             contractModel.getVotings();
+            accountStore.getBalance();
           });
       });
     } else {

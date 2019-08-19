@@ -59,9 +59,11 @@ class SetVoteModal extends Component {
               <p><strong className='note'>{questionId}</strong> {questionName}</p>
             </div>
             <div className={styles['modal-body__data']}>
-              {
-                votingParameters
-              }
+              <div className={styles['modal-body__data-parameters']}>
+                {
+                  votingParameters
+                }
+              </div>
             </div>
             <div className={styles['modal-body__form']}>
               <h2>{`Я голосую ${text}`}</h2>

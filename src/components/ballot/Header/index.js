@@ -22,6 +22,8 @@ class Header extends Component {
     }
   }
   componentWillMount() {
+    const { accountStore } = this.props;
+    accountStore.getBalance();
     this.prettyAddress();
   }
 
@@ -58,15 +60,16 @@ class Header extends Component {
     const { balances, userGroups } = contractModel;
     const groups = Object.keys(balances)
 
-    const userBalances = userGroups.map(group => [group.name, balances[group.groupAddress].balances[address]])
+    const userBalances = userGroups.map(group => [group.name, balances[group.groupAddress].balances[address], balances[group.groupAddress].symbol])
 
     this.setState({ userBalances })
   }
 
   render() {
+    const { accountStore } = this.props;
     const { userBalances } = this.state
     const balances = userBalances.map(balance => {
-      return <tr> <td><strong style={{ color: '#3AD29F' }}>{balance[0]}</strong></td> <td> <strong>{balance[1]}</strong> TKN</td></tr>
+      return <tr> <td><strong style={{ color: '#3AD29F' }}>{balance[0]}</strong></td> <td> <strong>{balance[1]}</strong> {balance[2]}</td></tr>
     })
     return (
       <header className={styles.header}>
@@ -133,6 +136,7 @@ class Header extends Component {
                   </tr>
                 </thead>
                 <tbody>
+                  <tr> <td><strong style={{ color: '#3AD29F' }}>Etherium</strong></td> <td> <strong>{accountStore.balance}</strong> ETH</td></tr>
                   {balances}
                 </tbody>
               </table>

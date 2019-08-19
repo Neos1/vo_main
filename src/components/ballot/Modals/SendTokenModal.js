@@ -126,7 +126,7 @@ class SendTokenModal extends Component {
 
 
   sendToken() {
-    const { contractModel, address: fromAddress, type, contractAddress } = this.props;
+    const { contractModel, accountStore, address: fromAddress, type, contractAddress } = this.props;
     const { addressWho, count } = this.state;
     const address = web3.eth.accounts.wallet[0].address
 
@@ -140,6 +140,7 @@ class SendTokenModal extends Component {
         .on('receipt', async receipt => {
           await this.setState({ step: 2 });
           contractModel.updateBalance(type, contractAddress, address)
+          accountStore.getBalance();
         })
     } else {
       const abi = window.__ENV == 'development'
@@ -151,6 +152,7 @@ class SendTokenModal extends Component {
           await this.setState({ step: 2 });
           contractModel.updateBalance(type, contractAddress, fromAddress)
           contractModel.updateBalance(type, contractAddress, addressWho)
+          accountStore.getBalance();
         })
     }
 
