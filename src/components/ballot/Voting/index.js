@@ -388,13 +388,13 @@ class Voting extends Component {
       <div className={styles['voting-expanded__split-start']}>
         <label className={`${userVote == 2 ? 'hidden' : ''}`}>
           <span> {`${userVote == 1 ? 'Вы проголосовали' : ''}`} ЗА </span>
-          <button className={`btn btn--positive`} onClick={isVoted ? '' : this.prepareToVote.bind(this, true, votingParams)}>
+          <button className={`btn btn--positive`} onClick={isVoted ? null : this.prepareToVote.bind(this, true, votingParams)}>
             <img src={positive}></img>
           </button>
         </label>
         <label className={`${userVote == 1 ? 'hidden' : ''}`}>
           <span>{`${userVote == 2 ? 'Вы проголосовали' : ''}`} ПРОТИВ </span>
-          <button className={`btn btn--red`} onClick={isVoted ? '' : this.prepareToVote.bind(this, false, votingParams)}>
+          <button className={`btn btn--red`} onClick={isVoted ? null : this.prepareToVote.bind(this, false, votingParams)}>
             <img src={negative}></img>
           </button>
         </label>

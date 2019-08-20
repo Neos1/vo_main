@@ -444,6 +444,15 @@
         }
       }
 
+      .react-datepicker-wrapper {
+        width: 100px;
+        .react-datepicker__input-container {
+          width: 100px;
+        }
+        input {
+          width: inherit;
+        }
+      }
       &-groups {
         display: block;
         margin: 20px 0;
@@ -463,6 +472,8 @@
     }
   }
 }
+
+
 
 $loader-size: 100px;
 $loader-dot-size: ($loader-size / 5);

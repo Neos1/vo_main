@@ -3,12 +3,12 @@ import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import Select from "react-select";
 import CustomSelect from "../../common/Select";
-import moment from "moment";
 import close from "../../../img/modal-close.svg";
 
-import DayPickerInput from "react-day-picker/DayPickerInput";
-import { formatDate, parseDate } from "react-day-picker/moment";
-import "react-day-picker/lib/style.css";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import moment from "moment";
+import 'react-day-picker/lib/style.css';
+import { formatDate, parseDate } from 'react-day-picker/moment';
 
 import "../../../styles/ballot/basic.scss";
 import styles from "./style.scss";
@@ -31,6 +31,8 @@ import Alert from "../../common/Alert";
 class Votings extends Component {
   constructor(props) {
     super(props);
+    this.handleFromChange = this.handleFromChange.bind(this);
+    this.handleToChange = this.handleToChange.bind(this);
     this.state = {
       loading: false,
       expanded: true,
@@ -450,7 +452,7 @@ class Votings extends Component {
     let privateKey = web3.eth.accounts.wallet[0].privateKey;
     let votingData = await this.createVotingData(document.forms.votingData);
 
-    console.log(this.state.invalidFormula)
+
     if (!this.state.invalidFormula) {
       let data = contract.methods
         .startNewVoting(questionId, 0, 0, votingData)
@@ -502,14 +504,26 @@ class Votings extends Component {
     });
     this.filterVotings(selected.value);
   }
-  async handleFromChange(from) {
-    // Change the from date and focus the "to" input field
-    await this.setState({ from });
-    this.filterVotings();
+
+  showFromMonth() {
+    const { from, to } = this.state;
+    if (!from) {
+      return;
+    }
+    if (moment(to).diff(moment(from), 'months') < 2) {
+      this.to.getDayPicker().showMonth(from);
+    }
   }
-  async handleToChange(to) {
-    await this.setState({ to });
-    this.filterVotings();
+
+ async handleFromChange(from) {
+    // Change the from date and focus the "to" input field
+    this.setState({ from });
+    this.filterVotings()
+  }
+
+ async handleToChange(to) {
+    this.setState({ to }, this.showFromMonth);
+    this.filterVotings()
   }
 
   filterVotings() {
@@ -520,8 +534,10 @@ class Votings extends Component {
       from: this.state.from,
       to: this.state.to
     };
+
     contractModel.filterVotings(params);
   }
+
   validateInputs(target) {
     let inputs = target.querySelectorAll("input");
     let valids = [];
@@ -664,7 +680,7 @@ class Votings extends Component {
                 options={contractModel.votingsPages}
               />
             </label>
-            <label
+            <div
               className={`${styles["section-votings__filters-numbers"]} 
                                ${
                 styles[
@@ -682,14 +698,15 @@ class Votings extends Component {
                   parseDate={parseDate}
                   dayPickerProps={{
                     selectedDays: [from, { from, to }],
+                    disabledDays: { after: to },
                     toMonth: to,
                     modifiers,
                     numberOfMonths: 2,
-                    onDayClick: () => this.to.getInput().focus()
+                    onDayClick: () => this.to.getInput().focus(),
                   }}
-                  onDayChange={this.handleFromChange.bind(this)}
-                />{" "}
-                —{" "}
+                  onDayChange={this.handleFromChange}
+                />{' '}
+                —{' '}
                 <span className="InputFromTo-to">
                   <DayPickerInput
                     ref={el => (this.to = el)}
@@ -700,16 +717,17 @@ class Votings extends Component {
                     parseDate={parseDate}
                     dayPickerProps={{
                       selectedDays: [from, { from, to }],
+                      disabledDays: { before: from },
                       modifiers,
                       month: from,
                       fromMonth: from,
-                      numberOfMonths: 2
+                      numberOfMonths: 2,
                     }}
-                    onDayChange={this.handleToChange.bind(this)}
+                    onDayChange={this.handleToChange}
                   />
                 </span>
               </div>
-            </label>
+            </div>
           </div>
 
           {this.state.loading ? loaderRight : renderVotings}

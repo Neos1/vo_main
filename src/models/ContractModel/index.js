@@ -107,6 +107,9 @@ class ContractModel {
       }
       this.questions.push(question);
     }
+    this.questions.map((question, index) => {
+      question.questionId = index + 1;
+    });
     this.bufferQuestions = this.questions;
     localStorage.setItem(
       `questions[${this.contract._address}]`,
@@ -126,10 +129,10 @@ class ContractModel {
 
   @action filterQuestionsByPage(page) {
     if (page != null) {
-      let start = Number(page) * 10;
+      let start = Number(page) * 10 + 1;
       let end = start + 9;
       this.bufferQuestions = this.questions.filter((question, index) => {
-        return index >= start && index <= end;
+        return question.questionId >= start && question.questionId <= end;
       });
     } else {
       return false;
@@ -207,10 +210,10 @@ class ContractModel {
   }
   @action filterByPage(page) {
     if (page != null) {
-      let start = Number(page) * 10;
+      let start = Number(page) * 10 + 1;
       let end = start + 9;
       this.bufferVotings = this.bufferVotings.filter((voting, index) => {
-        return index >= start && index <= end;
+        return voting.votingId >= start && voting.votingId <= end;
       });
     } else {
       return false;
@@ -528,6 +531,12 @@ class ContractModel {
     let voting = await contract.methods.voting(index).call({
       from: address
     });
+    let userVote = await this.contract.methods.getUserVote(index).call({
+      from: address
+    })
+    let votesPercents = await contract.methods.getVotes(index).call({ from: address })
+    voting['votesPercents'] = votesPercents
+    voting['userVote'] = userVote;
     voting.votingId = index;
     this.votings[index - 1] = voting;
     this.bufferVotings = this.votings
