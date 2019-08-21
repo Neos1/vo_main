@@ -271,11 +271,13 @@ class Votings extends Component {
     );
   }
   getActiveVotingPanel() {
+    const { contractModel } = this.props;
+    const { moveFromOtherPage } = contractModel;
     return (
       <div>
         <div className={styles["section-parameters__active"]}>
           <img src={VotingActive} />
-          <h1>Голосование запущено</h1>
+          <h1>Голосование {moveFromOtherPage ? "уже" : ''} запущено</h1>
           <p>
             Вы сможете начать новое голосование, после того как завершится
             активное
@@ -515,14 +517,14 @@ class Votings extends Component {
     }
   }
 
- async handleFromChange(from) {
+  async handleFromChange(from) {
     // Change the from date and focus the "to" input field
-    this.setState({ from });
+    await this.setState({ from });
     this.filterVotings()
   }
 
- async handleToChange(to) {
-    this.setState({ to }, this.showFromMonth);
+  async handleToChange(to) {
+    await this.setState({ to }, this.showFromMonth);
     this.filterVotings()
   }
 

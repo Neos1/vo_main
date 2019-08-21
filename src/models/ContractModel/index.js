@@ -10,6 +10,7 @@ class ContractModel {
   @observable userGroups = [];
   @observable questionGroups = [];
   @observable balances = {}
+  @observable moveFromOtherPage = false;
 
   @observable bufferQuestions = [];
   @observable bufferVotings = [];

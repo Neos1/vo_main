@@ -43,9 +43,10 @@ class Voting extends Component {
     await this.getTime();
     await this.getVotingDescision();
     await this.getVotesPercents();
+    await this.getUserVote(data.votingId)
     await this.setState({
       interval: data.status == 0
-        ? setInterval(() => { this.refreshVoting() }, 60 * 1000)
+        ? setInterval(() => { this.refreshVoting() }, 10 * 1000)
         : ''
     })
   }
@@ -75,7 +76,8 @@ class Voting extends Component {
   async getUserVote(id) {
     const { contractModel, data } = this.props;
     const { contract } = contractModel;
-    let userVote = data.userVote || "0"
+    let userVote = data.userVote
+    console.log(data.votingId, data.userVote);
     let isReturned = await contract.methods.isUserReturnTokens(data.votingId, web3.eth.accounts.wallet[0].address).call({ from: web3.eth.accounts.wallet[0].address })
     await this.setState({ userVote, isReturned });
   }
@@ -106,6 +108,7 @@ class Voting extends Component {
       expanded: !this.state.expanded
     })
   }
+
   async closeVoting(e) {
     const { contractModel, accountStore, setStep } = this.props;
     const { contract } = contractModel;
@@ -125,11 +128,14 @@ class Voting extends Component {
         .on('receipt', async (receipt) => {
           setStep(1);
           contractModel.refreshLastVoting();
+          this.refreshVoting();
           accountStore.getBalance();
+          contractModel.moveFromOtherPage = false;
         })
     }
 
   }
+
   getFlow() {
     const { contractModel, data } = this.props;
     const { remaining, percent, status } = this.state;
@@ -168,6 +174,7 @@ class Voting extends Component {
       </div>
     )
   }
+
   getVotingDescision() {
     const { contractModel, index, data } = this.props;
     const { contract } = contractModel;
@@ -181,8 +188,8 @@ class Voting extends Component {
 
   getDescision() {
     const { descision, userVote, isReturned } = this.state;
+    const { data } = this.props;
     const isVoted = (userVote != 0 && userVote != null);
-
     let descisions = {
       0: {
         text: "НЕ ПРИНЯТО",
@@ -213,6 +220,7 @@ class Voting extends Component {
       </div>
     )
   }
+
   getTime() {
     const { data } = this.props;
 

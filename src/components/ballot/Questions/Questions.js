@@ -29,6 +29,10 @@ class Questions extends Component {
   componentWillMount() {
     this.getData();
   }
+  componentWillUnmount() {
+    let { contractModel } = this.props;
+    contractModel.moveFromOtherPage = true;
+  }
 
   async getData() {
     this.setState({

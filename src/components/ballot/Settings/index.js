@@ -5,6 +5,10 @@ import Container from '../Container';
 
 
 class Settings extends React.Component {
+    componentWillUnmount() {
+        let { contractModel } = this.props;
+        contractModel.moveFromOtherPage = true;
+    }
     render() {
         return (
             <RequiredAuthorization>

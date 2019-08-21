@@ -66,9 +66,11 @@ class Question extends Component {
     }
 
     const vars = {
-      int: 'Число',
+      uint: 'Число',
       string: 'Строка',
       address: 'Адрес',
+      bytes4: 'Строка (4 байта)',
+      "bytes32[]": 'Параметры нового вопроса'
     }
 
     const params = this.getUtfParams(data._parameters);
