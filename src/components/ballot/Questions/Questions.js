@@ -11,6 +11,7 @@ import questionIcon from "../../../img/addQuestion_icon.svg";
 import Question from "../Question/Question";
 import { Redirect } from "react-router";
 import Loader from "../../common/Loader";
+import OptionsSelect from "../../common/Select/OptionsSelect";
 
 @inject("contractModel")
 @observer
@@ -20,7 +21,7 @@ class Questions extends Component {
     this.state = {
       loading: true,
       redirect: false,
-      selectedType: "",
+      selectedType: 0,
       selectedRange: "",
       page: 0
     };
@@ -53,11 +54,12 @@ class Questions extends Component {
   }
 
   async selectType(selected) {
-    await this.setState({ selectedType: selected.value });
+    await this.setState({ selectedType: selected });
+    console.log(selected)
     this.filterQuestions();
   }
   async selectRange(selected) {
-    await this.setState({ page: selected.value });
+    await this.setState({ page: selected });
     this.filterQuestions();
   }
 
@@ -125,27 +127,19 @@ class Questions extends Component {
           <div className={styles["section-questions__filters"]}>
             <label className={styles["section-questions__filters-numbers"]}>
               <span> Номера </span>
-              <Select
-                multi={false}
-                searchable={false}
-                clearable={false}
-                placeholder={"Выберитe номер"}
+              <OptionsSelect
                 value={this.state.page}
-                onChange={this.selectRange.bind(this)}
+                onClick={this.selectRange.bind(this)}
                 options={contractModel.questionsPages}
+                isPagination={true}
               />
             </label>
 
             <label className={styles["section-questions__filters-groups"]}>
               <span> Группа вопросов </span>
-
-              <Select
-                multi={false}
-                searchable={false}
-                clearable={false}
-                placeholder="Тип вопросов"
+              <OptionsSelect
                 value={this.state.selectedType}
-                onChange={this.selectType.bind(this)}
+                onClick={this.selectType.bind(this)}
                 options={contractModel.groupsOfQuestions}
               />
             </label>

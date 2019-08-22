@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { observable } from "mobx";
 import Select from "react-select";
 import CustomSelect from "../../common/Select";
+import OptionSelect from "../../common/Select/OptionsSelect";
+
 import close from "../../../img/modal-close.svg";
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -41,7 +43,7 @@ class Votings extends Component {
       selected: 0,
       questionId: 0,
       invalidFormula: false,
-      id: null,
+      id: 0,
       from: undefined,
       to: undefined,
       descision: false,
@@ -236,14 +238,10 @@ class Votings extends Component {
             <p className={styles["section-parameters__content-subheading"]}>
               Административные токены
           </p>
-            <Select
-              multi={false}
-              searchable={false}
-              clearable={false}
-              value={contractModel.votingTemplate.questionId}
-              onChange={this.handleSelect.bind(this)}
-              placeholder="Вопрос"
+            <OptionSelect
               options={contractModel.optionsForVoting}
+              value={contractModel.votingTemplate.questionId}
+              onClick={this.handleSelect.bind(this)}
             />
           </div>
 
@@ -296,10 +294,11 @@ class Votings extends Component {
   }
 
   handleSelect(selected) {
+    console.log(selected)
     const { contractModel } = this.props;
-    contractModel.prepareVoting(Number(selected.value));
+    contractModel.prepareVoting(Number(selected));
     this.setState({
-      selected: selected.value - 1,
+      selected: selected - 1,
       hints: contractModel.hints[selected.value - 1],
       invalidFormula: false
     });
@@ -496,15 +495,15 @@ class Votings extends Component {
 
   async selectQuestionId(selected) {
     await this.setState({
-      questionId: Number(selected.value)
+      questionId: Number(selected)
     });
     this.filterVotings();
   }
   async selectIdFromTo(selected) {
     await this.setState({
-      id: selected.value
+      id: selected
     });
-    this.filterVotings(selected.value);
+    this.filterVotings();
   }
 
   showFromMonth() {
@@ -653,13 +652,9 @@ class Votings extends Component {
                 }`}
             >
               <span> Вопрос </span>
-              <Select
-                multi={false}
-                searchable={false}
-                clearable={false}
-                placeholder={"Выберите вопрос"}
+              <OptionSelect
                 value={this.state.questionId}
-                onChange={this.selectQuestionId.bind(this)}
+                onClick={this.selectQuestionId.bind(this)}
                 options={contractModel.options}
               />
             </label>
@@ -671,15 +666,11 @@ class Votings extends Component {
                 }`}
             >
               <span> Номера </span>
-              <Select
-                multi={false}
-                searchable={false}
-                clearable={false}
-                value={0}
-                placeholder={"Номер"}
+              <OptionSelect
                 value={this.state.id}
-                onChange={this.selectIdFromTo.bind(this)}
+                onClick={this.selectIdFromTo.bind(this)}
                 options={contractModel.votingsPages}
+                isPagination={true}
               />
             </label>
             <div

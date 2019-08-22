@@ -1006,7 +1006,6 @@ class Login extends React.Component {
                 console.info("Solc Version Loaded: " + version);
                 console.info("Solc loaded.  Compiling...");
                 window.result = compiler.compile(contract);
-                console.log(result);
                 result ? this.substep = 2 : '';
                 if (result.contracts[contractID].interface !== "") {
                     let bytecode = result.contracts[contractID].bytecode;

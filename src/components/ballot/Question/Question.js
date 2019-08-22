@@ -50,7 +50,6 @@ class Question extends Component {
 
   prepareVoting(index, params) {
     const { contractModel } = this.props;
-    console.log(index);
     contractModel.prepareVoting(index, params);
     this.setState({
       redirect: true

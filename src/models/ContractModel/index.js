@@ -130,7 +130,7 @@ class ContractModel {
 
   @action filterQuestionsByPage(page) {
     if (page != null) {
-      let start = Number(page) * 10 + 1;
+      let start = (Number(page) - 1) * 10 + 1;
       let end = start + 9;
       this.bufferQuestions = this.questions.filter((question, index) => {
         return question.questionId >= start && question.questionId <= end;
@@ -140,9 +140,9 @@ class ContractModel {
     }
   }
   @action filterQuestionsByType(type) {
-    this.bufferQuestions = this.bufferQuestions.filter(question => {
-      console.log(question.groupId == Number(type) + 1);
-      return question.groupId == Number(type) + 1;
+    console.log(type);
+    this.bufferQuestions = type == 0 ? this.bufferQuestions : this.bufferQuestions.filter(question => {
+      return question.groupId == Number(type);
     });
   }
 
@@ -210,8 +210,8 @@ class ContractModel {
         : this.votings.slice().sort((a, b) => (a.votingId < b.votingId ? 1 : -1));
   }
   @action filterByPage(page) {
-    if (page != null) {
-      let start = Number(page) * 10 + 1;
+    if (page != 0) {
+      let start = (Number(page) - 1) * 10 + 1;
       let end = start + 9;
       this.bufferVotings = this.bufferVotings.filter((voting, index) => {
         return voting.votingId >= start && voting.votingId <= end;
@@ -319,23 +319,32 @@ class ContractModel {
   @computed get options() {
     let options = [
       {
-        value: null,
+        value: 0,
         label: "Все вопросы"
       }
     ];
     this.questions.map((item, index) =>
       options.push({
-        value: index + 1,
-        label: `${index + 1} ${item.caption}`
+        value: index,
+        label: item.caption
       })
     );
     return options;
   }
   @computed get optionsForVoting() {
-    return this.questions.map((item, index) => ({
-      value: index + 1,
-      label: `${index + 1} ${item.caption}`
-    }));
+    let options = [
+      {
+        value: 0,
+        label: "Выберите"
+      }
+    ];
+    this.questions.map((item, index) => {
+      options.push({
+        value: index,
+        label: `${item.caption}`
+      })
+    });
+    return options;
   }
   //* options with questions for selects end
 
@@ -343,14 +352,14 @@ class ContractModel {
   @computed get votingsPages() {
     let options = [
       {
-        value: null,
+        value: 0,
         label: "Все"
       }
     ];
     let length = this.votings.length;
     if (length / 10 < 1) {
       let option = {
-        value: 0,
+        value: 1,
         label: `1-${length}`
       };
       options.push(option);
@@ -358,8 +367,8 @@ class ContractModel {
       let count = Math.ceil(length / 10);
       for (let i = 0; i < count; i++) {
         let option = {
-          value: i,
-          label: `${i * 10 + 1}-${i * 10 + 10}`
+          value: i + 1,
+          label: `${(i) * 10 + 1}-${i * 10 + 10}`
         };
         options.push(option);
       }
@@ -371,14 +380,14 @@ class ContractModel {
   @computed get questionsPages() {
     let options = [
       {
-        value: null,
+        value: 0,
         label: "Все вопросы"
       }
     ];
     let length = this.questions.length;
     if (length / 10 < 1) {
       let option = {
-        value: 0,
+        value: 1,
         label: `1-${length}`
       };
       options.push(option);
@@ -386,7 +395,7 @@ class ContractModel {
       let count = Math.ceil(length / 10);
       for (let i = 0; i < count; i++) {
         let option = {
-          value: i,
+          value: i + 1,
           label: `${i * 10 + 1}-${i * 10 + 10}`
         };
         options.push(option);
@@ -398,7 +407,7 @@ class ContractModel {
   @computed get groupsOfQuestions() {
     let options = [
       {
-        value: null,
+        value: 0,
         label: "Все вопросы"
       }
     ];
@@ -406,7 +415,7 @@ class ContractModel {
     this.questionGroups.map((group, index) => {
       options.push({
         value: index + 1,
-        label: `${index + 1} ${group.name}`
+        label: group.name
       });
     });
 
@@ -415,6 +424,9 @@ class ContractModel {
 
   @action prepareVoting(id) {
     const { questions } = this;
+    console.log(id)
+    console.log(questions[id])
+    console.log(questions[id - 1])
     let parameters = questions[id - 1]._parameters;
     let params = [];
 

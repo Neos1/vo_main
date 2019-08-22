@@ -52,12 +52,9 @@ class SetVoteModal extends Component {
     let questionName = Number(questionId) ? contractModel.questions[questionId - 1].caption : '';
     let votingParameters = userVote.parameters.map((param, index) => {
       let parameter;
-      console.log(param[0], param[1])
       if (web3.utils.hexToUtf8(param[0]) == 'Formula') {
         parameter = this.getFormula(param[1])
-        console.log(parameter)
       } else if (web3.utils.hexToUtf8(param[0]) == 'parameters') {
-        console.log(parameter)
         parameter = param[1].map((subParam, index) => {
           if (index % 2 == 0) return (
             <span key={index} className={styles['modal-body__data--subparameter']}>

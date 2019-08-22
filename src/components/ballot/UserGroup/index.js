@@ -63,7 +63,6 @@ class UserGroup extends Component {
     let userBalance = await contract.methods.balanceOf(userAddress).call({ from: userAddress })
     await contractModel.getBalances("Custom", address);
     let balances = contractModel.balances[address].balances
-    console.log("custom", balances)
     await this.setState({ symbol, totalSupply, balances });
   }
 

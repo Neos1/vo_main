@@ -77,7 +77,6 @@ class Voting extends Component {
     const { contractModel, data } = this.props;
     const { contract } = contractModel;
     let userVote = data.userVote
-    console.log(data.votingId, data.userVote);
     let isReturned = await contract.methods.isUserReturnTokens(data.votingId, web3.eth.accounts.wallet[0].address).call({ from: web3.eth.accounts.wallet[0].address })
     await this.setState({ userVote, isReturned });
   }

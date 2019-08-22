@@ -23,14 +23,12 @@ class UserGroups extends Component {
   componentWillMount() {
     const { contractModel } = this.props;
     contractModel.getUserGroups();
-    console.log(this.props);
   }
   componentWillUnmount() {
     let { contractModel } = this.props;
     contractModel.moveFromOtherPage = true;
   }
   toggleModal(type, groupAddress, userAddress) {
-    console.log(type, groupAddress, userAddress);
     this.setState({
       modalVisible: !this.state.modalVisible,
       type,
@@ -52,7 +50,6 @@ class UserGroups extends Component {
     const { userGroups } = contractModel;
     const { modalVisible, redirect } = this.state;
 
-    console.log(userGroups);
     if (redirect) return <Redirect to='/votings' />
     return (
       <div className={styles.wrapper}>

@@ -311,124 +311,38 @@
       flex-flow: row nowrap;
       justify-content: unset;
       &-numbers {
-        display: inline-block;
+        display: flex;
         margin-right: 25px;
-        .Select {
-          display: inline-block;
-          width: 80px;
-          height: 20px !important;
-          margin-bottom: 0;
-          box-sizing: border-box;
-          border: none;
-
-          &* {
-            border: none;
-          }
-
-          &.is-focused,
-          &.is-open,
-          &-multi-value-wrapper,
-          &-arrow-zone,
-          &-input,
-          &-control {
-            background: transparent !important;
-            height: 20px !important;
-            border: none !important;
-          }
-
-          &.is-focused,
-          &.is-open {
-            .Select-control {
-              background: transparent;
-
-              & > * {
-                height: 20px !important;
-              }
-            }
-          }
-
-          &-control {
-            width: 170px;
-            transition: 0.2s linear;
-            border: none;
+        .select {
+          &__heading {
+            height: auto;
+            padding: 0;
             background: transparent;
+            border: none; 
           }
-
-          &-placeholder {
-            color: #5b778d;
-            line-height: 20px;
-          }
-
-          &-value {
-            width: 90%;
-            padding: 0 !important;
-          }
-
-          &.is-open {
-            .Select-control {
-              border: none;
-              background: transparent;
-            }
-
-            .Select-arrow {
-              border: none !important;
-              transform: rotate(180deg);
-            }
-          }
-
-          &-arrow {
-            right: 10px;
-            top: -3px;
-            width: 15px;
-            height: 15px;
-            border: none !important;
-            background-image: url($image_path+"select-arrow_grey.svg");
-            background-position: center center;
-            background-repeat: no-repeat;
-          }
-
-          &-arrow-zone {
-            left: 15px;
-            border: none;
-          }
-
-          &-menu-outer {
-            top: 22px;
-          }
-
-          &-value > span {
-            line-height: 20px !important;
+          &__wrapper {
+            &:after {
+              top: 9px;
+            } 
           }
         }
 
         &--questions {
-          .Select {
+          .select {
             width: 185px !important;
-          }
-          .Select-control {
-            width: 185px ;
           }
         }
 
         &--descision {
-          .Select {
-            width: 120px ;
-          }
-          .Select-control {
+          .select {
             width: 120px ;
           }
         }
 
         &--id {
-          .Select {
+          .select {
             width: 75px;
             text-align: center;
-          }
-          .Select-control {
-            width: 75px;
-          }
-          .Select-arrow-zone {
-            left: 26px;
           }
         }
 

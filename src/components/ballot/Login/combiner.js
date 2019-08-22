@@ -42,7 +42,6 @@ const unite = (type) => {
     mainContract = mainContract.replace(new RegExp(/(calldata)/g), '');
     fs.writeFileSync(path.join(path_to_contract, './output.sol'), mainContract, 'utf8');
   } catch (e) {
-    console.log(e);
   }
 };
 
