@@ -1,0 +1,28 @@
+@import '../../assets/styles/partials/variables';
+.user {
+  display: inline-block;
+  font-size: 0;
+  border: 1px solid $primary;
+  cursor: pointer;
+  &__image {
+    vertical-align: middle;
+  }
+  &__wallet {
+    margin: 0 10px;
+    font-size: 12px;
+    vertical-align: middle;
+    &--full {
+      display: none;
+    }
+  }
+  &:hover {
+    .user__wallet {
+      &--full {
+        display: inline-block;
+      }
+      &--half {
+        display: none;
+      }
+    }
+  }
+}

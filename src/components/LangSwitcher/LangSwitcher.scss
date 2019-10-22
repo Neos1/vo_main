@@ -37,6 +37,7 @@
     border: 1px solid $border;
     visibility: hidden;
     opacity: 0;
+    transition: .2s linear;
   }
   &__option {
     display: block;

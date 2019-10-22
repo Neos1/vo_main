@@ -6,6 +6,7 @@ import Input from './components/Input';
 import {
   Password,
 } from './components/Icons';
+import LangSwitcher from './components/LangSwitcher';
 
 
 const App = () => (
@@ -16,6 +17,7 @@ const App = () => (
     <Input type="password" required={false} className="" placeholder="Введите пароль" errorText="Вы ошиблись, смиритесь и исправьтесь">
       <Password />
     </Input>
+    <LangSwitcher />
   </div>
 );
 export default App;
