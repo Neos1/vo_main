@@ -1,0 +1,122 @@
+@import "../../assets/styles/partials/variables";
+
+.btn {
+  padding: 0;
+  text-decoration: none;
+  border: none;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  transition: 0.2s linear;
+  svg,
+  &__text {
+    vertical-align: middle;
+  }
+  svg {
+    margin-right: 10px;
+    path,
+    circle {
+      transition: 0.2s;
+    }
+  }
+
+  &--big {
+    min-width: 140px;
+    padding: 30px 0;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  &--default {
+    min-width: 232px;
+    padding: 18px 0;
+    font-size: 12px;
+  }
+  &--small {
+    min-width: 124px;
+    padding: 5px;
+  }
+  &--black {
+    color: $white;
+    background-color: $primary;
+    border: 1px solid $primary;
+    &:hover {
+      color: $primary;
+      background-color: $white;
+      border-color: $lightGrey;
+    }
+    &:active {
+      border-color: $primary;
+    }
+  }
+  &--link {
+    color: $linkColor;
+    background-color: transparent;
+    border-bottom: 1px solid $linkColor;
+    svg {
+      path {
+        stroke: $linkColor;
+      }
+    }
+    &:hover {
+      color: $secondary;
+      border-color: $secondary;
+      svg {
+        path {
+          stroke: $secondary;
+        }
+      }
+    }
+  }
+  &--white {
+    color: $primary;
+    background-color: $white;
+    border: 1px solid $lightGrey;
+    svg {
+      path {
+        transition: 0.2s;
+        fill: #808080;
+      }
+      circle {
+        transition: 0.2s;
+        stroke: #808080;
+      }
+    }
+    &:hover {
+      border-color: $primary;
+      svg {
+        path {
+          fill: $primary;
+        }
+        circle {
+          stroke: $primary;
+        }
+      }
+    }
+    &:active {
+      color: $white;
+      background-color: $primary;
+      border-color: #808080;
+      svg {
+        path {
+          fill: $white;
+        }
+        circle {
+          stroke: $white;
+        }
+      }
+    }
+  }
+  &--dashed {
+    color: $grey;
+    border-style: dashed;
+    &:hover {
+      color: $primary;
+    }
+    &:active {
+      color: $white;
+    }
+  }
+  &--noborder {
+    border: none;
+  }
+}

@@ -1,0 +1,21 @@
+$primary: #000;
+$secondary: #4d4d4d;
+$white: #fff;
+
+$grey: rgba(
+  $color: $primary,
+  $alpha: 0.5
+);
+$lightGrey: rgba(
+  $color: $primary,
+  $alpha: 0.1
+);
+$placeholderColor: rgba(
+  $color: #181818,
+  $alpha: 0.5
+);
+$linkColor: rgba(
+  $color: #262626,
+  $alpha: 0.4
+);
+$border: #808080;

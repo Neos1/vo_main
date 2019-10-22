@@ -1,0 +1,46 @@
+@import '../../assets/styles/partials/variables';
+
+.lang {
+  display: inline-block;
+  &--selected {
+    position: relative;
+    display: block;
+    padding: 5px 0;
+    font-weight: bold;
+    &:hover {
+      & + .lang__options {
+        visibility: visible;
+        opacity: 1;
+      }
+      &:after {
+        border-color: transparent transparent $primary transparent;
+        border-width: 0px 3px 6px 3px;
+      }
+    }
+    &:after {
+      top: 50%;
+      right: 0;
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-color: $primary transparent transparent transparent;
+      border-style: solid;
+      border-width: 6px 3px 0 3px;
+      transform: translateY(-50%);
+      transition: .2s;
+      content: '';
+    }
+  }
+  &__options {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid $border;
+    visibility: hidden;
+    opacity: 0;
+  }
+  &__option {
+    display: block;
+    padding: 5px 0;
+    cursor: pointer;
+  }
+}

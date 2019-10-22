@@ -1,0 +1,17 @@
+{
+    "extends": [
+        "stylelint-config-rational-order"
+    ],
+    "plugins": [
+        "@namics/stylelint-bem"
+    ],
+    "rules": {
+        "plugin/stylelint-bem-namics": {
+            "patternPrefixes": [],
+            "helperPrefixes": []
+        },
+        "indentation": 2,
+        "at-rule-no-unknown": null
+    },
+    "syntax": "scss",
+}
