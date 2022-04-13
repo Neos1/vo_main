@@ -57,7 +57,7 @@
         "webpack-shell-plugin": "^0.5.0"
     },
     "dependencies": {
-        "async": "^2.6.1",
+        "async": "^3.2.2",
         "bignumber.js": "^7.0.1",
         "bip39": "^3.0.1",
         "bootstrap-4-grid": "^2.4.0",
